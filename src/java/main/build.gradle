@@ -3,17 +3,17 @@
   https://docs.gradle.org/current/userguide/plugins.html#sec:plugins_block
 ------------------------------------------------------------------------------*/
 plugins {
-    id 'java-library'         // See: https://docs.gradle.org/current/userguide/java_library_plugin.html
+  id 'java-library'         // See: https://docs.gradle.org/current/userguide/java_library_plugin.html
 }
 
 /*------------------------------------------------------------------------------
   Local sub-project properties
 ------------------------------------------------------------------------------*/
-description = 'The Nyx main library and entry point.'
+description = 'The Nyx Java main binaries'
 
 /*------------------------------------------------------------------------------
   Configurations
-*/
+------------------------------------------------------------------------------*/
 configurations {
   // Create new configurations used by other projects to use classes from this project.
   // In particular we need the Git scripts (in the test source set) to be available for other projects.
@@ -24,9 +24,9 @@ configurations {
 }
 
 /*------------------------------------------------------------------------------
-  Repositories and dependencies
+  Dependencies
   https://docs.gradle.org/current/userguide/dependency_management_for_java_projects.html
-*/
+------------------------------------------------------------------------------*/
 dependencies {
   // Import dependencies from other modules of this project
   api                   project(':src:java:version')
@@ -55,35 +55,35 @@ dependencies {
 // These tests are better isolated from unit tests (in the src/test directory of each sub project)
 // as they may take longer.
 testing {
-    suites {
-        // This is the built-in suite
-        test {
-            targets {
-                all { 
-                    testTask.configure {
-                        // Pass the name of the configuration file examples to tests.
-                        // We use the same files used for the documentation here.
-                        systemProperty 'extendedJSONExampleConfigurationFile', file("$rootDir/docs/main/docs/_includes/.nyx-extended.json").absolutePath
-                        systemProperty 'mediumJSONExampleConfigurationFile', file("$rootDir/docs/main/docs/_includes/.nyx-medium.json").absolutePath
-                        systemProperty 'simpleJSONExampleConfigurationFile', file("$rootDir/docs/main/docs/_includes/.nyx-simple.json").absolutePath
-                        systemProperty 'simplestJSONExampleConfigurationFile', file("$rootDir/docs/main/docs/_includes/.nyx-simplest.json").absolutePath
-                        systemProperty 'extendedYAMLExampleConfigurationFile', file("$rootDir/docs/main/docs/_includes/.nyx-extended.yaml").absolutePath
-                        systemProperty 'mediumYAMLExampleConfigurationFile', file("$rootDir/docs/main/docs/_includes/.nyx-medium.yaml").absolutePath
-                        systemProperty 'simpleYAMLExampleConfigurationFile', file("$rootDir/docs/main/docs/_includes/.nyx-simple.yaml").absolutePath
-                        systemProperty 'simplestYAMLExampleConfigurationFile', file("$rootDir/docs/main/docs/_includes/.nyx-simplest.yaml").absolutePath
-                    }
-                }
-            }
+  suites {
+    // This is the built-in suite
+    test {
+      targets {
+        all { 
+          testTask.configure {
+            // Pass the name of the configuration file examples to tests.
+            // We use the same files used for the documentation here.
+            systemProperty 'extendedJSONExampleConfigurationFile', file("$rootDir/docs/main/docs/_includes/.nyx-extended.json").absolutePath
+            systemProperty 'mediumJSONExampleConfigurationFile', file("$rootDir/docs/main/docs/_includes/.nyx-medium.json").absolutePath
+            systemProperty 'simpleJSONExampleConfigurationFile', file("$rootDir/docs/main/docs/_includes/.nyx-simple.json").absolutePath
+            systemProperty 'simplestJSONExampleConfigurationFile', file("$rootDir/docs/main/docs/_includes/.nyx-simplest.json").absolutePath
+            systemProperty 'extendedYAMLExampleConfigurationFile', file("$rootDir/docs/main/docs/_includes/.nyx-extended.yaml").absolutePath
+            systemProperty 'mediumYAMLExampleConfigurationFile', file("$rootDir/docs/main/docs/_includes/.nyx-medium.yaml").absolutePath
+            systemProperty 'simpleYAMLExampleConfigurationFile', file("$rootDir/docs/main/docs/_includes/.nyx-simple.yaml").absolutePath
+            systemProperty 'simplestYAMLExampleConfigurationFile', file("$rootDir/docs/main/docs/_includes/.nyx-simplest.yaml").absolutePath
+          }
         }
-
-        // Integration tests can be implemented in the directory src/integrationTest/[java|groovy]
-        integrationTest(JvmTestSuite) {
-            // Here we can configure additional dependencies, properties and options for these tests
-        }
-
-        // Functional tests can be implemented in the directory src/functionalTest/[java|groovy]
-        functionalTest(JvmTestSuite) {
-            // Here we can configure additional dependencies, properties and options for these tests
-        }
+      }
     }
+
+    // Integration tests can be implemented in the directory src/integrationTest/[java|groovy]
+    integrationTest(JvmTestSuite) {
+      // Here we can configure additional dependencies, properties and options for these tests
+    }
+
+    // Functional tests can be implemented in the directory src/functionalTest/[java|groovy]
+    functionalTest(JvmTestSuite) {
+      // Here we can configure additional dependencies, properties and options for these tests
+    }
+  }
 }

@@ -237,7 +237,7 @@ jobs:
       if: ${{ always() }}
       with:
         name: ${{ inputs.artifacts-name-prefix }}-${{ github.job }}-binaries
-        path: src/java/**/build/jar/
+        path: src/java/**/build/libs/
     - name: Publish the Java documentation artifacts
       uses: actions/upload-artifact@v4
       if: ${{ always() }}

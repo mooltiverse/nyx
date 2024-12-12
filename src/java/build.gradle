@@ -3,335 +3,410 @@
   https://docs.gradle.org/current/userguide/plugins.html#sec:plugins_block
 ------------------------------------------------------------------------------*/
 plugins {
-    /* Direct publishing to Maven Central is forbidden because contents need a bunch of validation steps to succeed.
-     * These validation steps wouldn't be necessary if we publish to private Maven repositories or others but in order
-     * to cope with Maven Central we need to use the Sonatype Open Source Software Repository Hosting (a.k.a. Sonatype OSSRH),
-     * which takes care of the validation and publication.
-     * 
-     * This complicates things as getting the contents to Maven Central actually needs a workflow to run. From our
-     * perspective here the workflows cosists of two steps:
-     * 1. publication to a Staging repository hosted on Sonatype Nexus (https://oss.sonatype.org/)
-     * 2. promote the Staging repository and release to Maven Central (https://search.maven.org/)
-     *
-     * With a little more detail:
-     * - step 1 completes with an apparently simple Maven publication to a staging repository but:
-     *      - a new Staging repository needs to be created at each publication, so additional initialization is required
-     *      - Sonatype Nexus is extremely slow so it needs peculiar timeouts and retries
-     *      - Sonatype Nexus needs some additional fields to be handled (i.e. 'stagingProfileId') which are also
-     *        needed in the next step (promoting) so they need to be shared with other plugins
-     * - step 2 is completely specific to Sonatype OSSRH as it needs to start the validation (by Promoting the repository)
-     *   and only when it succeeds (usually after several minutes, like ~10-20) publish the repository contents to Maven central
-     *   (which means Close and Release the Staging repository). During all this time the plugin retries to Promote
-     *   the repository on a regular basis to check ths current status and this is why so many retries (200-300) are required.
-     *
-     * If the above steps succeed it will take a while (a few minutes or more) before the content is visible on Maven Central.
-     *
-     * This is why we cannot simply use the 'maven-publish' plugin and, instead, we need:
-     * - Nexus Publish Plugin ('de.marcphilipp.nexus-publish') to publish contents to the staging repository (step 1)
-     *   This plugin is configured in the 'nexusPublishing' section where we can add the 'special' Nexus repositories
-     *   (considering that the 'sonatype' repository already comes with URLs preconfigured). Regular Maven repositories
-     *   that do not need the 'special' initialization must be configured in the regular Maven Publish plugin
-     *   section, not here. The plugin creates dynamically so many tasks (by repository, publications etc) but the
-     *   only one we need to explicitly care about is 'publishToSonatype', which actually initializes the
-     *   staging repository and loads the artifacts.
-     *   ATTENTION: this plugin depends on the regular 'maven-publish' plugin, which then is still there. What this
-     *   plugin does is just adding custom configurations to the 'sonatype' repositories in its specific configuration
-     *   and create all the 'initialization' tasks that 'publishToSonatype' depends on to properly initialize Nexus
-     *   repositories.
-     *   In other words: OTHER REGULAR MAVEN REPOSITORIES CAN STILL BE HANDLED BY THE STANDARD MAVEN PUBLISH PLUGIN
-     *   as long as they are configured outside of the 'nexusPublishing' specific section.
-     * - Nexus Staging Plugin ('io.codearte.nexus-staging') to close and promote the staging repository to Maven Central (step 2).
-     *   This plugin is configured in the 'nexusStaging' section and creates two additional tasks we use:
-     *      - 'closeAndReleaseRepository' does the actual promotion of the staging repository to Closed and released.
-     *        It must run after the publication to the Staging repository is complete
-     *      - 'getStagingProfile' is an utility task that enables to retrieve the Staging Profile ID dynamically instead
-     *        of hardcoding it
-     *   When this plugin fails it's usually because of the Sonatype Nexus server being too slow or faulty (this happens
-     *   more often that it should), or because there are some old stale Staging repositories pending. In this case you
-     *   see a message like "Wrong number of received repositories in state" and you can clean them up by connecting
-     *   to https://oss.sonatype.org/, log in with the project service account, click on 'Staging Repositories' and
-     *   delete the stale ones, if any.
-     * 
-     * Just for the records, if using the 'maven-publish' plugin even just for step 1 (publishing to the Staging repository)
-     * we face many issues like::
-     * - Staging repository fragmented into several repositories
-     * - timeouts occurring during connections
-     * - subsequent invocation of the 'closeAndReleaseRepository' task from the 'io.codearte.nexus-staging' plugin to
-     *   fail with errors
-     * The issues are documented at the Nexus Publish plugin home page (https://github.com/marcphilipp/nexus-publish-plugin/)
-     * and, among others, at:
-     * - https://github.com/Codearte/gradle-nexus-staging-plugin/issues/76
-     * - https://github.com/gradle/gradle/issues/5711#issuecomment-430170888
-     * - https://github.com/travis-ci/travis-ci/issues/9555#issuecomment-428799836
-     * - https://issues.sonatype.org/browse/OSSRH-6262
-     * - https://issues.sonatype.org/browse/OSSRH-5454
-     * - https://github.com/researchgate/gradle-release/issues/244#issuecomment-372794864
-     *
-     * This is why instead of using the 'maven-publish' plugin we need to use the 'de.marcphilipp.nexus-publish' plugin,
-     * (which in turn uses the 'maven-publish' but also adds workarounds to it)
-     *
-     * Another plugin used here is the 'signing' plugin, which just takes care of signing content before their publication
-     * (otherwise, without signatures, they woudln't pass the validation steps).
-     */
-    
-    // 'maven-publish' is implicitly applied by 'de.marcphilipp.nexus-publish'
-    //id 'maven-publish'                                          // See: https://docs.gradle.org/current/userguide/publishing_maven.html
-    id 'signing'                                                  // See: https://docs.gradle.org/current/userguide/signing_plugin.html
-    id 'de.marcphilipp.nexus-publish' version '0.4.0'             // See: https://github.com/marcphilipp/nexus-publish-plugin/
-    id 'io.codearte.nexus-staging' version '0.30.0'               // See: https://github.com/Codearte/gradle-nexus-staging-plugin/
+  /* Direct publishing to Maven Central is forbidden because contents need a bunch of validation steps to succeed.
+   * These validation steps wouldn't be necessary if we publish to private Maven repositories or others but in order
+   * to cope with Maven Central we need to use the Sonatype Open Source Software Repository Hosting (a.k.a. Sonatype OSSRH),
+   * which takes care of the validation and publication.
+   * 
+   * This complicates things as getting the contents to Maven Central actually needs a workflow to run. From our
+   * perspective here the workflows cosists of two steps:
+   * 1. publication to a Staging repository hosted on Sonatype Nexus (https://oss.sonatype.org/)
+   * 2. promote the Staging repository and release to Maven Central (https://search.maven.org/)
+   *
+   * With a little more detail:
+   * - step 1 completes with an apparently simple Maven publication to a staging repository but:
+   *      - a new Staging repository needs to be created at each publication, so additional initialization is required
+   *      - Sonatype Nexus is extremely slow so it needs peculiar timeouts and retries
+   *      - Sonatype Nexus needs some additional fields to be handled (i.e. 'stagingProfileId') which are also
+   *        needed in the next step (promoting) so they need to be shared with other plugins
+   * - step 2 is completely specific to Sonatype OSSRH as it needs to start the validation (by Promoting the repository)
+   *   and only when it succeeds (usually after several minutes, like ~10-20) publish the repository contents to Maven central
+   *   (which means Close and Release the Staging repository). During all this time the plugin retries to Promote
+   *   the repository on a regular basis to check ths current status and this is why so many retries (200-300) are required.
+   *
+   * If the above steps succeed it will take a while (a few minutes or more) before the content is visible on Maven Central.
+   *
+   * This is why we cannot simply use the 'maven-publish' plugin and, instead, we need:
+   * - Nexus Publish Plugin ('de.marcphilipp.nexus-publish') to publish contents to the staging repository (step 1)
+   *   This plugin is configured in the 'nexusPublishing' section where we can add the 'special' Nexus repositories
+   *   (considering that the 'sonatype' repository already comes with URLs preconfigured). Regular Maven repositories
+   *   that do not need the 'special' initialization must be configured in the regular Maven Publish plugin
+   *   section, not here. The plugin creates dynamically so many tasks (by repository, publications etc) but the
+   *   only one we need to explicitly care about is 'publishToSonatype', which actually initializes the
+   *   staging repository and loads the artifacts.
+   *   ATTENTION: this plugin depends on the regular 'maven-publish' plugin, which then is still there. What this
+   *   plugin does is just adding custom configurations to the 'sonatype' repositories in its specific configuration
+   *   and create all the 'initialization' tasks that 'publishToSonatype' depends on to properly initialize Nexus
+   *   repositories.
+   *   In other words: OTHER REGULAR MAVEN REPOSITORIES CAN STILL BE HANDLED BY THE STANDARD MAVEN PUBLISH PLUGIN
+   *   as long as they are configured outside of the 'nexusPublishing' specific section.
+   * - Nexus Staging Plugin ('io.codearte.nexus-staging') to close and promote the staging repository to Maven Central (step 2).
+   *   This plugin is configured in the 'nexusStaging' section and creates two additional tasks we use:
+   *      - 'closeAndReleaseRepository' does the actual promotion of the staging repository to Closed and released.
+   *        It must run after the publication to the Staging repository is complete
+   *      - 'getStagingProfile' is an utility task that enables to retrieve the Staging Profile ID dynamically instead
+   *        of hardcoding it
+   *   When this plugin fails it's usually because of the Sonatype Nexus server being too slow or faulty (this happens
+   *   more often that it should), or because there are some old stale Staging repositories pending. In this case you
+   *   see a message like "Wrong number of received repositories in state" and you can clean them up by connecting
+   *   to https://oss.sonatype.org/, log in with the project service account, click on 'Staging Repositories' and
+   *   delete the stale ones, if any.
+   * 
+   * Just for the records, if using the 'maven-publish' plugin even just for step 1 (publishing to the Staging repository)
+   * we face many issues like::
+   * - Staging repository fragmented into several repositories
+   * - timeouts occurring during connections
+   * - subsequent invocation of the 'closeAndReleaseRepository' task from the 'io.codearte.nexus-staging' plugin to
+   *   fail with errors
+   * The issues are documented at the Nexus Publish plugin home page (https://github.com/marcphilipp/nexus-publish-plugin/)
+   * and, among others, at:
+   * - https://github.com/Codearte/gradle-nexus-staging-plugin/issues/76
+   * - https://github.com/gradle/gradle/issues/5711#issuecomment-430170888
+   * - https://github.com/travis-ci/travis-ci/issues/9555#issuecomment-428799836
+   * - https://issues.sonatype.org/browse/OSSRH-6262
+   * - https://issues.sonatype.org/browse/OSSRH-5454
+   * - https://github.com/researchgate/gradle-release/issues/244#issuecomment-372794864
+   *
+   * This is why instead of using the 'maven-publish' plugin we need to use the 'de.marcphilipp.nexus-publish' plugin,
+   * (which in turn uses the 'maven-publish' but also adds workarounds to it)
+   *
+   * Another plugin used here is the 'signing' plugin, which just takes care of signing content before their publication
+   * (otherwise, without signatures, they woudln't pass the validation steps).
+   */
+
+  // 'maven-publish' is implicitly applied by 'de.marcphilipp.nexus-publish'
+  //id 'maven-publish'                                          // See: https://docs.gradle.org/current/userguide/publishing_maven.html
+  id 'signing'                                                  // See: https://docs.gradle.org/current/userguide/signing_plugin.html
+  id 'de.marcphilipp.nexus-publish' version '0.4.0'             // See: https://github.com/marcphilipp/nexus-publish-plugin/
+  id 'io.codearte.nexus-staging' version '0.30.0'               // See: https://github.com/Codearte/gradle-nexus-staging-plugin/
 }
 
 /*------------------------------------------------------------------------------
   Local sub-project properties
 ------------------------------------------------------------------------------*/
-description = 'All the Nyx Java artifacts'
+description = 'Java binaries'
 
 /*------------------------------------------------------------------------------
   This is the configuration for this project and all sub-projects
 ------------------------------------------------------------------------------*/
 allprojects {
-    /*------------------------------------------------------------------------------
-      Plugins DSL block
-      https://docs.gradle.org/current/userguide/plugins.html#sec:plugins_block
-    ------------------------------------------------------------------------------*/
-    apply plugin: 'java'                                // See: https://docs.gradle.org/current/userguide/java_plugin.html
-    apply plugin: 'eclipse'                             // See: https://docs.gradle.org/current/userguide/eclipse_plugin.html
+  /*------------------------------------------------------------------------------
+    Plugins DSL block
+    https://docs.gradle.org/current/userguide/plugins.html#sec:plugins_block
+  ------------------------------------------------------------------------------*/
+  apply plugin: 'java'                                // See: https://docs.gradle.org/current/userguide/java_plugin.html
+  apply plugin: 'eclipse'                             // See: https://docs.gradle.org/current/userguide/eclipse_plugin.html
 
-    // This plugin applied also to the global Java project makes available the 'testCodeCoverageReport'
-    // to aggregate all JaCoCo metrics from subprojects into one.
-    apply plugin: 'jacoco-report-aggregation'           // See: https://docs.gradle.org/current/userguide/jacoco_report_aggregation_plugin.html
+  // This plugin applied also to the global Java project makes available the 'testCodeCoverageReport'
+  // to aggregate all JaCoCo metrics from subprojects into one.
+  apply plugin: 'jacoco-report-aggregation'           // See: https://docs.gradle.org/current/userguide/jacoco_report_aggregation_plugin.html
 
-    /*------------------------------------------------------------------------------
-      Repositories and dependencies
-      https://docs.gradle.org/current/userguide/dependency_management_for_java_projects.html
-    ------------------------------------------------------------------------------*/
-    repositories {
-        mavenCentral()
-        maven {
-            name = "mavenDir"
-            // This repository is useful to check artifacts and their layout before they are published
-            url = "file://${buildDir}/maven"
-        }
+  /*------------------------------------------------------------------------------
+    Repositories
+    https://docs.gradle.org/current/userguide/dependency_management_for_java_projects.html
+  ------------------------------------------------------------------------------*/
+  repositories {
+    mavenCentral()
+    maven {
+      name = "mavenDir"
+      // This repository is useful to check artifacts and their layout before they are published
+      url = "file://${buildDir}/maven"
     }
+  }
 
-    dependencies {
-        // This lets the JaCoCo aggregator know which subprojects to aggregate from
-        jacocoAggregation subprojects.findAll()
-    }
-    reporting {
-        reports {
-            testCodeCoverageReport(JacocoCoverageReport) { 
-                // It looks there is no way to select all test types here,
-                // only one value is allowed and when empty the UNIT_TEST is assumed by default
-                /*
-                testType = TestSuiteType.UNIT_TEST
-                testType = TestSuiteType.INTEGRATION_TEST
-                testType = TestSuiteType.FUNCTIONAL_TEST
-                */
-            }
-        }
-    }
+  /*------------------------------------------------------------------------------
+    Configurations
+  ------------------------------------------------------------------------------*/
+  configurations {
+  }
 
-    /*------------------------------------------------------------------------------
-      Extension configurations
-    ------------------------------------------------------------------------------*/
-    compileJava {
-        //options.warnings      = false
-        //options.deprecation   = false
-        options.compilerArgs  += ["-Xlint:unchecked"]
-    }
-    compileTestJava {
-        //options.warnings      = false
-        //options.deprecation   = false
-        options.compilerArgs  += ["-Xlint:unchecked"]
-    }
+  /*------------------------------------------------------------------------------
+    Dependencies
+    https://docs.gradle.org/current/userguide/dependency_management_for_java_projects.html
+  ------------------------------------------------------------------------------*/
+  dependencies {
+    // This lets the JaCoCo aggregator know which subprojects to aggregate from
+    jacocoAggregation subprojects.findAll()
+  }
 
-    java {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
-
-        withSourcesJar()
-        withJavadocJar()
+  /*------------------------------------------------------------------------------
+    Reporting
+  ------------------------------------------------------------------------------*/
+  reporting {
+    reports {
+      testCodeCoverageReport(JacocoCoverageReport) { 
+        // It looks there is no way to select all test types here,
+        // only one value is allowed and when empty the UNIT_TEST is assumed by default
+        /*
+        testType = TestSuiteType.UNIT_TEST
+        testType = TestSuiteType.INTEGRATION_TEST
+        testType = TestSuiteType.FUNCTIONAL_TEST
+        */
+      }
     }
+  }
 
-    jar {
-        manifest {
-            attributes(
-                'Specification-Title'       : "${projectID} ${project.name}",
-                'Specification-Version'     : rootProject.version,
-                'Specification-Vendor'      : projectOrganizationName,
-                'Implementation-Title'      : "${projectID} ${project.name} java",
-                'Implementation-Version'    : rootProject.version,
-                'Implementation-Vendor'     : projectOrganizationName,
-                'Build-Timestamp'           : new java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ").format(new Date()),
-                'Build-Revision'            : rootProject.version,
-                'Created-By'                : "Gradle ${gradle.gradleVersion}",
-                'Build-Jdk'                 : "${System.properties['java.version']} (${System.properties['java.vendor']} ${System.properties['java.vm.version']})",
-                'Build-OS'                  : "${System.properties['os.name']} ${System.properties['os.arch']} ${System.properties['os.version']}"
-            )
-        }
+  jacocoTestReport {
+    reports {
+      xml.required = true
+      xml.outputLocation = new File(buildDir, "test/reports/xml")
+      html.required = true
+      html.outputLocation = new File(buildDir, "test/reports/html")
     }
+  }
 
-    javadoc {
-        options {
-            // Link generated javadocs to external docs
-            links 'https://download.eclipse.org/jgit/site/6.4.0.202211300538-r/apidocs/' // TODO: Update this link to https://download.eclipse.org/jgit/site/6.8.0.202311291450-r/apidocs/ when available (as of this writing it's not)
-            links 'https://www.slf4j.org/apidocs/'
-            links 'https://docs.gradle.org/current/javadoc/'
-            links 'https://junit.org/junit5/docs/current/api/'
-            links 'https://docs.oracle.com/en/java/javase/15/docs/api/'
-        }
-    }
+  /*------------------------------------------------------------------------------
+    Extension configurations
+  ------------------------------------------------------------------------------*/
+  compileJava {
+    //options.warnings      = false
+    //options.deprecation   = false
+    options.compilerArgs  += ["-Xlint:unchecked"]
+  }
+  compileTestJava {
+    //options.warnings      = false
+    //options.deprecation   = false
+    options.compilerArgs  += ["-Xlint:unchecked"]
+  }
 
-    // The Eclipse plugin is also used for VSCode.
-    // This plugin generates .project and .classpath files used by Eclipse and/or VSCode based on the Gradle configurations.
-    // There's still an issue caused by Buildship that always overwrites the generated .classpath with its own but at least
-    // it does so by taking into account also the values defined here.
-    // To clean and generate new .project and .classpath files run ./gradlew cleanEclipse eclipse
-    eclipse {
-        // control how the .project files are generated
-        //project {}
-        // control how the .classpath files are generated
-        classpath {
-            // the default output directory for java .class files
-            defaultOutputDir = file('build/classes')
-            // this is supposed to prevent Buildship to overwrite the .classpath file, according to
-            // https://stackoverflow.com/questions/49068870/buildship-keeps-overwriting-classpath
-            containers 'org.eclipse.buildship.core.gradleclasspathcontainer'
-        }
+  java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+
+    withSourcesJar()
+    withJavadocJar()
+  }
+
+  jar {
+    manifest {
+      attributes(
+        'Specification-Title'       : "${projectID} ${project.name}",
+        'Specification-Version'     : rootProject.version,
+        'Specification-Vendor'      : projectOrganizationName,
+        'Implementation-Title'      : "${projectID} ${project.name} java",
+        'Implementation-Version'    : rootProject.version,
+        'Implementation-Vendor'     : projectOrganizationName,
+        'Build-Timestamp'           : new java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ").format(new Date()),
+        'Build-Revision'            : rootProject.version,
+        'Created-By'                : "Gradle ${gradle.gradleVersion}",
+        'Build-Jdk'                 : "${System.properties['java.version']} (${System.properties['java.vendor']} ${System.properties['java.vm.version']})",
+        'Build-OS'                  : "${System.properties['os.name']} ${System.properties['os.arch']} ${System.properties['os.version']}"
+      )
     }
+  }
+
+  javadoc {
+    destinationDir = new File(buildDir, "api/docs")
+    options {
+      // Link generated javadocs to external docs
+      links 'https://download.eclipse.org/jgit/site/6.4.0.202211300538-r/apidocs/' // TODO: Update this link to https://download.eclipse.org/jgit/site/6.8.0.202311291450-r/apidocs/ when available (as of this writing it's not)
+      links 'https://www.slf4j.org/apidocs/'
+      links 'https://docs.gradle.org/current/javadoc/'
+      links 'https://junit.org/junit5/docs/current/api/'
+      links 'https://docs.oracle.com/en/java/javase/15/docs/api/'
+    }
+  }
+
+  // The Eclipse plugin is also used for VSCode.
+  // This plugin generates .project and .classpath files used by Eclipse and/or VSCode based on the Gradle configurations.
+  // There's still an issue caused by Buildship that always overwrites the generated .classpath with its own but at least
+  // it does so by taking into account also the values defined here.
+  // To clean and generate new .project and .classpath files run ./gradlew cleanEclipse eclipse
+  eclipse {
+    // control how the .project files are generated
+    //project {}
+    // control how the .classpath files are generated
+    classpath {
+      // the default output directory for java .class files
+      defaultOutputDir = file('build/classes')
+      // this is supposed to prevent Buildship to overwrite the .classpath file, according to
+      // https://stackoverflow.com/questions/49068870/buildship-keeps-overwriting-classpath
+      containers 'org.eclipse.buildship.core.gradleclasspathcontainer'
+    }
+  }
 }
 
 /*------------------------------------------------------------------------------
   This is the configuration for all sub-projects, but not this project
 ------------------------------------------------------------------------------*/
 subprojects {
-    /*------------------------------------------------------------------------------
-      Plugins DSL block
-      https://docs.gradle.org/current/userguide/plugins.html#sec:plugins_block
-    ------------------------------------------------------------------------------*/
-    apply plugin: 'jacoco'                              // See: https://docs.gradle.org/current/userguide/jacoco_plugin.html
-    //apply plugin: 'jacoco-report-aggregation'           // See: https://docs.gradle.org/current/userguide/jacoco_report_aggregation_plugin.html
+  /*------------------------------------------------------------------------------
+    Plugins DSL block
+    https://docs.gradle.org/current/userguide/plugins.html#sec:plugins_block
+  ------------------------------------------------------------------------------*/
+  apply plugin: 'jacoco'                              // See: https://docs.gradle.org/current/userguide/jacoco_plugin.html
+  //apply plugin: 'jacoco-report-aggregation'           // See: https://docs.gradle.org/current/userguide/jacoco_report_aggregation_plugin.html
 
-    //apply plugin: 'checkstyle'                        // See: https://docs.gradle.org/current/userguide/checkstyle_plugin.html
-    //apply plugin: 'pmd'                               // See: https://docs.gradle.org/current/userguide/pmd_plugin.html
+  //apply plugin: 'checkstyle'                        // See: https://docs.gradle.org/current/userguide/checkstyle_plugin.html
+  //apply plugin: 'pmd'                               // See: https://docs.gradle.org/current/userguide/pmd_plugin.html
 
-    // This plugin allows to have additional test sets, configured in a 'testing' block (see below)
-    apply plugin: 'jvm-test-suite'                      // See: https://docs.gradle.org/current/userguide/jvm_test_suite_plugin.html
+  // This plugin allows to have additional test sets, configured in a 'testing' block (see below)
+  apply plugin: 'jvm-test-suite'                      // See: https://docs.gradle.org/current/userguide/jvm_test_suite_plugin.html
 
-    /*------------------------------------------------------------------------------
-      Extension configurations
-    ------------------------------------------------------------------------------*/
-    // Additional test sets created using the 'jvm-test-suite'
-    // These tests are better isolated from unit tests (in the src/test directory of each sub project)
-    // as they may take longer.
-    testing {
-        suites {
-            // This configuration is common to all test suites
-            configureEach { 
-                useJUnitJupiter() //useJUnitPlatform()
-                targets {
-                    all { 
-                        testTask.configure {
-                            maxHeapSize = '1024m' 
-                            testLogging {
-                                events "passed", "skipped", "failed"
-                            }
-                        }
-                    }
-                }
+  /*------------------------------------------------------------------------------
+    Configurations
+  ------------------------------------------------------------------------------*/
+  configurations {
+    // make integrations tests configuration extend others
+    integrationTestImplementation.extendsFrom testImplementation
+    integrationTestRuntime.extendsFrom testRuntime
+    // make functional tests configuration extend others
+    functionalTestImplementation.extendsFrom testImplementation
+    functionalTestRuntime.extendsFrom testRuntime
+  }
+
+  /*------------------------------------------------------------------------------
+    Dependencies
+    https://docs.gradle.org/current/userguide/dependency_management_for_java_projects.html
+  ------------------------------------------------------------------------------*/
+  dependencies {
+  }
+
+  /*------------------------------------------------------------------------------
+    Extension configurations
+  ------------------------------------------------------------------------------*/
+  // Additional test sets created using the 'jvm-test-suite'
+  // These tests are better isolated from unit tests (in the src/test directory of each sub project)
+  // as they may take longer.
+  testing {
+    suites {
+      // This configuration is common to all test suites
+      configureEach { 
+        useJUnitJupiter() //useJUnitPlatform()
+        targets {
+          all { 
+            testTask.configure {
+              maxHeapSize = '1024m' 
+              testLogging {
+                events "passed", "skipped", "failed"
+              }
             }
-            // This is the built-in suite
-            test {
-                testType = TestSuiteType.UNIT_TEST
-                dependencies {
-                    // plug the Logback SLF4J implementation when testing so we can get log messages logged to the standard output
-                    runtimeOnly    'ch.qos.logback:logback-core:1.4.7'
-                    runtimeOnly    'ch.qos.logback:logback-classic:1.4.7'
-
-                    // The SLF4J framework that prints all test output to System err
-                    // See http://www.slf4j.org/apidocs/org/slf4j/impl/SimpleLogger.html for the system properties available to change verbosity levels
-                    runtimeOnly    'org.slf4j:slf4j-simple:2.0.12'
-                }
-            }
-
-            // Integration tests can be implemented in the directory src/integrationTest/[java|groovy]
-            integrationTest(JvmTestSuite) {
-                testType = TestSuiteType.INTEGRATION_TEST
-                dependencies {
-                    // allow production code to be added to the test dependencies
-                    implementation project()
-                }
-                targets {
-                    all { 
-                        testTask.configure {
-                            // Pass the credentials to test suites as per https://github.com/mooltiverse/nyx/blob/main/CONTRIBUTING.md#contributing-code
-                            // Suggestion is to set the $GRADLE_USER_HOME environment variable and create a gradle.properties therein, with these
-                            // properties defined
-                            systemProperty 'gitHubTestUserToken', findProperty("gitHubTestUserToken")
-                            systemProperty 'gitHubTestUserPublicKey', findProperty("gitHubTestUserPublicKey")
-                            systemProperty 'gitHubTestUserPrivateKeyPassphrase', findProperty("gitHubTestUserPrivateKeyPassphrase")
-                            systemProperty 'gitHubTestUserPrivateKeyWithPassphrase', findProperty("gitHubTestUserPrivateKeyWithPassphrase")
-                            systemProperty 'gitHubTestUserPrivateKeyWithoutPassphrase', findProperty("gitHubTestUserPrivateKeyWithoutPassphrase")
-                            systemProperty 'gitLabTestUserToken', findProperty("gitLabTestUserToken")
-                            systemProperty 'gitLabTestUserPublicKey', findProperty("gitLabTestUserPublicKey")
-                            systemProperty 'gitLabTestUserPrivateKeyPassphrase', findProperty("gitLabTestUserPrivateKeyPassphrase")
-                            systemProperty 'gitLabTestUserPrivateKeyWithPassphrase', findProperty("gitLabTestUserPrivateKeyWithPassphrase")
-                            systemProperty 'gitLabTestUserPrivateKeyWithoutPassphrase', findProperty("gitLabTestUserPrivateKeyWithoutPassphrase")
-                        }
-                    }
-                }
-            }
-
-            // Functional tests can be implemented in the directory src/functionalTest/[java|groovy]
-            functionalTest(JvmTestSuite) {
-                testType = TestSuiteType.FUNCTIONAL_TEST
-                dependencies {
-                    // allow production code to be added to the test dependencies
-                    implementation project()
-                }
-                targets {
-                    all { 
-                        testTask.configure {
-                            // Pass the credentials to test suites as per https://github.com/mooltiverse/nyx/blob/main/CONTRIBUTING.md#contributing-code
-                            // Suggestion is to set the $GRADLE_USER_HOME environment variable and create a gradle.properties therein, with these
-                            // properties defined
-                            systemProperty 'gitHubTestUserToken', findProperty("gitHubTestUserToken")
-                            systemProperty 'gitHubTestUserPublicKey', findProperty("gitHubTestUserPublicKey")
-                            systemProperty 'gitHubTestUserPrivateKeyPassphrase', findProperty("gitHubTestUserPrivateKeyPassphrase")
-                            systemProperty 'gitHubTestUserPrivateKeyWithPassphrase', findProperty("gitHubTestUserPrivateKeyWithPassphrase")
-                            systemProperty 'gitHubTestUserPrivateKeyWithoutPassphrase', findProperty("gitHubTestUserPrivateKeyWithoutPassphrase")
-                            systemProperty 'gitLabTestUserToken', findProperty("gitLabTestUserToken")
-                            systemProperty 'gitLabTestUserPublicKey', findProperty("gitLabTestUserPublicKey")
-                            systemProperty 'gitLabTestUserPrivateKeyPassphrase', findProperty("gitLabTestUserPrivateKeyPassphrase")
-                            systemProperty 'gitLabTestUserPrivateKeyWithPassphrase', findProperty("gitLabTestUserPrivateKeyWithPassphrase")
-                            systemProperty 'gitLabTestUserPrivateKeyWithoutPassphrase', findProperty("gitLabTestUserPrivateKeyWithoutPassphrase")
-
-                            // Pass the 'quickTests' property (if declared by user, i.e. running ''./gradlew -PquickTests=true') to reduce the number of tests
-                            systemProperty 'quickTests', findProperty("quickTests")
-                        }
-                    }
-                }
-            }
+          }
         }
-    }
+      }
+      // This is the built-in suite
+      test {
+        testType = TestSuiteType.UNIT_TEST
+        dependencies {
+          // plug the Logback SLF4J implementation when testing so we can get log messages logged to the standard output
+          runtimeOnly    'ch.qos.logback:logback-core:1.4.7'
+          runtimeOnly    'ch.qos.logback:logback-classic:1.4.7'
 
-    configurations {
-        // make integrations tests configuration extend others
-        integrationTestImplementation.extendsFrom testImplementation
-        integrationTestRuntime.extendsFrom testRuntime
-        // make functional tests configuration extend others
-        functionalTestImplementation.extendsFrom testImplementation
-        functionalTestRuntime.extendsFrom testRuntime
-    }
+          // The SLF4J framework that prints all test output to System err
+          // See http://www.slf4j.org/apidocs/org/slf4j/impl/SimpleLogger.html for the system properties available to change verbosity levels
+          runtimeOnly    'org.slf4j:slf4j-simple:2.0.12'
+        }
+        targets {
+          all { 
+            testTask.configure {
+              // Configure the output directory for test reports
+              binaryResultsDirectory = new File(buildDir, "test/unit/results/binary")
+              reports {
+                html {
+                  destination = new File(buildDir, "test/unit/results/html")
+                }
+                junitXml {
+                  destination = new File(buildDir, "test/unit/results/xml")
+                }
+              }
+            }
+          }
+        }
+      }
 
-    /*------------------------------------------------------------------------------
-      Additional task dependencies
-    ------------------------------------------------------------------------------*/
-    // Make sure all tests are finalized with the generation of JaCoCo coverave reports
-    tasks.test.finalizedBy tasks.jacocoTestReport
-    tasks.integrationTest.finalizedBy tasks.integrationTestCodeCoverageReport
-    tasks.functionalTest.finalizedBy tasks.functionalTestCodeCoverageReport
+      // Integration tests can be implemented in the directory src/integrationTest/[java|groovy]
+      integrationTest(JvmTestSuite) {
+        testType = TestSuiteType.INTEGRATION_TEST
+        dependencies {
+          // allow production code to be added to the test dependencies
+          implementation project()
+        }
+        targets {
+          all { 
+            testTask.configure {
+              // Configure the output directory for test reports
+              binaryResultsDirectory = new File(buildDir, "test/integration/results/binary")
+              reports {
+                html {
+                  destination = new File(buildDir, "test/integration/results/html")
+                }
+                junitXml {
+                  destination = new File(buildDir, "test/integration/results/xml")
+                }
+              }
+
+              // Pass the 'quickTests' property (if declared by user, i.e. running ''./gradlew -PquickTests=true') to reduce the number of tests
+              systemProperty 'quickTests', findProperty("quickTests")
+
+              // Pass the credentials to test suites as per https://github.com/mooltiverse/nyx/blob/main/CONTRIBUTING.md#contributing-code
+              // Suggestion is to set the $GRADLE_USER_HOME environment variable and create a gradle.properties therein, with these
+              // properties defined
+              systemProperty 'gitHubTestUserToken', findProperty("gitHubTestUserToken")
+              systemProperty 'gitHubTestUserPublicKey', findProperty("gitHubTestUserPublicKey")
+              systemProperty 'gitHubTestUserPrivateKeyPassphrase', findProperty("gitHubTestUserPrivateKeyPassphrase")
+              systemProperty 'gitHubTestUserPrivateKeyWithPassphrase', findProperty("gitHubTestUserPrivateKeyWithPassphrase")
+              systemProperty 'gitHubTestUserPrivateKeyWithoutPassphrase', findProperty("gitHubTestUserPrivateKeyWithoutPassphrase")
+              systemProperty 'gitLabTestUserToken', findProperty("gitLabTestUserToken")
+              systemProperty 'gitLabTestUserPublicKey', findProperty("gitLabTestUserPublicKey")
+              systemProperty 'gitLabTestUserPrivateKeyPassphrase', findProperty("gitLabTestUserPrivateKeyPassphrase")
+              systemProperty 'gitLabTestUserPrivateKeyWithPassphrase', findProperty("gitLabTestUserPrivateKeyWithPassphrase")
+              systemProperty 'gitLabTestUserPrivateKeyWithoutPassphrase', findProperty("gitLabTestUserPrivateKeyWithoutPassphrase")
+            }
+          }
+        }
+      }
+
+      // Functional tests can be implemented in the directory src/functionalTest/[java|groovy]
+      functionalTest(JvmTestSuite) {
+        testType = TestSuiteType.FUNCTIONAL_TEST
+        dependencies {
+          // allow production code to be added to the test dependencies
+          implementation project()
+        }
+        targets {
+          all { 
+            testTask.configure {
+              // Configure the output directory for test reports
+              binaryResultsDirectory = new File(buildDir, "test/functional/results/binary")
+              reports {
+                html {
+                  destination = new File(buildDir, "test/functional/results/html")
+                }
+                junitXml {
+                  destination = new File(buildDir, "test/functional/results/xml")
+                }
+              }
+
+              // Pass the 'quickTests' property (if declared by user, i.e. running ''./gradlew -PquickTests=true') to reduce the number of tests
+              systemProperty 'quickTests', findProperty("quickTests")
+
+              // Pass the credentials to test suites as per https://github.com/mooltiverse/nyx/blob/main/CONTRIBUTING.md#contributing-code
+              // Suggestion is to set the $GRADLE_USER_HOME environment variable and create a gradle.properties therein, with these
+              // properties defined
+              systemProperty 'gitHubTestUserToken', findProperty("gitHubTestUserToken")
+              systemProperty 'gitHubTestUserPublicKey', findProperty("gitHubTestUserPublicKey")
+              systemProperty 'gitHubTestUserPrivateKeyPassphrase', findProperty("gitHubTestUserPrivateKeyPassphrase")
+              systemProperty 'gitHubTestUserPrivateKeyWithPassphrase', findProperty("gitHubTestUserPrivateKeyWithPassphrase")
+              systemProperty 'gitHubTestUserPrivateKeyWithoutPassphrase', findProperty("gitHubTestUserPrivateKeyWithoutPassphrase")
+              systemProperty 'gitLabTestUserToken', findProperty("gitLabTestUserToken")
+              systemProperty 'gitLabTestUserPublicKey', findProperty("gitLabTestUserPublicKey")
+              systemProperty 'gitLabTestUserPrivateKeyPassphrase', findProperty("gitLabTestUserPrivateKeyPassphrase")
+              systemProperty 'gitLabTestUserPrivateKeyWithPassphrase', findProperty("gitLabTestUserPrivateKeyWithPassphrase")
+              systemProperty 'gitLabTestUserPrivateKeyWithoutPassphrase', findProperty("gitLabTestUserPrivateKeyWithoutPassphrase")
+            }
+          }
+        }
+      }
+    }
+  }
+
+  /*------------------------------------------------------------------------------
+    Additional task dependencies
+  ------------------------------------------------------------------------------*/
+  // Make sure all tests are finalized with the generation of JaCoCo coverave reports
+  tasks.test.finalizedBy tasks.jacocoTestReport
+  tasks.integrationTest.finalizedBy tasks.integrationTestCodeCoverageReport
+  tasks.functionalTest.finalizedBy tasks.functionalTestCodeCoverageReport
 }
 
 /*------------------------------------------------------------------------------
@@ -350,80 +425,80 @@ sourcesJar.from(subprojects.collect { it.sourceSets.main.allJava })
 // Maven publications are configured here for all java projects to grant more consistency when dealing with Sonatype Nexus.
 // Here we create one Maven publication for each project.
 allprojects.each {prj ->
-    publishing {
-        publications {
-            "$prj.name"(MavenPublication) {
-                afterEvaluate {
-                    artifactId = prj.name
-                    groupId = rootProject.group
-                    version = rootProject.version
-                    from prj.components.java
-                }
-
-                pom {
-                    name = prj.name
-                    // prj.description fails to evaluate because it's not yet available when publications are defined
-                    description = "$prj.group:$prj.name:$rootProject.version $prj.description"
-                    url = projectURL
-                    licenses {
-                        license {
-                            name = projectLicenseName
-                            url = projectLicenseURL
-                        }
-                    }
-                    developers {
-                        developer {
-                            id = projectID
-                            name = projectTeamName
-                            email = projectTeamEmail
-                            organization = projectOrganizationName
-                            organizationUrl = projectOrganizationURL
-                        }
-                    }
-                    scm {
-                        connection = projectGitURL
-                        developerConnection = projectGitURL
-                        url = projectURL
-                    }
-                }
-            }
+  publishing {
+    publications {
+      "$prj.name"(MavenPublication) {
+        afterEvaluate {
+          artifactId = prj.name
+          groupId = rootProject.group
+          version = rootProject.version
+          from prj.components.java
         }
+
+        pom {
+          name = prj.name
+          // prj.description fails to evaluate because it's not yet available when publications are defined
+          description = "$prj.group:$prj.name:$rootProject.version $prj.description"
+          url = projectURL
+          licenses {
+            license {
+              name = projectLicenseName
+              url = projectLicenseURL
+            }
+          }
+          developers {
+            developer {
+              id = projectID
+              name = projectTeamName
+              email = projectTeamEmail
+              organization = projectOrganizationName
+              organizationUrl = projectOrganizationURL
+            }
+          }
+          scm {
+            connection = projectGitURL
+            developerConnection = projectGitURL
+            url = projectURL
+          }
+        }
+      }
     }
+  }
 }
 
 /*------------------------------------------------------------------------------
   Extension configurations
 ------------------------------------------------------------------------------*/
 publishing {
-    repositories {
-        // The GitHub Packages repository, visible at https://github.com/mooltiverse/nyx/packages
-        maven {
-            name = "GitHubPackages"
-            url = uri("https://maven.pkg.github.com/"+projectOrganizationID+"/"+projectID)
-            credentials {
-                // The 'gitHubUser' and 'gitHubToken' variables are passed as credentials fetching them in GitHub Actions as 'secrets.GITHUB_ACTOR' and 'secrets.GITHUB_TOKEN', respectively.
-                // See the GitHub Actions definition for more.
-                username = findProperty("gitHubUser")
-                password = findProperty("gitHubToken")
-            }
-        }
-
-        // The Sonatype Nexus repository is configured as the 'sonatype' repository in the 'nexusPublishing' section below
-        // as it needs additional initialization tasks provided by the Nexus Publish Plugin.
-        /*maven {
-            name = 'SonatypeNexusOSS'
-
-            // Select the right repo URL, depending on the version type
-            def releaseStagingRepoUrl = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
-            def snapshotsRepoUrl = "https://oss.sonatype.org/content/repositories/snapshots/"
-            url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releaseStagingRepoUrl
-
-            credentials {
-                username findProperty("ossrhUsername")
-                password findProperty("ossrhPassword")
-            }
-        }*/
+  repositories {
+    // The GitHub Packages repository, visible at https://github.com/mooltiverse/nyx/packages
+    maven {
+      name = "GitHubPackages"
+      url = uri("https://maven.pkg.github.com/"+projectOrganizationID+"/"+projectID)
+      credentials {
+        // The 'gitHubUser' and 'gitHubToken' variables are passed as credentials fetching them in GitHub Actions as 'secrets.GITHUB_ACTOR' and 'secrets.GITHUB_TOKEN', respectively.
+        // See the GitHub Actions definition for more.
+        username = findProperty("gitHubUser")
+        password = findProperty("gitHubToken")
+      }
     }
+
+    // The Sonatype Nexus repository is configured as the 'sonatype' repository in the 'nexusPublishing' section below
+    // as it needs additional initialization tasks provided by the Nexus Publish Plugin.
+    /*maven {
+      name = 'SonatypeNexusOSS'
+
+      // Select the right repo URL, depending on the version type
+      def releaseStagingRepoUrl = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
+      def snapshotsRepoUrl = "https://oss.sonatype.org/content/repositories/snapshots/"
+      url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releaseStagingRepoUrl
+
+      credentials {
+        username findProperty("ossrhUsername")
+        password findProperty("ossrhPassword")
+      }
+    }*/
+  }
 }
 
 // PGP artifacts signing before publishing
@@ -479,36 +554,36 @@ publishing {
 // - https://maven.apache.org/repository/guide-central-repository-upload.html
 // - https://stackoverflow.com/questions/1251999/how-can-i-replace-a-newline-n-using-sed/14853319#14853319
 signing {
-    // With the keypair created as per the instructions above we can sign the artifacts to publish.
-    // However we don't want the passphrase or the private key (even if it's protected by the passphrase) stored
-    // in cleartext files or publicly available on the Git repo so we use variables in the CI/CD environments to
-    // store them.
-    // By using the 'findProperty' we can fetch those values from environment variables named:
-    // - ORG_GRADLE_PROJECT_signingKeyBase64: we use this base 64 encoded version instead of the plain
-    //   ORG_GRADLE_PROJECT_signingKey to make it safer and more portable, avoiding escaping and transcoding issues
-    //   about newlines (see comments above about this).
-    // - ORG_GRADLE_PROJECT_signingPassword
-    //
-    // For more see:
-    // - https://docs.gradle.org/current/userguide/signing_plugin.html#sec:in-memory-keys
+  // With the keypair created as per the instructions above we can sign the artifacts to publish.
+  // However we don't want the passphrase or the private key (even if it's protected by the passphrase) stored
+  // in cleartext files or publicly available on the Git repo so we use variables in the CI/CD environments to
+  // store them.
+  // By using the 'findProperty' we can fetch those values from environment variables named:
+  // - ORG_GRADLE_PROJECT_signingKeyBase64: we use this base 64 encoded version instead of the plain
+  //   ORG_GRADLE_PROJECT_signingKey to make it safer and more portable, avoiding escaping and transcoding issues
+  //   about newlines (see comments above about this).
+  // - ORG_GRADLE_PROJECT_signingPassword
+  //
+  // For more see:
+  // - https://docs.gradle.org/current/userguide/signing_plugin.html#sec:in-memory-keys
 
-    // The signingKey is set by base64 decoding the value of signingKeyBase64 (i.e. from the environment variable
-    // ORG_GRADLE_PROJECT_signingKeyBase64)
-    // It's available only on CI/CD configurations allowed to sign and publish, otherwise it's null
-    def signingKeyBase64 = findProperty("signingKeyBase64")
-    def signingKey = signingKeyBase64 == null ? "" : new String(signingKeyBase64.decodeBase64())
-    // The signingPassword is taken from a property or the environment variable ORG_GRADLE_PROJECT_signingPassword
-    def signingPassword = findProperty("signingPassword")
+  // The signingKey is set by base64 decoding the value of signingKeyBase64 (i.e. from the environment variable
+  // ORG_GRADLE_PROJECT_signingKeyBase64)
+  // It's available only on CI/CD configurations allowed to sign and publish, otherwise it's null
+  def signingKeyBase64 = findProperty("signingKeyBase64")
+  def signingKey = signingKeyBase64 == null ? "" : new String(signingKeyBase64.decodeBase64())
+  // The signingPassword is taken from a property or the environment variable ORG_GRADLE_PROJECT_signingPassword
+  def signingPassword = findProperty("signingPassword")
 
-    def signingCredentialsAvailable = (signingKey != null) && (signingPassword != null)
+  def signingCredentialsAvailable = (signingKey != null) && (signingPassword != null)
 
-    useInMemoryPgpKeys(signingKey, signingPassword)
+  useInMemoryPgpKeys(signingKey, signingPassword)
 
-    // Sign only for release and prerelease versions
-    required { signingCredentialsAvailable && gradle.taskGraph.hasTask("publish") }
+  // Sign only for release and prerelease versions
+  required { signingCredentialsAvailable && gradle.taskGraph.hasTask("publish") }
 
-    //sign publishing.publications.mavenJava
-    sign publishing.publications
+  //sign publishing.publications.mavenJava
+  sign publishing.publications
 }
 
 // Publish to Sonatype Nexus staging repository
@@ -516,27 +591,27 @@ signing {
 // the Nexus UI at https://oss.sonatype.org/index.html#stagingRepositories in the Staging Repositories section
 // See: https://github.com/marcphilipp/nexus-publish-plugin/
 nexusPublishing {
-    // Sonatype Nexus is so slow that the plugin often needs several minutes to upload (ofter ~5 minutes)
-    connectTimeout = java.time.Duration.ofMinutes(10)
-    clientTimeout = java.time.Duration.ofMinutes(10)
+  // Sonatype Nexus is so slow that the plugin often needs several minutes to upload (ofter ~5 minutes)
+  connectTimeout = java.time.Duration.ofMinutes(10)
+  clientTimeout = java.time.Duration.ofMinutes(10)
 
-    // These repositories are in addition to the other regular Maven repositories that may have been configured for the Maven Publish
-    // plugin. These ones will be handled by the Nexus Publish Plugin as Sonatype repositories with all of their peculiarities
-    // (like the need to be initialized etc). Maven repositories other than Sonatype must be configured to the regular Maven Publish
-    // plugin section.
-    repositories {
-        packageGroup = 'com.mooltiverse'
-        //stagingProfileId = '302fa0a0346251' // see below on how to retrieve this automatically through the getStagingProfile task
-        // 'sonatype' is preconfigured by the Nexus Publish Plugin with proper URLs.
-        // The following username and password properties must be a valid Sonatype token (which is actually
-        // a pair of values, the username and the password).
-        // The token can be generated at https://oss.sonatype.org/ selecting Profile > User Token (from the drop down).
-        // For more see:  https://support.sonatype.com/hc/en-us/articles/360049469534-401-Content-access-is-protected-by-token-when-accessing-repositories
-        sonatype {
-            username = findProperty("ossrhUsername")
-            password = findProperty("ossrhPassword")
-        }
+  // These repositories are in addition to the other regular Maven repositories that may have been configured for the Maven Publish
+  // plugin. These ones will be handled by the Nexus Publish Plugin as Sonatype repositories with all of their peculiarities
+  // (like the need to be initialized etc). Maven repositories other than Sonatype must be configured to the regular Maven Publish
+  // plugin section.
+  repositories {
+    packageGroup = 'com.mooltiverse'
+    //stagingProfileId = '302fa0a0346251' // see below on how to retrieve this automatically through the getStagingProfile task
+    // 'sonatype' is preconfigured by the Nexus Publish Plugin with proper URLs.
+    // The following username and password properties must be a valid Sonatype token (which is actually
+    // a pair of values, the username and the password).
+    // The token can be generated at https://oss.sonatype.org/ selecting Profile > User Token (from the drop down).
+    // For more see:  https://support.sonatype.com/hc/en-us/articles/360049469534-401-Content-access-is-protected-by-token-when-accessing-repositories
+    sonatype {
+      username = findProperty("ossrhUsername")
+      password = findProperty("ossrhPassword")
     }
+  }
 }
 
 // Promote (validate) and Release from the Sonatype Nexus Staging repository to Maven Central
@@ -544,55 +619,59 @@ nexusPublishing {
 // Once done the content is publicly available at https://repo.maven.apache.org/maven2/com/mooltiverse/oss/nyx/
 // See https://github.com/Codearte/gradle-nexus-staging-plugin/
 nexusStaging {
-    // Nexus is terribly slow, at times it take more than 100 tries (and ~10-20 minutes) to process
-    numberOfRetries = 200
+  // Nexus is terribly slow, at times it take more than 100 tries (and ~10-20 minutes) to process
+  numberOfRetries = 200
 
-    packageGroup = 'com.mooltiverse'
-    //stagingProfileId = '302fa0a0346251' // see below on how to retrieve this automatically through the getStagingProfile task
-    // The following username and password properties must be a valid Sonatype token (which is actually
-    // a pair of values, the username and the password).
-    // For more see:  https://support.sonatype.com/hc/en-us/articles/360049469534-401-Content-access-is-protected-by-token-when-accessing-repositories
-    username findProperty("ossrhUsername")
-    password findProperty("ossrhPassword")
+  packageGroup = 'com.mooltiverse'
+  //stagingProfileId = '302fa0a0346251' // see below on how to retrieve this automatically through the getStagingProfile task
+  // The following username and password properties must be a valid Sonatype token (which is actually
+  // a pair of values, the username and the password).
+  // For more see:  https://support.sonatype.com/hc/en-us/articles/360049469534-401-Content-access-is-protected-by-token-when-accessing-repositories
+  username findProperty("ossrhUsername")
+  password findProperty("ossrhPassword")
 }
+
+/*----------------------------------------------------------------------------
+  Additional properties
+----------------------------------------------------------------------------*/
 
 /*------------------------------------------------------------------------------
   Additional tasks
 ------------------------------------------------------------------------------*/
-// Create an overall Java unit test lifecycle task to trigger all integration tests in subprojects 
-// This also acts as an alias to the 'test' task
-task unitTest() {
-    description 'Runs all Java unit tests and verification tasks'
-    group 'Verification'
-
-    dependsOn subprojects*.test
+// Create an overall Java unit test lifecycle task to trigger all
+// unit tests in subprojects.
+// This also acts as an alias to the 'test' task.
+task unitTest(group: 'verification', description: 'Runs the unit tests for the Java binaries') {
+  dependsOn subprojects*.test
 }
 
-// Create an overall Java integration test lifecycle task to trigger all integration tests in subprojects 
-task integrationTest() {
-    description 'Runs all Java integration tests and verification tasks'
-    group 'Verification'
+// Create an overall Java integration test lifecycle task to trigger all
+// integration tests in subprojects.
+task integrationTest(group: 'verification', description: 'Runs the integration tests for the Java binaries') {
+  dependsOn subprojects*.integrationTest
 
-    dependsOn subprojects*.integrationTest
+  // When they are all in the execution plan, run faster tests first.
+  mustRunAfter unitTest
 }
 
-// Create an overall Java functional test lifecycle task to trigger all intefunctionalgration tests in subprojects 
-task functionalTest() {
-    description 'Runs all Java functional tests and verification tasks'
-    group 'Verification'
+// Create an overall Java functional test lifecycle task to trigger all
+// functional tests in subprojects.
+task functionalTest(group: 'verification', description: 'Runs the functional tests for the Java binaries') {
+  dependsOn subprojects*.functionalTest
 
-    dependsOn subprojects*.functionalTest
+  // When they are all in the execution plan, run faster tests first.
+  mustRunAfter unitTest
+  mustRunAfter integrationTest
 }
 
 // Aggregate all JUnit reports from sub projects into one
-task testReport(type: TestReport) {
-    description 'Aggregates all JUnit test reports into one'
-    group 'Verification'
+task testReport(type: TestReport, group: 'verification', description: 'Aggregates all JUnit test reports into one') {
+  // The output directory for test reports
+  destinationDir = new File(buildDir, "test/aggregated/reports")
 
-    destinationDir = file("$buildDir/reports/tests/all")
-    // Include the results from the "test" task in all subprojects
-    // Be careful as including report sets implicitly makes the task dependent on the tasks producing those reports
-    reportOn subprojects*.test, subprojects*.integrationTest, subprojects*.functionalTest
+  // Include the results from the "test" task in all subprojects
+  // Be careful as including report sets implicitly makes the task dependent on the tasks producing those reports
+  reportOn subprojects*.test, subprojects*.integrationTest, subprojects*.functionalTest
 }
 
 /*------------------------------------------------------------------------------
@@ -626,14 +705,14 @@ tasks.publishToSonatype.finalizedBy tasks.closeAndReleaseRepository
 tasks.publish.dependsOn tasks.publishToSonatype
 
 afterEvaluate {
-    // Only perform publishing if the Nyx release type enables publishing.
-    // Remember that setting the 'onlyIf' on a task does not prevent its dependencies
-    // to run so the tasks of the entire tree must be disabled.
-    //
-    // The tasks listed here are those not caught in the 'allProjects' section above.
-    tasks.getStagingProfile.onlyIf { rootProject.nyxState.newRelease }                  // from the 'release' group
-    tasks.closeRepository.onlyIf { rootProject.nyxState.newRelease }                    // from the 'release' group
-    tasks.releaseRepository.onlyIf { rootProject.nyxState.newRelease }                  // from the 'release' group
-    tasks.closeAndReleaseRepository.onlyIf { rootProject.nyxState.newRelease }          // from the 'release' group
-    tasks.initializeSonatypeStagingRepository.onlyIf { rootProject.nyxState.newRelease }// from the 'other' group
+  // Only perform publishing if the Nyx release type enables publishing.
+  // Remember that setting the 'onlyIf' on a task does not prevent its dependencies
+  // to run so the tasks of the entire tree must be disabled.
+  //
+  // The tasks listed here are those not caught in the 'allProjects' section above.
+  tasks.getStagingProfile.onlyIf { rootProject.nyxState.newRelease }                  // from the 'release' group
+  tasks.closeRepository.onlyIf { rootProject.nyxState.newRelease }                    // from the 'release' group
+  tasks.releaseRepository.onlyIf { rootProject.nyxState.newRelease }                  // from the 'release' group
+  tasks.closeAndReleaseRepository.onlyIf { rootProject.nyxState.newRelease }          // from the 'release' group
+  tasks.initializeSonatypeStagingRepository.onlyIf { rootProject.nyxState.newRelease }// from the 'other' group
 }
