@@ -22,8 +22,8 @@
 package command_template
 
 import (
-	nyx "github.com/mooltiverse/nyx/src/go/nyx"
 	cmd "github.com/mooltiverse/nyx/src/go/nyx/command"
+	nyx "github.com/mooltiverse/nyx/src/go/nyx/nyx"
 	stt "github.com/mooltiverse/nyx/src/go/nyx/state"
 	gittools "github.com/mooltiverse/nyx/src/go/nyx/test/integration/git/tools"
 )

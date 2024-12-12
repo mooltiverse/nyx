@@ -32,6 +32,7 @@ import (
 	err "github.com/mooltiverse/nyx/src/go/errors"
 	cmd "github.com/mooltiverse/nyx/src/go/nyx/command"
 	cnf "github.com/mooltiverse/nyx/src/go/nyx/configuration"
+	nyx "github.com/mooltiverse/nyx/src/go/nyx/nyx"
 )
 
 const (
@@ -95,7 +96,7 @@ func main() {
 		os.Exit(0)
 	}
 
-	nyx := NewNyx()
+	nyx := nyx.NewNyx()
 
 	// set the global logger verbosity as soon as possible
 	configuration, err := nyx.Configuration()

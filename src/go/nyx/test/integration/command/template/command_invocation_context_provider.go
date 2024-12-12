@@ -25,10 +25,10 @@ import (
 	"errors" // https://pkg.go.dev/errors
 	"fmt"    // https://pkg.go.dev/fmt
 
-	nyx "github.com/mooltiverse/nyx/src/go/nyx"
 	cmd "github.com/mooltiverse/nyx/src/go/nyx/command"
 	cnf "github.com/mooltiverse/nyx/src/go/nyx/configuration"
 	git "github.com/mooltiverse/nyx/src/go/nyx/git"
+	nyx "github.com/mooltiverse/nyx/src/go/nyx/nyx"
 	stt "github.com/mooltiverse/nyx/src/go/nyx/state"
 	gittools "github.com/mooltiverse/nyx/src/go/nyx/test/integration/git/tools"
 )

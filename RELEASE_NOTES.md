@@ -15,6 +15,7 @@ This release:
 * applied conventions and styling rules
   * the `modules` directory has been renamed to to `src`
   * GitHub Actions workflows have been refactored for reusability
+* the Go packages layout has changed: the `github.com/mooltiverse/nyx/src/go/main` package has been merged into `github.com/mooltiverse/nyx/src/go`, while the `Nyx` main structure has been moved into `github.com/mooltiverse/nyx/src/go/nyx`
 * dismissed SonarCloud and Codecov
 * converted the documentation microsite from Jekyll to Docusaurus
 

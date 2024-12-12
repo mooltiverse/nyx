@@ -19,7 +19,7 @@ This is the main package for Nyx.
 
 See https://mooltiverse.github.io/nyx/guide/developer/go/ for the developer's guide.
 */
-package main
+package nyx
 
 import (
 	"fmt"           // https://pkg.go.dev/fmt

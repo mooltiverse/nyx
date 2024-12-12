@@ -29,10 +29,10 @@ import (
 	log "github.com/sirupsen/logrus"            // https://pkg.go.dev/github.com/sirupsen/logrus
 	assert "github.com/stretchr/testify/assert" // https://pkg.go.dev/github.com/stretchr/testify/assert
 
-	nyx "github.com/mooltiverse/nyx/src/go/nyx"
 	cmd "github.com/mooltiverse/nyx/src/go/nyx/command"
 	cnf "github.com/mooltiverse/nyx/src/go/nyx/configuration"
 	ent "github.com/mooltiverse/nyx/src/go/nyx/entities"
+	nyx "github.com/mooltiverse/nyx/src/go/nyx/nyx"
 	github "github.com/mooltiverse/nyx/src/go/nyx/services/github"
 	gitlab "github.com/mooltiverse/nyx/src/go/nyx/services/gitlab"
 	cmdtpl "github.com/mooltiverse/nyx/src/go/nyx/test/integration/command/template"
