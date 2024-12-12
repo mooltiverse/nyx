@@ -384,8 +384,11 @@ subprojects {
       outputs.file(coverageReportFile)
 
       doLast {
-        // CUSTOMIZATIONS ON THE STANDARD BUILD SCRIPT - START
         def testEnvironmentVariables = [:]
+        // Add the path to the binaries as the 'binDir' environment variable
+        // so that tests can find the generated executables.
+        testEnvironmentVariables['binDir']=goBinOutputDirectory.absolutePath
+        // CUSTOMIZATIONS ON THE STANDARD BUILD SCRIPT - START
         if (group == 'unit') {
           // Pass the name of the configuration file examples to tests. These are passed as environment variables.
           // We use the same files used for the documentation here.
@@ -402,6 +405,7 @@ subprojects {
         if (group == 'integration' || group == 'functional') {
           // Pass the environment variables with credentials to access remote services.
           // These are passed as environment variables and are only used for integration and functional tests.
+          testEnvironmentVariables['quickTests']=findProperty("quickTests") // the flag to narrow the number of tests, added on the command line using the -PquickTests=true option
           testEnvironmentVariables['gitHubTestUserToken']=findProperty("gitHubTestUserToken")
           testEnvironmentVariables['gitHubTestUserPublicKey']=findProperty("gitHubTestUserPublicKey")
           testEnvironmentVariables['gitHubTestUserPrivateKeyPassphrase']=findProperty("gitHubTestUserPrivateKeyPassphrase")
@@ -417,9 +421,9 @@ subprojects {
 
         logger.quiet("Running ${group} tests for Go module '${modulePath}'")
         exec {
-          environment += testEnvironmentVariables // CUSTOMIZATIONS ON THE STANDARD BUILD SCRIPT
           logging.captureStandardOutput LogLevel.QUIET
           logging.captureStandardError  LogLevel.ERROR
+          environment += testEnvironmentVariables
           workingDir = projectDir
           // note that with '--tags=<GROUP>' we only run tests declared in files with the '+build <GROUP>' directive on top
           commandLine 'go', 'test', "--tags=${group}", '-coverpkg=./...', "-coverprofile=${coverageProfileFile}", '-v', './...'

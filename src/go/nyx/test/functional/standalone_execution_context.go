@@ -30,7 +30,7 @@ const (
 	 The name of the environment variable used to pass the path of the directory containing Nyx binary files.
 	 If this variable is not passed the Nyx executable will be assumed to be in the current working directory.
 	*/
-	NYX_BIN_DIR_ENVIRONMENT_VARIABLE = "nyxBinDir"
+	NYX_BIN_DIR_ENVIRONMENT_VARIABLE = "binDir"
 )
 
 /*
