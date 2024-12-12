@@ -448,10 +448,6 @@ subprojects {
     onlyIf { rootProject.nyxState.newRelease }
     onlyIf { project.hasProperty("publishToGoPkg") && Boolean.parseBoolean(project.getProperty("publishToGoPkg")) }
 
-    // Task dependencies
-    // nyxMark is required because the tag must already be available on GitHub when we run this task
-    dependsOn rootProject.tasks.nyxMark
-
     // See https://go.dev/doc/src/publishing
     doLast {
       def moduleReference = modulePath+'@'+project.version
@@ -473,10 +469,6 @@ subprojects {
     // Only perform publishing if the Nyx release type enables publishing
     onlyIf { rootProject.nyxState.newRelease }
     onlyIf { project.hasProperty("publishToGoDocs") && Boolean.parseBoolean(project.getProperty("publishToGoDocs")) }
-
-    // Task dependencies
-    // nyxMark is required because the tag must already be available on GitHub when we run this task
-    dependsOn rootProject.tasks.nyxMark
 
     // See https://godocs.io/-/about
     doLast {
