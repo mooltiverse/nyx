@@ -1,0 +1,20 @@
+{
+    "suites": [
+      {
+        "name": "setup",
+        "description": "Verify that all software components were correctly installed in the Docker image",
+        "cases": [
+          {
+            "name": "nyx setup",
+            "description": "Verify that 'nyx' is installed and available in the PATH and the configuration file is in place",
+            "#comment": "Run some commands inside the 'simple' container using 'docker run'",
+            "commands": [
+              {
+                "command": [ "docker", "run", "-t", "--rm", "--entrypoint", "/bin/sh", "nyx:local", "-c", "which nyx" ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }

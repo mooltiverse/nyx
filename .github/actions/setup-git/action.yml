@@ -1,0 +1,42 @@
+name: "Setup Git"
+description: |-
+  Run the common tasks to setup a Git environment from scratch or restoring
+  the environment from a previous job:
+  - check out the Git repository
+  - make Git ignore file permission changes
+inputs:
+  verbosity:
+    description: |-
+      Sets the verbosity level to adjust the output logs verbosity.
+      Allowed values are: 'error', 'warning', 'quiet', 'info', 'debug'.
+      Default: quiet
+    required: false
+    default: 'quiet'
+  fetch-depth:
+    description: |-
+      Number of commits to fetch. 0 indicates all history for all branches and tags.
+      Default: 0
+    required: false
+    default: '0'
+  fetch-tags:
+    description: |-
+      Whether to fetch tags, even if fetch-depth > 0.
+      Default: true
+    required: false
+    default: 'true'
+  enable-lfs:
+    description: |-
+      Whether to download Git-LFS files.
+      Default: false
+    required: false
+    default: 'false'
+runs:
+  # Composite GitHub Actions actions require to set 'using': 'composite'
+  using: "composite"
+  steps:
+  - name: Git checkout
+    uses: actions/checkout@v4
+    with:
+      fetch-depth: ${{ inputs.fetch-depth }}
+      fetch-tags: ${{ inputs.fetch-tags }}
+      lfs: ${{ inputs.enable-lfs }}

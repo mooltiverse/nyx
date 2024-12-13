@@ -1,0 +1,629 @@
+/*------------------------------------------------------------------------------
+  Plugins DSL block
+  https://docs.gradle.org/current/userguide/plugins.html#sec:plugins_block
+------------------------------------------------------------------------------*/
+plugins {
+}
+
+/*------------------------------------------------------------------------------
+  Local sub-project properties
+------------------------------------------------------------------------------*/
+description = 'Go binaries'
+
+/*------------------------------------------------------------------------------
+  This is the configuration for all sub-projects, but not this project
+------------------------------------------------------------------------------*/
+subprojects {
+  /*----------------------------------------------------------------------------
+    Configurations and Dependencies
+  ----------------------------------------------------------------------------*/
+  // For more on Configurations, Dependencies and Artifacts see:
+  // - https://docs.gradle.org/current/userguide/declaring_dependencies_adv.html
+  // - https://docs.gradle.org/current/userguide/cross_project_publications.html
+  configurations {
+    // Here we define the configurations to:
+    // - define dependencies to other projects so this project can use their
+    //   artifacts
+    // - expose artifacts produced by this project that can be used by others as
+    //  dependencies
+    // Configurations can extend other configurations from within the same
+    // project by means of 'extendsFrom'.
+    // To add artifacts to configurations use the 'artifacts' section.
+    apiDocumentation {
+      // The 'apiDocumentation' configuration exposes the generated API
+      // documentation. This configuration is 'consumable' so it can be used
+      // by other 'consumer' projects.
+      // Artifacts are added to this configuration by means of the
+      // 'apiDocumentation' artifact in the 'artifacts' section.
+      canBeConsumed = true
+      canBeResolved = false
+    }
+    binaries {
+      // The 'binaries' configuration exposes the generated binary files.
+      // This configuration is 'consumable' so it can be used by other
+      // 'consumer' projects.
+      // Artifacts are added to this configuration by means of the
+      // 'binaries' artifact in the 'artifacts' section.
+      canBeConsumed = true
+      canBeResolved = false
+    }
+  }
+
+  dependencies {
+    // Here we define the static dependencies on other projects' configurations.
+  }
+
+  /*----------------------------------------------------------------------------
+    Additional properties
+  ----------------------------------------------------------------------------*/
+  // The module file
+  ext.modFile = file('go.mod')
+
+  // The 'modulePath' from the project properties
+  ext.modulePath = project.getProperty("modulePath")
+
+  // The directory where Go binaries have to be stored.
+  ext.goBinOutputDirectory = new File(buildDir, "bin/")
+
+  // The directory where Go docs have to be stored.
+  ext.goDocsOutputDirectory = new File(buildDir, "api/docs/")
+
+  // Define the value to use for the GOBIN variable when installing the tools
+  // used to generate the documentation.
+  // We keep a separate GOBIN for those so we don't pollute the project path.
+  ext.goDocBin = new File(buildDir, '/go/bin/doc')
+
+  // Define the full path to the 'godoc' executable, depending on the platform
+  // (with or without the '.exe' extension)
+  ext.goDocExecutable = new File(goDocBin, 'godoc'+(org.gradle.nativeplatform.platform.internal.DefaultNativePlatform.currentOperatingSystem.isWindows() ? '.exe' : ''))
+
+  // Define the full path to the 'godocdown' executable, depending on the platform
+  // (with or without the '.exe' extension)
+  ext.goDocDownExecutable = new File(goDocBin, 'godocdown'+(org.gradle.nativeplatform.platform.internal.DefaultNativePlatform.currentOperatingSystem.isWindows() ? '.exe' : ''))
+
+  // Returns the list of target platforms to build the binary for, where each
+  // entry is in the for OS/ARCH.
+  // For the list of available OSs and architectures see:
+  // - https://go.dev/doc/install/source#environment)
+  ext.buildPlatforms = {
+    if (project.hasProperty("targetPlatforms")) {
+      if (!project.getProperty("targetPlatforms").isBlank()) {
+        def platforms = project.getProperty("targetPlatforms").split(',')
+        return platforms
+      } else return null
+    } else return null
+  }
+
+  // Returns the map of test groups for this project and their associated directories.
+  // Test groups may be: 'unit', 'integration', 'functional'.
+  ext.testGroups = {
+    return [ 'unit', 'integration', 'functional' ]
+  }
+
+  /*----------------------------------------------------------------------------
+    Additional tasks
+  ----------------------------------------------------------------------------*/
+  // This is a lifecycle task that will depend on other dynamically created
+  // tasks.
+  // Since concrete tasks are not known in advance, the dependencies of this
+  // task on others are defined when those tasks are created.
+  task goBuild(group: 'build', description: 'Builds the Go binaries') {
+  }
+
+  // This is a lifecycle task that will depend on other dynamically created
+  // tasks.
+  // Since concrete tasks are not known in advance, the dependencies of this
+  // task on others are defined when those tasks are created.
+  task unitTest(group: 'verification', description: 'Runs the unit tests for the Go binaries') {
+  }
+
+  // This is a lifecycle task that will depend on other dynamically created
+  // tasks.
+  // Since concrete tasks are not known in advance, the dependencies of this
+  // task on others are defined when those tasks are created.
+  task integrationTest(group: 'verification', description: 'Runs the integration tests for the Go binaries') {
+    // When they are all in the execution plan, run faster tests first.
+    mustRunAfter unitTest
+  }
+
+  // This is a lifecycle task that will depend on other dynamically created
+  // tasks.
+  // Since concrete tasks are not known in advance, the dependencies of this
+  // task on others are defined when those tasks are created.
+  task functionalTest(group: 'verification', description: 'Runs the functional tests for the Go binaries') {
+    // When they are all in the execution plan, run faster tests first.
+    mustRunAfter unitTest
+    mustRunAfter integrationTest
+  }
+
+  // This is a lifecycle task that will depend on other specific test tasks.
+  task test(group: 'verification', description: 'Runs all the tests for the Go binaries') {
+    dependsOn unitTest
+    dependsOn integrationTest
+    dependsOn functionalTest
+  }
+
+  task deepClean(group: 'build', description: 'Clean the reproducible and reusable artifacts including caches, dependencies etc') {
+    dependsOn clean
+
+    // No other particular contents to clean so far in this task
+  }
+
+  task goClean(group: 'build', description: 'Cleans Go object files and cached files') {
+    // Declare inputs and outputs of this task
+    inputs.dir(projectDir)
+    outputs.dir(projectDir)
+
+    doLast {
+      logger.quiet('Cleaning up Go artifacts')
+      exec {
+        logging.captureStandardOutput LogLevel.QUIET
+        logging.captureStandardError  LogLevel.ERROR
+        workingDir projectDir
+        commandLine 'go', 'clean', '-r', '-cache', '-testcache', '-modcache'
+      }
+    }
+  }
+
+  task goModInit(group: 'build', description: 'Initializes the go.mod file unless it aleady exists') {
+    // Run this task only if the module file doesn't exist (which might also be
+    // ignored by .gitignore although it shouldn't).
+    // Overwriting this file could be harmless as it could be generated again
+    // if it only contains dependencies that can be automatically inferred from
+    // sources but it may cause a loss of information and break the project when
+    // it also has extra directives like 'replace' (like in our case).
+    onlyIf { !modFile.exists() }
+
+    // Declare inputs and outputs of this task
+    inputs.files(fileTree(projectDir).filter { File f ->
+      f.name.endsWith(".go")
+    })
+    outputs.file(modFile)
+
+    doLast {
+      logger.quiet("Initializing the Go module '${modulePath}' file: '${modFile.path}'")
+      exec {
+        logging.captureStandardOutput LogLevel.QUIET
+        logging.captureStandardError  LogLevel.ERROR
+        workingDir projectDir
+        commandLine 'go', 'mod', 'init', modulePath
+      }
+    }
+  }
+
+  task goModUpdate(group: 'build', description: 'Updates the go.mod file by adding new dependencies or removing those unnecessary') {
+    // Task dependencies
+    dependsOn goModInit
+
+    // Declare inputs and outputs of this task
+    inputs.files(fileTree(projectDir).filter { File f ->
+      f.name.endsWith(".go")
+    })
+    outputs.file(modFile)
+
+    doLast {
+      logger.quiet("Updating the Go module '${modulePath}' file: '${modFile.path}'")
+      exec {
+        logging.captureStandardOutput LogLevel.QUIET
+        logging.captureStandardError  LogLevel.ERROR
+        workingDir projectDir
+        commandLine 'go', 'mod', 'tidy', '-v'
+      }
+    }
+  }
+
+  task goModUpgrade(group: 'build', description: 'Upgrades Go dependencies') {
+    // Task dependencies
+    dependsOn goModInit
+
+    // Declare inputs and outputs of this task
+    inputs.files(fileTree(projectDir).filter { File f ->
+      f.name.endsWith(".go")
+    })
+    outputs.file(modFile)
+
+    doLast {
+      logger.quiet("Upgrading dependencies in Go module '${modulePath}' file: '${modFile.path}'")
+      exec {
+        logging.captureStandardOutput LogLevel.QUIET
+        logging.captureStandardError  LogLevel.ERROR
+        workingDir projectDir
+        commandLine 'go', 'get', '-u', '-v'
+      }
+    }
+  }
+
+  task goDocInit(group: 'build', description: 'Initializes the godoc module') {
+    // Declare inputs and outputs of this task
+    outputs.file(goDocExecutable)
+
+    doLast {
+      logger.quiet('Installing the Godoc module')
+      exec {
+        logging.captureStandardOutput LogLevel.QUIET
+        logging.captureStandardError  LogLevel.ERROR
+        environment 'GOBIN', goDocBin.path
+        workingDir projectDir
+        commandLine 'go', 'install', 'golang.org/x/tools/cmd/godoc@latest'
+      }
+    }
+  }
+
+  task goDocDownInit(group: 'build', description: 'Initializes the godocdown module') {
+    // Declare inputs and outputs of this task
+    outputs.file(goDocDownExecutable)
+
+    doLast {
+      logger.quiet('Installing the Godocdown module')
+      exec {
+        logging.captureStandardOutput LogLevel.QUIET
+        logging.captureStandardError  LogLevel.ERROR
+        environment 'GOBIN', goDocBin.path
+        workingDir projectDir
+        commandLine 'go', 'install', 'github.com/robertkrimen/godocdown/godocdown@latest'
+      }
+    }
+  }
+
+  task goDoc(group: 'build', description: 'Builds the source code documentation using godoc') {
+    // The 'godoc' tool is Go's official tool for the documentation but it
+    // only runs as a live HTTP server so it's pretty useless.
+    // To generate markdown files see the 'goDocDown' task.
+
+    // Task dependencies
+    dependsOn goModUpdate, goDocInit
+
+    // Declare inputs and outputs of this task
+    inputs.files(fileTree(projectDir).filter { File f ->
+      f.name.endsWith(".go") || f.name.endsWith(".mod") || f.name.endsWith(".sum")
+    })
+
+    doLast {
+      logger.quiet('Running Godoc, listening on port 6060')
+      exec {
+        logging.captureStandardOutput LogLevel.QUIET
+        logging.captureStandardError  LogLevel.ERROR
+        environment 'GOBIN', goDocBin.path
+        workingDir projectDir
+        commandLine goDocExecutable
+      }
+    }
+  }
+
+  task goDocDown(group: 'build', description: 'Builds the source code documentation using godocdown') {
+    // The Go 'official' tool 'godoc', used by task 'goDoc', doesn't render
+    // the documentation on the filesystem (it only runs as a live HTTP server)
+    // so we need 'godocdown' to produce markdown files on the filesystem.
+
+    // Task dependencies
+    dependsOn goModUpdate, goDocDownInit
+
+    def outputFile = new File(goDocsOutputDirectory, 'README.md')
+
+    // Declare inputs and outputs of this task
+    inputs.files(fileTree(projectDir).filter { File f ->
+      f.name.endsWith(".go") || f.name.endsWith(".mod") || f.name.endsWith(".sum")
+    })
+    outputs.file(outputFile)
+
+    doLast {
+      logger.quiet('Running Godocdown')
+      exec {
+        logging.captureStandardOutput LogLevel.QUIET
+        logging.captureStandardError  LogLevel.ERROR
+        environment 'GOBIN', goDocBin.path
+        workingDir projectDir
+        commandLine goDocDownExecutable, '-plain', "-output=${outputFile}", '.'
+      }
+    }
+  }
+
+  // Create tasks for each target platform.
+  buildPlatforms().each { targetPlatform ->
+    def os = targetPlatform.split('/')[0]
+    def arch = targetPlatform.split('/')[1]
+    def extension = os == 'windows' ? '.exe' : ''
+    def platformSuffix = "${os}-${arch}"
+    def binaryName = (project.hasProperty("moduleName") ? project.getProperty("moduleName") : project.name) + '-' + platformSuffix + extension
+    def binaryFile = new File(goBinOutputDirectory, binaryName)
+
+    // Create one 'goBuild-<PLATFORM>' task for each platform.
+    tasks.create(group: 'build', name: "goBuild-${platformSuffix}", description: "Builds the Go binary for the ${targetPlatform} platform") {
+      // Task dependencies
+      dependsOn goModUpdate
+
+      // Declare inputs and outputs of this task
+      inputs.files(fileTree(projectDir).filter { File f ->
+        f.name.endsWith(".go") || f.name.endsWith(".mod") || f.name.endsWith(".sum")
+      })
+      outputs.file(binaryFile)
+
+      // See https://golang.org/doc/install/source#environment for variables determining the build platform ans OS
+      doLast {
+        logger.quiet("Building the Go binary '${binaryName}' for the '${targetPlatform}' platform")
+        exec {
+            logging.captureStandardOutput LogLevel.QUIET
+            logging.captureStandardError  LogLevel.ERROR
+            environment 'GOOS', os
+            environment 'GOARCH', arch
+            environment 'CGO_ENABLED', "0" // use full static linking, which also makes it compatible with Alpine Linux
+            workingDir projectDir
+            commandLine 'go', 'build', '-o', binaryFile, '-ldflags=.="-X=main.release='+rootProject.version+'"', modulePath
+        }
+      }
+    }
+
+    // Make the overall lifecycle tasks depend on the flavor specific build tasks
+    tasks.goBuild.dependsOn tasks.named("goBuild-${platformSuffix}")
+  }
+
+  // Create tasks for each specific test groups.
+  testGroups().each { group ->
+    // The test group name, capitalized
+    def groupCapitalized = group.capitalize()
+
+    // Create one 'go<GROUP>Test' task for each group.
+    // <GROUP> is replaced by the test group name (i.e. Unit, Integration,
+    // Functional).
+    tasks.create(group: 'verification', name: "go${groupCapitalized}Test", description: "Runs the ${group} tests for the Go binaries") {
+      // Task dependencies
+      dependsOn goModUpdate
+      if (group == 'functional') {
+        dependsOn goBuild
+      }
+
+      def testOutputDir = new File(buildDir, "test/${group}")
+      def coverageProfileFile = new File(testOutputDir, 'coverageprofile.out')
+      def coverageReportFile = new File(testOutputDir, 'coveragereport.html')
+
+      // Declare inputs and outputs of this task
+      inputs.files(fileTree(projectDir).filter { File f ->
+        f.name.endsWith(".go") || f.name.endsWith(".mod") || f.name.endsWith(".sum")
+      })
+      outputs.file(coverageProfileFile)
+      outputs.file(coverageReportFile)
+
+      doLast {
+        def testEnvironmentVariables = [:]
+        // Add the path to the binaries as the 'binDir' environment variable
+        // so that tests can find the generated executables.
+        testEnvironmentVariables['binDir']=goBinOutputDirectory.absolutePath
+        // CUSTOMIZATIONS ON THE STANDARD BUILD SCRIPT - START
+        if (group == 'unit') {
+          // Pass the name of the configuration file examples to tests. These are passed as environment variables.
+          // We use the same files used for the documentation here.
+          // These are passed as environment variables and are only used for unit tests.
+          testEnvironmentVariables['extendedJSONExampleConfigurationFile']=file("$rootDir/docs/main/docs/_includes/.nyx-extended.json").absolutePath
+          testEnvironmentVariables['mediumJSONExampleConfigurationFile']=file("$rootDir/docs/main/docs/_includes/.nyx-medium.json").absolutePath
+          testEnvironmentVariables['simpleJSONExampleConfigurationFile']=file("$rootDir/docs/main/docs/_includes/.nyx-simple.json").absolutePath
+          testEnvironmentVariables['simplestJSONExampleConfigurationFile']=file("$rootDir/docs/main/docs/_includes/.nyx-simplest.json").absolutePath
+          testEnvironmentVariables['extendedYAMLExampleConfigurationFile']=file("$rootDir/docs/main/docs/_includes/.nyx-extended.yaml").absolutePath
+          testEnvironmentVariables['mediumYAMLExampleConfigurationFile']=file("$rootDir/docs/main/docs/_includes/.nyx-medium.yaml").absolutePath
+          testEnvironmentVariables['simpleYAMLExampleConfigurationFile']=file("$rootDir/docs/main/docs/_includes/.nyx-simple.yaml").absolutePath
+          testEnvironmentVariables['simplestYAMLExampleConfigurationFile']=file("$rootDir/docs/main/docs/_includes/.nyx-simplest.yaml").absolutePath
+        }
+        if (group == 'integration' || group == 'functional') {
+          // Pass the environment variables with credentials to access remote services.
+          // These are passed as environment variables and are only used for integration and functional tests.
+          testEnvironmentVariables['quickTests']=findProperty("quickTests") // the flag to narrow the number of tests, added on the command line using the -PquickTests=true option
+          testEnvironmentVariables['gitHubTestUserToken']=findProperty("gitHubTestUserToken")
+          testEnvironmentVariables['gitHubTestUserPublicKey']=findProperty("gitHubTestUserPublicKey")
+          testEnvironmentVariables['gitHubTestUserPrivateKeyPassphrase']=findProperty("gitHubTestUserPrivateKeyPassphrase")
+          testEnvironmentVariables['gitHubTestUserPrivateKeyWithPassphrase']=findProperty("gitHubTestUserPrivateKeyWithPassphrase")
+          testEnvironmentVariables['gitHubTestUserPrivateKeyWithoutPassphrase']=findProperty("gitHubTestUserPrivateKeyWithoutPassphrase")
+          testEnvironmentVariables['gitLabTestUserToken']=findProperty("gitLabTestUserToken")
+          testEnvironmentVariables['gitLabTestUserPublicKey']=findProperty("gitLabTestUserPublicKey")
+          testEnvironmentVariables['gitLabTestUserPrivateKeyPassphrase']=findProperty("gitLabTestUserPrivateKeyPassphrase")
+          testEnvironmentVariables['gitLabTestUserPrivateKeyWithPassphrase']=findProperty("gitLabTestUserPrivateKeyWithPassphrase")
+          testEnvironmentVariables['gitLabTestUserPrivateKeyWithoutPassphrase']=findProperty("gitLabTestUserPrivateKeyWithoutPassphrase")
+        }
+        // CUSTOMIZATIONS ON THE STANDARD BUILD SCRIPT - END
+
+        logger.quiet("Running ${group} tests for Go module '${modulePath}'")
+        exec {
+          logging.captureStandardOutput LogLevel.QUIET
+          logging.captureStandardError  LogLevel.ERROR
+          environment += testEnvironmentVariables
+          workingDir = projectDir
+          // note that with '--tags=<GROUP>' we only run tests declared in files with the '+build <GROUP>' directive on top
+          commandLine 'go', 'test', "--tags=${group}", '-coverpkg=./...', "-coverprofile=${coverageProfileFile}", '-v', './...'
+        }
+
+        logger.quiet("Rendering ${group} test coverage report for Go module '${modulePath}'")
+        exec {
+          logging.captureStandardOutput LogLevel.QUIET
+          logging.captureStandardError  LogLevel.ERROR
+          workingDir = projectDir
+          commandLine 'go', 'tool', 'cover', '-html', coverageProfileFile, '-o', coverageReportFile
+        }
+      }
+    }
+
+    // Make the "[unit|integration|functional]Test" lifecycle task depend on this one
+    tasks.getByName("${group}Test").dependsOn tasks.named("go${groupCapitalized}Test")
+  }
+
+  task goPublishToGoPkg(group: 'publishing', description: 'Lists the module to https://pkg.go.dev/') {
+    // Only perform publishing if the Nyx release type enables publishing
+    onlyIf { rootProject.nyxState.newRelease }
+    onlyIf { project.hasProperty("publishToGoPkg") && Boolean.parseBoolean(project.getProperty("publishToGoPkg")) }
+
+    // See https://go.dev/doc/src/publishing
+    doLast {
+      def moduleReference = modulePath+'@'+project.version
+
+      logger.quiet("Listing Go module '${moduleReference}' to https://pkg.go.dev/")
+      exec {
+        ignoreExitValue = true // sometimes response is too slow to come and results in a timeout error
+        environment 'GOPROXY', 'proxy.golang.org'
+        workingDir = projectDir
+        logging.captureStandardOutput LogLevel.INFO
+        logging.captureStandardError  LogLevel.ERROR
+        // if this fails when using the Gradle wrapper you may need to run './gradlew --stop' first in order to get it running again
+        commandLine 'go', 'list', '-m', moduleReference
+      }
+    }
+  }
+
+  task goPublishToGoDocs(group: 'publishing', description: 'Lists the module to https://godocs.io/') {
+    // Only perform publishing if the Nyx release type enables publishing
+    onlyIf { rootProject.nyxState.newRelease }
+    onlyIf { project.hasProperty("publishToGoDocs") && Boolean.parseBoolean(project.getProperty("publishToGoDocs")) }
+
+    // See https://godocs.io/-/about
+    doLast {
+      def moduleHTTPURL = "https://godocs.io/"+modulePath
+
+      logger.quiet("Listing Go module '${modulePath}' to https://godocs.io/")
+      URL moduleURL = new URL(moduleHTTPURL)
+      HttpURLConnection urlConnection = (HttpURLConnection)moduleURL.openConnection()
+      logger.debug "Status code: ${urlConnection.getResponseCode()}"
+    }
+  }
+
+  // This is a lifecycle task that will depend on other dynamically created
+  // tasks.
+  task publish(group: 'publishing', description: 'Pushes the Go binaries to remote registries') {
+    // Only perform publishing if the Nyx release type enables publishing
+    onlyIf { rootProject.nyxState.newRelease }
+
+    // Task dependencies
+    // This is pretty much a lifecycle taks that only depends on other tasks
+    dependsOn goPublishToGoPkg, goPublishToGoDocs
+  }
+
+  task exportAPIDocumentationArchive(type: Tar, group: 'build', description: 'Builds the API documentation archive for this project') {
+    // Task dependencies
+    dependsOn goDocDown
+
+    // This task is of type Tar so:
+    // - we can reuse its outputs for the project artifacts
+    // - we can inherit its copying features from its AbstractCopyTask
+    //   superclass
+    // - we can reuse implicit inputs and outputs
+
+    // Simply copy the README.md, just renaming it to the image name,
+    // so when there are more than one they can be used as API docs
+    // and stored together in the same directory.
+    archiveBaseName = project.name
+    archiveAppendix = 'api-docs'
+    archiveVersion = project.version
+    archiveClassifier = null
+    archiveExtension = 'tar.gz'
+    destinationDirectory = file("${buildDir}/archives")
+    compression = Compression.GZIP
+
+    from(goDocsOutputDirectory) {
+      include 'README.md'
+      into("go/${project.name}/")
+    }
+  }
+
+  // This is a lifecycle task that will depend on other specific tasks.
+  task documentation(group: 'build', description: 'Builds the documentation for this project') {
+    dependsOn exportAPIDocumentationArchive
+  }
+
+  task exportBinariesArchive(type: Tar, group: 'build', description: 'Creates the archive containing the binaries for this project') {
+    // Task dependencies
+    dependsOn goBuild
+
+    // This task is of type Tar so:
+    // - we can reuse its outputs for the project artifacts
+    // - we can inherit its copying features from its AbstractCopyTask
+    //   superclass
+    // - we can reuse implicit inputs and outputs
+
+    // Simply copy the README.md, just renaming it to the image name,
+    // so when there are more than one they can be used as API docs
+    // and stored together in the same directory.
+    archiveBaseName = project.name
+    archiveAppendix = 'binaries'
+    archiveVersion = project.version
+    archiveClassifier = null
+    archiveExtension = 'tar.gz'
+    destinationDirectory = file("${buildDir}/archives")
+    compression = Compression.GZIP
+
+    from(goBinOutputDirectory) {
+      into("go/${project.name}/")
+    }
+  }
+
+  /*----------------------------------------------------------------------------
+    Additional task dependencies
+    ----------------------------------------------------------------------------*/
+  tasks.build.dependsOn documentation
+  tasks.check.dependsOn test
+  tasks.clean.dependsOn goClean
+
+  /*----------------------------------------------------------------------------
+    Artifacts published by this project
+  ----------------------------------------------------------------------------*/
+  // For more on Configurations, Dependencies and Artifacts see:
+  // - https://docs.gradle.org/current/userguide/declaring_dependencies_adv.html
+  // - https://docs.gradle.org/current/userguide/cross_project_publications.html
+  artifacts {
+    // Here we associate artifacts produced by this project to the
+    // configurations so that they can be consumed by other projects.
+
+    // Expose the API documentation.
+    // Here we associate the outputs from the 'exportAPIDocumentationArchive'
+    // task to the 'apiDocumentation' configuration.
+    apiDocumentation tasks.exportAPIDocumentationArchive
+
+    // Expose the binaries.
+    // Here we associate the outputs from the 'exportBinariesArchive' task to
+    // the 'binaries' configuration.
+    binaries tasks.exportBinariesArchive
+  }
+}
+
+/*------------------------------------------------------------------------------
+  Additional tasks
+  ------------------------------------------------------------------------------*/
+// This is just a lifecycle task
+task unitTest(group: 'verification', description: 'Runs the unit tests for the Go binaries') {
+  dependsOn subprojects*.unitTest
+}
+
+// This is just a lifecycle task
+task integrationTest(group: 'verification', description: 'Runs the integration tests for the Go binaries') {
+  dependsOn subprojects*.integrationTest
+}
+
+// This is just a lifecycle task
+task functionalTest(group: 'verification', description: 'Runs the functional tests for the Go binaries') {
+  dependsOn subprojects*.functionalTest
+}
+
+// This is just a lifecycle task
+task test(group: 'verification', description: 'Runs all the tests for the Go binaries') {
+  dependsOn subprojects*.test
+}
+
+// This is just a lifecycle task
+task documentation(group: 'build', description: 'Builds the documentation for this project') {
+  dependsOn subprojects*.documentation
+}
+
+// This is just a lifecycle task
+task publish(group: 'publishing', description: 'Publishes artifacts produced by this project') {
+  // Only perform publishing if the Nyx release type enables publishing
+  onlyIf { nyxState.newRelease }
+
+  dependsOn subprojects*.publish
+}
+
+task deepClean(group: 'build', description: 'Clean the reproducible and reusable artifacts including caches, dependencies etc') {
+  dependsOn clean
+  dependsOn subprojects*.clean
+}
+
+/*------------------------------------------------------------------------------
+  Additional task dependencies
+------------------------------------------------------------------------------*/
+tasks.assemble.dependsOn subprojects*.assemble
+tasks.build.dependsOn subprojects*.build
+tasks.check.dependsOn subprojects*.check
+tasks.clean.dependsOn subprojects*.clean

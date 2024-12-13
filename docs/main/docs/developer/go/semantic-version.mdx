@@ -1,0 +1,71 @@
+---
+sidebar_position: 2
+tags:
+  - go
+  - developer
+  - guide
+---
+
+# Semantic Version
+
+The [`version`](https://godocs.io/github.com/mooltiverse/nyx/src/go/version) package provides you with a fully featured implementation of the [Semantic Versioning (SemVer)](https://semver.org/) specification without any external dependency. Full support for parsing, ordering, bumping and manipulating versions and their identifiers is provided.
+
+This library is used at the Nyx core but yet is completely independent from its logic so is perfectly suitable for use in ano other context.
+
+## Get the library
+
+To install the module locally run:
+
+```sh
+go get github.com/mooltiverse/nyx/src/go/version
+```
+
+To import it in your source code:
+
+```go
+import "github.com/mooltiverse/nyx/src/go/version"
+```
+
+## API docs
+
+Thanks to [Go docs](https://godocs.io/) you can browse the API docs at [this URL](https://godocs.io/github.com/mooltiverse/nyx/src/go/version).
+
+## Using the library
+
+Using the library is simple. You just need to create a [`SemanticVersion`](https://godocs.io/github.com/mooltiverse/nyx/src/go/version#SemanticVersion) and use it as in the following example.
+
+**Remember the `SemanticVersion` is immutable** so every time you invoke a method that changes the number you actually get a new object representing the new state.
+
+```go
+package main
+
+import version "github.com/mooltiverse/nyx/src/go/version"
+
+func main() {
+  // parse any string as a semantic version, in this case we use the default initial version "0.1.0"
+  v1, err := version.ValueOfSemanticVersion(version.SEMANTIC_VERSION_DEFAULT_INITIAL_VERSION)
+  // bump the MINOR number > "0.2.0"
+  v2, err := v1.BumpMinor()
+  // bump the MAJOR number > "1.0.0"
+  v3, err := v2.BumpMajor()
+  // bump the new pre-release identifier named 'alpha' > "1.0.0-alpha.1"
+  v4, err := v3.BumpPrerelease("alpha")
+  // bump the 'alpha' pre-release identifier again > "1.0.0-alpha.2"
+  v5, err := v4.BumpPrerelease("alpha")
+  // add the 'build' identifier and give it the '123' value > "1.0.0-alpha.2+build.123"
+  v6, err := v5.SetBuild("build", "123")
+  // and so on...
+}
+```
+
+The `SemanticVersion` also provides additional useful methods to handle arbitrary identifiers so that it's even more expressive. For example:
+
+```go
+v1, err := version.ValueOfSemanticVersion("2.0.3")
+v2, err := v1.SetBuildAttributeWith("timestamp", "20200101T1500")    // v2 is now "2.0.3+timestamp.20200101T1500"
+// but in another run you want to overwrite the attribute with the same name, so...
+v3, err := v2.SetBuildAttributeWith("timestamp", "20991201T2359")    // v3 is now "2.0.3+timestamp.20991201T2359"
+// or add a branch name and a tag value in the pre-release part, one as a simple attribute and the other as a named pair
+v4, err := v3.SetPrereleaseAttributeWith("develop").setPrereleaseAttribute("tag", 3)
+// v4 is now "2.0.3-develop.tag.3+timestamp.20991201T2359"
+```

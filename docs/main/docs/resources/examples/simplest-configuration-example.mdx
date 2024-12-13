@@ -1,0 +1,40 @@
+---
+sidebar_position: 1
+tags:
+  - support
+  - examples
+  - configuration
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+import CodeBlock from '@theme/CodeBlock';
+// Importing non-markdown snippets requires the 'raw-loader'. See:
+// - https://docusaurus.io/docs/markdown-features/react#importing-code-snippets
+import SimplestJSON from '!!raw-loader!../../_includes/.nyx-simplest.json';
+import SimplestYAML from '!!raw-loader!../../_includes/.nyx-simplest.yaml';
+import SimplestGroovy from '!!raw-loader!../../_includes/.nyx-simplest.groovy';
+
+# Simplest configuration example
+
+Here you can find the example of the simplest configuration in the supported [`formats`](../../user/introduction/configuration-methods.mdx#supported-file-grammars).
+
+This configuration is the bare minimum and just uses the [*simple* preset](../../user/configuration-presets/simple.mdx), leaving all other options to their default values.
+
+<Tabs>
+  <TabItem value="json" label="JSON" default>
+    <CodeBlock language="json">{SimplestJSON}</CodeBlock>
+
+    Source code for this file is available [here](https://raw.githubusercontent.com/mooltiverse/nyx/main/docs/main/docs/_includes/.nyx-simplest.json).
+  </TabItem>
+  <TabItem value="yaml" label="YAML">
+    <CodeBlock language="yaml">{SimplestYAML}</CodeBlock>
+
+    Source code for this file is available [here](https://raw.githubusercontent.com/mooltiverse/nyx/main/docs/main/docs/_includes/.nyx-simplest.yaml).
+  </TabItem>
+  <TabItem value="groovy" label="Groovy (Gradle)">
+    <CodeBlock language="groovy">{SimplestGroovy}</CodeBlock>
+
+    Source code for this file is available [here](https://raw.githubusercontent.com/mooltiverse/nyx/main/docs/main/docs/_includes/.nyx-simplest.groovy).
+  </TabItem>
+</Tabs>

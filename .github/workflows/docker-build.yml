@@ -1,0 +1,470 @@
+# Build Docker images.
+
+name: Docker Build
+
+on:
+  workflow_dispatch:
+  workflow_call:
+    inputs:
+      runs-on:
+        description: |-
+          Define the type of machine to run the job on.
+          Default: ubuntu-latest
+        type: string
+        required: false
+        default: 'ubuntu-latest'
+      verbosity:
+        description: |-
+          Sets the verbosity level to adjust the output logs verbosity.
+          Allowed values are: 'error', 'warning', 'quiet', 'info', 'debug'.
+          Default: quiet
+        type: string
+        required: false
+        default: 'quiet'
+      gradle-arguments:
+        description: |-
+          The whitespace separated list of Gradle arguments to pass on the
+          Gradle command line. See also 'gradle-secret-arguments' for passing
+          sensitive values.
+          For example you may use '--quiet', '--warn', '--info', '--debug' to
+          set the verbosity level.
+          For more see: https://docs.gradle.org/current/userguide/command_line_interface.html.
+          The -PbuildCacheTo='type=gha,mode=max' -PbuildCacheFrom='type=gha'
+          can be used to enable the Docker GitHub Actions cache used when
+          building the Docker images using BuildKit. These options are parsed
+          by our Gradle scripts building the Docker images and allow the
+          scripts to invoke the 'docker buildx build' command with the
+          '--cache-to type=gha[,parameters...]' and
+          '--cache-from type=gha[,parameters...]' arguments to improve the
+          performances and reuse layers.
+          For more see:
+            - https://docs.docker.com/build/cache/backends/gha/
+            - https://docs.docker.com/build/ci/github-actions/cache/
+          Default: --build-cache --stacktrace -PbuildCacheTo='type=gha,mode=max' -PbuildCacheFrom='type=gha'
+        type: string
+        required: false
+        default: "--build-cache --stacktrace -PbuildCacheTo='type=gha,mode=max' -PbuildCacheFrom='type=gha'"
+      gradle-tasks:
+        description: |-
+          The whitespace separated list of Gradle tasks to run.
+          Default: src:docker:assemble
+        type: string
+        required: false
+        default: "src:docker:assemble"
+      install-jdk:
+        description: |-
+          Whether to install the JDK or not.
+          For more see: https://github.com/actions/setup-java.
+          Please note that the tools come preinstalled in many hosted GitHub
+          runner images and re-installing would just slow down the setup process.
+          Consider installing only when the runners don't have it preinstalled or
+          when you need a specific version.
+          To check out if it's already installed see:
+          - https://docs.github.com/en/actions/using-github-hosted-runners/using-github-hosted-runners/about-github-hosted-runners#preinstalled-software
+          Default: false
+        type: boolean
+        required: false
+        default: true
+      install-jdk-distribution:
+        description: |-
+          The JDK distribution to setup if 'install-jdk' is 'true'.
+          For available distributions see: https://github.com/actions/setup-java.
+          Default: temurin
+        type: string
+        required: false
+        default: 'temurin'
+      install-jdk-version:
+        description: |-
+          The JDK version to setup if 'install-jdk' is 'true'.
+          For available versions see: https://github.com/actions/setup-java.
+          Default: 21
+        type: string
+        required: false
+        default: '21'
+      install-gradle:
+        description: |-
+          Whether to install Gradle or not.
+          For more see: https://github.com/gradle/actions/blob/main/docs/setup-gradle.md.
+          Please note that the tools come preinstalled in many hosted GitHub
+          runner images and re-installing would just slow down the setup process.
+          Consider installing only when the runners don't have it preinstalled or
+          when you need a specific version.
+          To check out if it's already installed see:
+          - https://docs.github.com/en/actions/using-github-hosted-runners/using-github-hosted-runners/about-github-hosted-runners#preinstalled-software
+          Default: false
+        type: boolean
+        required: false
+        default: false
+      install-gradle-version:
+        description: |-
+          The Gradle version to setup if 'install-gradle' is 'true'.
+          There are a few aliases that can be used here: 'wrapper' uses the version
+          defined in the Gradle wrapper (recommended), 'current' uses the latest
+          stable release.
+          For available versions see: https://github.com/gradle/actions/blob/main/docs/setup-gradle.md.
+          Default: wrapper
+        type: string
+        required: false
+        default: 'wrapper'
+      delete-android:
+        description: |-
+          When true the jobs will first delete some preinstalled contents from
+          the runner to free up some space (up to > 30GB if you enable all
+          the 'delete-*' options).
+          This may be useful if you encounter errors due to disk space when
+          running but introduces some delays (~3 minutes) when the job starts
+          due to the time required to delete contents.
+          This option, when true, deletes the Android preinstalled packages.
+          The clean-up task runs first so even in case was deleted and yet
+          needed it can still be installed after the cleanup.
+          For more see: https://github.com/jlumbroso/free-disk-space.
+          Default: false
+        type: boolean
+        required: false
+        default: false
+      delete-dotnet:
+        description: |-
+          When true the jobs will first delete some preinstalled contents from
+          the runner to free up some space (up to > 30GB if you enable all
+          the 'delete-*' options).
+          This may be useful if you encounter errors due to disk space when
+          running but introduces some delays (~3 minutes) when the job starts
+          due to the time required to delete contents.
+          This option, when true, deletes the DotNet preinstalled packages.
+          The clean-up task runs first so even in case was deleted and yet
+          needed it can still be installed after the cleanup.
+          For more see: https://github.com/jlumbroso/free-disk-space.
+          Default: false
+        type: boolean
+        required: false
+        default: false
+      delete-haskell:
+        description: |-
+          When true the jobs will first delete some preinstalled contents from
+          the runner to free up some space (up to > 30GB if you enable all
+          the 'delete-*' options).
+          This may be useful if you encounter errors due to disk space when
+          running but introduces some delays (~3 minutes) when the job starts
+          due to the time required to delete contents.
+          This option, when true, deletes the Haskell preinstalled packages.
+          The clean-up task runs first so even in case was deleted and yet
+          needed it can still be installed after the cleanup.
+          For more see: https://github.com/jlumbroso/free-disk-space.
+          Default: false
+        type: boolean
+        required: false
+        default: false
+      delete-large-packages:
+        description: |-
+          When true the jobs will first delete some preinstalled contents from
+          the runner to free up some space (up to > 30GB if you enable all
+          the 'delete-*' options).
+          This may be useful if you encounter errors due to disk space when
+          running but introduces some delays (~3 minutes) when the job starts
+          due to the time required to delete contents.
+          This option, when true, deletes the large preinstalled packages.
+          The clean-up task runs first so even in case was deleted and yet
+          needed it can still be installed after the cleanup.
+          For more see: https://github.com/jlumbroso/free-disk-space.
+          Default: false
+        type: boolean
+        required: false
+        default: false
+      delete-docker-images:
+        description: |-
+          When true the jobs will first delete some preinstalled contents from
+          the runner to free up some space (up to > 30GB if you enable all
+          the 'delete-*' options).
+          This may be useful if you encounter errors due to disk space when
+          running but introduces some delays (~3 minutes) when the job starts
+          due to the time required to delete contents.
+          This option, when true, deletes the preinstalled Docker images.
+          The clean-up task runs first so even in case was deleted and yet
+          needed it can still be installed after the cleanup.
+          For more see: https://github.com/jlumbroso/free-disk-space.
+          Default: false
+        type: boolean
+        required: false
+        default: false
+      delete-tool-cache:
+        description: |-
+          When true the jobs will first delete some preinstalled contents from
+          the runner to free up some space (up to > 30GB if you enable all
+          the 'delete-*' options).
+          This may be useful if you encounter errors due to disk space when
+          running but introduces some delays (~3 minutes) when the job starts
+          due to the time required to delete contents.
+          This option, when true, deletes the tool cache. This might remove
+          tools that are actually needed (Node, Go, Python, Ruby etc) but if
+          set to true but frees about 6 GB.
+          The clean-up task runs first so even in case was deleted and yet
+          needed it can still be installed after the cleanup.
+          For more see: https://github.com/jlumbroso/free-disk-space.
+          Default: false
+        type: boolean
+        required: false
+        default: false
+      delete-swap-storage:
+        description: |-
+          When true the jobs will first delete some preinstalled contents from
+          the runner to free up some space (up to > 30GB if you enable all
+          the 'delete-*' options).
+          This may be useful if you encounter errors due to disk space when
+          running but introduces some delays (~3 minutes) when the job starts
+          due to the time required to delete contents.
+          This option, when true, deletes the preinstalled swap storage.
+          The clean-up task runs first so even in case was deleted and yet
+          needed it can still be installed after the cleanup.
+          For more see: https://github.com/jlumbroso/free-disk-space.
+          Default: false
+        type: boolean
+        required: false
+        default: false
+      nyx-cache-name-restore-suffix:
+        description: |-
+          The suffix of the name to use for the cache that will be read by this
+          workflow. This is useful to 'chain' caches, so here you can pass the
+          suffix from a previous cache to make this workflow start from that
+          one cache.
+          If the cache to read does not exists a new one will be created from
+          scratch without errors.
+          Default: none
+        type: string
+        required: false
+        default: ""
+      gradle-cache-name-prefix:
+        description: |-
+          The prefix to use for the cache that will be read by this workflow.
+          This is useful to 'chain' caches, so here you can pass the suffix
+          from a previous cache to make this workflow start from that one cache.
+          Moreover, this can be used to override the default Gradle action's
+          cache prefix to make all jobs within the same stream (i.e. a feature)
+          share the same prefix and not overlap with other streams. However,
+          when setting this prefix to some specific feature you won't be
+          able to merge the caches and in case you 'chain' them you can only
+          use one upstream cache for each downstream job.
+          If the cache to read does not exists a new one will be created from
+          scratch without errors.
+          Default: gradle-\$\{\{ github.job \}\}-docker (isolate the cache for
+          the 'docker' feature).
+        type: string
+        required: false
+        default: "gradle-${{ github.run_id }}-docker"
+      gradle-cache-name-restore-suffix:
+        description: |-
+          The suffix of the name to use for the cache that will be read by this
+          workflow. This is useful to 'chain' caches, so here you can pass the
+          suffix from a previous cache to make this workflow start from that
+          one cache.
+          If the cache to read does not exists a new one will be created from
+          scratch without errors.
+          Default: \$\{\{ github.job \}\}
+        type: string
+        required: false
+        default: "${{ github.job }}"
+      go-cache-name-restore-suffix:
+        description: |-
+          The suffix of the name to use for the cache that will be read by this
+          workflow. This is useful to 'chain' caches, so here you can pass the
+          suffix from a previous cache to make this workflow start from that
+          one cache.
+          If the cache to read does not exists a new one will be created from
+          scratch without errors.
+          If this value is empty (by default) this workflow assumes this
+          feature is not used therefore no cache will be restored.
+          Default: none
+        type: string
+        required: false
+        default: ""
+      java-cache-name-restore-suffix:
+        description: |-
+          The suffix of the name to use for the cache that will be read by this
+          workflow. This is useful to 'chain' caches, so here you can pass the
+          suffix from a previous cache to make this workflow start from that
+          one cache.
+          If the cache to read does not exists a new one will be created from
+          scratch without errors.
+          If this value is empty (by default) this workflow assumes this
+          feature is not used therefore no cache will be restored.
+          Default: none
+        type: string
+        required: false
+        default: ""
+      docker-cache-name-restore-suffix:
+        description: |-
+          The suffix of the name to use for the cache that will be read by this
+          workflow. This is useful to 'chain' caches, so here you can pass the
+          suffix from a previous cache to make this workflow start from that
+          one cache.
+          If the cache to read does not exists a new one will be created from
+          scratch without errors.
+          Default: \$\{\{ github.job \}\}
+        type: string
+        required: false
+        default: "${{ github.job }}"
+      enable-github-container-registry:
+        description: |-
+          Whether or not authentication to the GitHub Container Registry must
+          be enabled.
+          When true the 'GITHUB_TOKEN' will be used to authenticate.
+          Default: false
+        type: boolean
+        required: false
+        default: false
+      enable-elastic-container-registry:
+        description: |-
+          Whether or not authentication to the AWS Elastic Container Registry (ECR)
+          must be enabled.
+          When true the 'aws-region', 'aws-access-key-id' and 'aws-secret-access-key'
+          will be used to authenticate.
+          Default: false
+        type: boolean
+        required: false
+        default: false
+      github-user:
+        description: |-
+          The GitHub user name to use for remote API.
+          When using the GITHUB_TOKEN in place of the password (which is what
+          we usually do), this value can be anything and even though the
+          documentation suggests using $\{\{ github.actor \}\}, that would
+          use the name of the user who pushed a commit (when a pipeline runs
+          on a push event) so using an anonymous value may be worth.
+        type: string
+        required: false
+        default: "GITHUB"
+      aws-access-key-id:
+        description: |-
+          The AWS access key ID to use for remote API.
+          This is usually the value of the AWS_ACCESS_KEY_ID environment variable.
+          See 'enable-elastic-container-registry' to enable authentication.
+        type: string
+        required: false
+      aws-region:
+        description: |-
+          The AWS region to use for remote API.
+          This is usually the value of the AWS_REGION environment variable.
+          See 'enable-elastic-container-registry' to enable authentication.
+        type: string
+        required: false
+      aws-container-registry:
+        description: |-
+          The AWS Elastic Container Registry fully qualified name (i.e.
+          '<aws-account-number>.dkr.ecr.<region>.amazonaws.com').
+          See 'enable-elastic-container-registry' to enable authentication.
+        type: string
+        required: false
+    secrets:
+      gradle-secret-arguments:
+        description: |-
+          The whitespace separated list of Gradle arguments to pass on the
+          Gradle command line. This is for passing sensitive values.
+          See also 'gradle-arguments' for passing non sensitive values.
+          For example you may use '--quiet', '--warn', '--info', '--debug' to
+          set the verbosity level.
+          For more see: https://docs.gradle.org/current/userguide/command_line_interface.html.
+        required: false
+      aws-secret-access-key:
+        description: |-
+          The AWS access key ID to use for remote API.
+          This is usually the value of the AWS_SECRET_ACCESS_KEY environment variable.
+          See 'enable-elastic-container-registry' to enable authentication.
+        required: false
+    outputs:
+      gradle-cache-name-suffix:
+        description: "The suffix of the name used by the last cache in this workflow. This is useful to 'chain' caches, so you can pass this value as input for other actions or workflows."
+        value: ${{ jobs.build.outputs.gradle-cache-name-suffix }}
+      docker-cache-name-suffix:
+        description: "The suffix of the name used by the last cache in this workflow. This is useful to 'chain' caches, so you can pass this value as input for other actions or workflows."
+        value: ${{ jobs.build.outputs.docker-cache-name-suffix }}
+
+env:
+  # Compute the extra Gradle properties to use for Gradle commands.
+  # Here:
+  # - we add one argument for the verbosity level passed in the 'verbosity' input
+  GRADLE_EXTRA_OPTS: >-
+    ${{ inputs.verbosity == 'warning' && '--warn' || '' }}
+    ${{ inputs.verbosity == 'quiet' && '--quiet' || '' }}
+    ${{ inputs.verbosity == 'info' && '--info' || '' }}
+    ${{ inputs.verbosity == 'debug' && '--debug' || '' }}
+
+jobs:
+  build:
+    name: Build
+    runs-on: ${{ inputs.runs-on }}
+    steps:
+    # Free up to 30+ GB of space by removing pre-installed packages
+    # This is required to prevent the 'no space left on device'.
+    # It takes up to 3 additional minutes to run this task.
+    # This action only runs on Linux (Ubuntu) runners so a warning
+    # is emitted when running on other operating systems.
+    - name: Free Disk Space
+      if: runner.os == 'Linux' && (inputs.delete-tool-cache || inputs.delete-android || inputs.delete-dotnet || inputs.delete-haskell || inputs.delete-large-packages || inputs.delete-docker-images || inputs.delete-swap-storage)
+      uses: jlumbroso/free-disk-space@main
+      with:
+        tool-cache: ${{ inputs.delete-tool-cache }}
+        android: ${{ inputs.delete-android }}
+        dotnet: ${{ inputs.delete-dotnet }}
+        haskell: ${{ inputs.delete-haskell }}
+        large-packages: ${{ inputs.delete-large-packages }}
+        docker-images: ${{ inputs.delete-docker-images }}
+        swap-storage: ${{ inputs.delete-swap-storage }}
+    - name: Log the warning message impairement about freeing disk space on the current runner
+      if: runner.os != 'Linux' && (inputs.delete-tool-cache || inputs.delete-android || inputs.delete-dotnet || inputs.delete-haskell || inputs.delete-large-packages || inputs.delete-docker-images || inputs.delete-swap-storage)
+      shell: bash
+      run: echo "::warning title=Unable to free disk space on ${{ runner.os }}::The job has been configured to delete preconfigured packages to free disk space but that feature is only supported on Linux (Ubuntu) runners, while this instance runs on ${{ runner.os }}."
+    - uses: mooltiverse/nyx/.github/actions/setup-git@main
+      with:
+        verbosity: ${{ inputs.verbosity }}
+    - id: nyx
+      uses: mooltiverse/nyx/.github/actions/setup-nyx@@main
+      with:
+        # Just restore the cache
+        enable-action: false
+        verbosity: ${{ inputs.verbosity }}
+        cache-name-restore-suffix: ${{ inputs.nyx-cache-name-restore-suffix }}
+    - id: go
+      if: inputs.go-cache-name-restore-suffix != ''
+      uses: mooltiverse/nyx/.github/actions/setup-go@@main
+      with:
+        verbosity: ${{ inputs.verbosity }}
+        # Restore the cache from the previous job to 'chain' the two caches
+        cache-name-restore-suffix: ${{ inputs.go-cache-name-restore-suffix }}
+    - id: java
+      if: inputs.java-cache-name-restore-suffix != ''
+      uses: mooltiverse/nyx/.github/actions/setup-java@@main
+      with:
+        verbosity: ${{ inputs.verbosity }}
+        # Restore the cache from the previous job to 'chain' the two caches
+        cache-name-restore-suffix: ${{ inputs.java-cache-name-restore-suffix }}
+    - id: docker
+      uses: mooltiverse/nyx/.github/actions/setup-docker@main
+      with:
+        verbosity: ${{ inputs.verbosity }}
+        # Restore the cache from the previous job to 'chain' the two caches
+        cache-name-restore-suffix: ${{ inputs.docker-cache-name-restore-suffix }}
+        enable-github-container-registry: ${{ inputs.enable-github-container-registry }}
+        github-user: ${{ inputs.github-user }}
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        enable-elastic-container-registry: ${{ inputs.enable-elastic-container-registry }}
+        aws-region: ${{ inputs.aws-region }}
+        aws-container-registry: ${{ inputs.aws-container-registry }}
+        aws-access-key-id: ${{ inputs.aws-access-key-id }}
+        aws-secret-access-key: ${{ secrets.aws-secret-access-key }}
+    - id: gradle
+      uses: mooltiverse/nyx/.github/actions/setup-gradle@main
+      with:
+        verbosity: ${{ inputs.verbosity }}
+        install-jdk: ${{ inputs.install-jdk || inputs.delete-tool-cache }}
+        install-jdk-version: ${{ inputs.install-jdk-version }}
+        install-jdk-distribution: ${{ inputs.install-jdk-distribution }}
+        install-gradle: ${{ inputs.install-gradle || inputs.delete-tool-cache }}
+        install-gradle-version: ${{ inputs.install-gradle-version }}
+        cache-name-prefix: ${{ inputs.gradle-cache-name-prefix }}
+        # Restore the cache from the previous job to 'chain' the two caches
+        cache-name-restore-suffix: ${{ inputs.gradle-cache-name-restore-suffix }}
+    - name: Build the Docker images
+      shell: bash
+      run: ./gradlew ${{ inputs.gradle-arguments }} ${{ secrets.gradle-secret-arguments }} ${{ env.GRADLE_EXTRA_OPTS }} ${{ inputs.gradle-tasks }}
+    outputs:
+      docker-cache-name-suffix: ${{ steps.docker.outputs.cache-name-suffix }}
+      gradle-cache-name-suffix: ${{ steps.gradle.outputs.cache-name-suffix }}

@@ -1,9 +1,0 @@
-# Nyx site variables
-#
-# Nyx Project Home
-# This variable can be used as {{ site.data.project.home }} to parametrize the project home 
-home: "https://github.com/mooltiverse/nyx"
-#
-# Nyx Documentation Home
-# This variable can be used as {{ site.data.project.docs_home }} to parametrize the documentation home
-docs_home: "https://mooltiverse.github.io/nyx"

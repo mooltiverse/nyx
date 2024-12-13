@@ -1,0 +1,1360 @@
+/*------------------------------------------------------------------------------
+  Plugins DSL block
+  https://docs.gradle.org/current/userguide/plugins.html#sec:plugins_block
+------------------------------------------------------------------------------*/
+plugins {
+}
+
+/*------------------------------------------------------------------------------
+  Local sub-project properties
+------------------------------------------------------------------------------*/
+description = 'Docker images'
+
+/*------------------------------------------------------------------------------
+  This is the configuration for all sub-projects, but not this project
+------------------------------------------------------------------------------*/
+subprojects {
+  /*----------------------------------------------------------------------------
+    Configurations and Dependencies
+  ----------------------------------------------------------------------------*/
+  // For more on Configurations, Dependencies and Artifacts see:
+  // - https://docs.gradle.org/current/userguide/declaring_dependencies_adv.html
+  // - https://docs.gradle.org/current/userguide/cross_project_publications.html
+  configurations {
+    // Here we define the configurations to:
+    // - define dependencies to other projects so this project can use their
+    //   artifacts
+    // - expose artifacts produced by this project that can be used by others as
+    //  dependencies
+    // Configurations can extend other configurations from within the same
+    // project by means of 'extendsFrom'.
+    // To add artifacts to configurations use the 'artifacts' section.
+    apiDocumentation {
+      // The 'apiDocumentation' configuration exposes the generated API
+      // documentation. This configuration is 'consumable' so it can be used
+      // by other 'consumer' projects.
+      // Artifacts are added to this configuration by means of the
+      // 'apiDocumentation' artifact in the 'artifacts' section.
+      canBeConsumed = true
+      canBeResolved = false
+    }
+    binaries {
+      // The 'binaries' configuration depends on the binary files generated
+      // by other projects to make them available into one local configuration
+      // used to import them to the Docker images.
+      canBeConsumed = false
+      canBeResolved = true
+    }
+  }
+
+  dependencies {
+    // Here we define the static dependencies on other projects' configurations.
+
+    // For all projects listed in the 'importBinariesFrom' property add a
+    // dependency to their 'binaries' configuration to the local 'binaries'
+    // configuration.
+    if (project.hasProperty("importBinariesFrom") && !project.getProperty("importBinariesFrom").isBlank()) {
+      project.getProperty("importBinariesFrom").split(',').each { p -> 
+        binaries (project(path: p, configuration: 'binaries'))
+      }
+    }
+  }
+
+  /*----------------------------------------------------------------------------
+    Additional properties
+  ----------------------------------------------------------------------------*/
+  // The directory when dependencies from other projects are stored
+  ext.dependenciesDir = new File(buildDir, 'dependencies')
+
+  // The project version may have a '+' sign (when using extra identifier in the
+  // 'build' part) but since Docker doesn't handle it as a valid label we need
+  // to replace all '+' occurrences with '_'.
+  // We also transform to lowercase as Docker tags don't allow uppercase letters.
+  ext.sanitizedVersion = project.version.replaceAll('\\+','_').toLowerCase()
+
+  // Capture the timestamp that we can use uniquely inside the script.
+  ext.timestamp = new Date()
+
+  // A string representing a timestamp, in reverse order (from year down to
+  // seconds) to be used in identifiers.
+  ext.timestampStringReverse = new java.text.SimpleDateFormat("yyyyMMddHHmmssSSS").format(timestamp)
+
+  // A string representing a timestamp, in RFC3339 format.
+  ext.timestampStringRFC3339 = new java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ").format(timestamp)
+
+  // The object used to format timestamps in log entries
+  ext.logDateFormat = new java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ")
+
+  // This function returns true if Docker is installed locally.
+  ext.dockerIsInstalled = {
+    // To check whether or not Docker is installed we simply run
+    // 'docker version' it and and check for the exit status.
+    def processBuilder = new ProcessBuilder("docker", "version")
+    try {
+      return processBuilder.start().waitFor() == 0
+    } catch (Exception e) {
+      // In case of any exception we assume Docker is not installed
+      return false
+    }
+  }
+
+  // This function returns the name to use for the BuildKit builder.
+  // The flavor parameter is optional.
+  ext.dockerBuilderName = { flavor ->
+    // The suffix is '-<FLAVOR>' when the flavor is not null, otherwise
+    // the empty string.
+    def flavorSuffix = flavor == null ? "" : "-${flavor}"
+    return rootProject.name+'-'+project.name+flavorSuffix+'-builder'
+  }
+
+  // This function returns true if a Docker BuildKit builder with the given
+  // name exists, false otherwise.
+  ext.dockerBuilderExists = { name ->
+    if (!dockerIsInstalled()) {
+      return false
+    }
+    // To check whether or not the builder exists we run the 'inspect'
+    // command and check for the exit status.
+    def exitValue = new ProcessBuilder("docker", "buildx", "inspect", name).start().waitFor()
+    return exitValue == 0 ? true : false
+  }
+
+  // This function returns true if a Docker image with the given SHA
+  // exists in the local image store.
+  // The given SHA may have an optional 'sha256:' prefix.
+  ext.dockerImageExists = { sha ->
+    if (!dockerIsInstalled()) {
+      return false
+    }
+    // To check whether or not the image exists we run the 'inspect'
+    // command and check for the exit status.
+    def exitValue = new ProcessBuilder("docker", "image", "inspect", sha).start().waitFor()
+    return exitValue == 0 ? true : false
+  }
+
+  // Returns the map of Docker files and their associated flavors.
+  // Dockerfiles are the map keys, while values are flavor identifiers.
+  // Flavors are detected at project configuration time by reading the files in
+  // this directory.
+  // Each flavor is defined by a specific Dockerfile for each flavor, named
+  // Dockerfile.<FLAVOR> (mind the dot separator).
+  // The standard Dockerfile, if present, is configured with a null flavor value.
+  // If no Dockerfile or Dockerfile.<FLAVOR> is found an empty map is returned.
+  ext.flavors = {
+    def flavorsMap = [:]
+    fileTree(dir: projectDir, includes: ['Dockerfile*']).each { file ->
+      if (file.name.equals('Dockerfile')) {
+        flavorsMap.put(file.name, null)
+      } else if (file.name.startsWith('Dockerfile.')) {
+        flavorsMap.put(file.name, file.name.replace('Dockerfile.', ''))
+      }
+    }
+    return flavorsMap
+  }
+
+  // Returns the map of Docker Compose files and their associated environment names
+  // found in the given directory.
+  // Docker Compose files are the map keys, while values are environment names.
+  // Environment names are detected at project configuration time by reading 
+  // files in this directory.
+  // Each environment name is defined by a specific Docker Compose file for each
+  // environment, named Compose.<FLAVOR>.yaml (mind the dot separator).
+  // Variants in the file name are allowed, matching the initial upper or lower case
+  // letter ('Compose' or 'compose'). Variants are also allowed for extensions,
+  // which can be either '.yaml' or '.yml'.
+  // The standard Docker Compose file ('Compose.yaml', 'compose.yaml', 'Compose.yml'
+  // or 'compose.yml'), if present, is configured with a null environment name.
+  // If no Docker compose file is found an empty map is returned.
+  ext.environments = { scanDir ->
+    def environmentsMap = [:]
+    fileTree(dir: scanDir, includes: ['Compose*.yaml', 'compose*.yaml', 'Compose*.yml', 'compose*.yml']).each { file ->
+      java.util.regex.Matcher matcher = java.util.regex.Pattern.compile("[Cc]ompose(\\.(.*))?.y[a]?ml").matcher(file.name)
+      if (matcher.matches()) {
+        def environmentName = matcher.group(2);
+        environmentsMap.put(file.name, environmentName)
+      }
+    }
+    return environmentsMap
+  }
+
+  // Returns the map of test groups for this project and their associated directories.
+  // Test groups may be: 'unit', 'integration', 'functional'.
+  // This function only returns the test groups with a corresponding directory under
+  // 'tests' (namely 'test/unit', 'test/integration', 'test/functional').
+  // Test group names are the map keys, while values are relative subdirectory paths.
+  ext.testGroups = {
+    def groupsMap = [:]
+    [ 'unit', 'integration', 'functional' ].each { entry ->
+      def entryFile = new File("${projectDir}/test", entry)
+      if (entryFile.exists() && entryFile.isDirectory()) {
+        groupsMap.put(entry, project.relativePath(entryFile))
+      }
+    }
+    return groupsMap
+  }
+
+  // Returns the Docker test suites for a certain group, where a group
+  // is a type of tests (i.e. 'unit', 'integration', 'functional').
+  // A test suite is represented by a Docker Compose file and you can have
+  // none or as many suites you want for each group.
+  // Test suites (Docker Compose files) must be stored under the
+  // 'test/<GROUP>/' directory and they are dynamically scanned.
+  // Each test suite can be anonymous (i.e. when modelled in a 'compose.yaml'
+  // or 'compose.yml' file) or named (i.e. when modelled in a
+  // 'compose.<NAME>.yaml' or 'compose.<NAME>.yml' file).
+  // This function takes the arguments:
+  // - 'group': is mandatory and represents the directory under the 'test'
+  //   directory where the Docker Compose files are stored (i.e. 'unit',
+  //   'integration', 'functional') and also the kind of tests.
+  // This function returns a map where keys are Docker Compose file names
+  // found under the 'test/<GROUP>/' directory and values are suite names
+  // (the optional suffix in the file name between the 'compose.' prefix
+  // and the '.yaml' or '.yml' extension). If a suite is anonymous the
+  // returned map value is null.
+  ext.testSuites = { group ->
+    def suitesMap = [:]
+    fileTree(dir: new File(projectDir, "test/${group}"), includes: ['compose*.yaml','compose*.yml']).each { file ->
+      if (file.name.equals('compose.yaml') || file.name.equals('compose.yml')) {
+        suitesMap.put(file.name, null)
+      } else if (file.name.startsWith('compose.')) {
+        suitesMap.put(file.name,
+          file.name.replace('compose.', '').replace('.yaml', '').replace('.yml', '')
+        )
+      }
+    }
+    return suitesMap
+  }
+
+  // Returns the list of items for the given property, which is assumed to be a
+  // comma-separated list of entries, with placeholders resolved to their
+  // actual values.
+  // This function takes two parameters:
+  // - 'propertyName': is the name of the property to read (i.e. 'tags',
+  //   'latestTags', 'registries')
+  //   and must be a comma-separated list of strings
+  // - 'flavor': is the current flavor, used to replace the '$flavor' placeholder
+  // If the 'propertyName' property is not configured an empty list is returned.
+  // Available placeholders are:
+  // - $version: will be replaced with the image name
+  // - $version: will be replaced with the current version
+  // - $flavor: will be replaced with the image flavor (if not null)
+  ext.resolvedProperties = { propertyName, flavor ->
+    if (project.hasProperty(propertyName)) {
+      def propertiesString = project.getProperty(propertyName)
+
+      // Do the placeholder replacements
+      propertiesString = propertiesString.replaceAll('\\$name', project.name)
+      propertiesString = propertiesString.replaceAll('\\$version', sanitizedVersion)
+      propertiesString = propertiesString.replaceAll('\\$flavor', flavor == null ? "" : flavor)
+
+      return propertiesString.split(',')
+    } else return []
+  }
+
+  // Returns the list of tags for the given Docker image flavor, reading the
+  // 'tags', 'latestTags' and 'localTags' properties and placeholders resolved
+  // to their actual values.
+  // The tags configured in the 'latestTags' property are only returned if
+  // the current release is also the latest and is only made of 'core'
+  // SemVer numbers (so not when it's a pre-release or build-release) with
+  // extra identifiers.
+  // The tags configured in the 'localTags' property are only returned if
+  // the 'resolveRegistries' parameter is false, so they don't get published
+  // to remote registries.
+  // The returned set of tags will be different based on the value passed
+  // for the 'resolveRegistries' flag:
+  // - when 'false' tags will be read from the 'tags', 'latestTags' and
+  //   'localTags', the image(s) name is added as a tag prefix (before the
+  //   ':' sign), their placeholders resolved and returned
+  // - when 'true' tags will be read from the 'tags' and 'latestTags' but
+  //   not from 'localTags', they will be prefixed with registries read
+  //   from the 'registries' property (also with placeholders resolved)
+  //  and the whole set of tags will be replicated for each registry.
+  //  If 'resolveRegistries' is true and no registry has been configured
+  //  then no tag will be returned.
+  //
+  // This function takes two parameters:
+  // - 'flavor': is the current flavor, used to replace the '$flavor'
+  //   placeholder
+  // - 'resolveRegistries': when true tags will be replicated for each
+  //   configured registry by adding the registry prefix
+  // Available placeholders are:
+  // - $version: will be replaced with the image name
+  // - $version: will be replaced with the current version
+  // - $flavor: will be replaced with the image flavor (if not null)
+  ext.resolvedTags = { flavor, resolveRegistries ->
+    def tags = resolvedProperties('tags', flavor)
+    if (nyxState.newRelease && nyxState.coreVersion && nyxState.latestVersion) {
+      tags = tags + resolvedProperties('latestTags', flavor)
+    }
+    if (!resolveRegistries) {
+      tags = tags + resolvedProperties('localTags', flavor)
+    }
+
+    if (resolveRegistries) {
+      def registries = resolvedProperties('registries', flavor)
+      def resolvedTagByRegistry = []
+      registries.each { registry ->
+        tags.each { tag ->
+          resolvedTagByRegistry.add(registry+":"+tag)
+        }
+      }
+      return resolvedTagByRegistry
+    } else {
+      def resolvedTags = []
+      tags.each { tag ->
+        resolvedTags.add(project.name+":"+tag)
+      }
+      return resolvedTags
+    }
+  }
+
+  // Returns the file to use when storing and retrieving the name of
+  // the Docker BuildKit builder name related to a specific Dockerfile.
+  // The file is stored in the 'build/state' directory and has the same
+  // name as the Dockerfile, adding the '.builder' extension.
+  ext.dockerStateBuilderFile = { dockerfile ->
+    return new File("${buildDir}/state", "${dockerfile}.builder")
+  }
+
+  // Returns the file to use when storing and retrieving the IID
+  // of the Docker image related to a specific Dockerfile.
+  // Do not confuse this with the local image SHA as this is the
+  // BuildKit multi-platform image digest. The IID and SHA values
+  // The file is stored in the 'build/state' directory and has the same
+  // name as the Dockerfile, adding the '.iid' extension.
+  ext.dockerStateIIDFile = { dockerfile ->
+    return new File("${buildDir}/state", "${dockerfile}.iid")
+  }
+
+  // Returns the file to use when storing and retrieving the SHA
+  // of the Docker image related to a specific Dockerfile.
+  // Do not confuse this with the local image IID as this is the
+  // image digest used for the local image store (visible with
+  // 'docker image ls').
+  // The file is stored in the 'build/state' directory and has the same
+  // name as the Dockerfile, adding the '.sha' extension.
+  ext.dockerStateSHAFile = { dockerfile ->
+    return new File("${buildDir}/state", "${dockerfile}.sha")
+  }
+
+  // Returns the file to use when storing and retrieving the registries
+  // where the Docker image has been pushed.
+  // The file is stored in the 'build/state' directory and has the same
+  // name as the Dockerfile, adding the '.push' extension.
+  ext.dockerStatePushFile = { dockerfile ->
+    return new File("${buildDir}/state", "${dockerfile}.push")
+  }
+
+  // Returns the file to use when storing and retrieving the test execution
+  // timestamp for a specific test group and suite.
+  // The file is stored in the 'build/state' directory and the name is
+  // 'test-<GROUP>-<SUITE>.status'.
+  ext.testStateStatusFile = { group, suite ->
+    return new File("${buildDir}/state", "test-${group}-${suite}.status")
+  }
+
+  // Returns the file to use when storing and retrieving the environment
+  // status for a specific test group and suite.
+  // The file is stored in the 'build/state' directory and the name is
+  // 'test-environment-<GROUP>-<SUITE>.status'.
+  ext.testEnvironmentStateStatusFile = { group, suite ->
+    return new File("${buildDir}/state", "test-environment-${group}-${suite}.status")
+  }
+
+  // Returns the file to use when storing and retrieving the archive
+  // where the OCI image is stored.
+  // The file is stored in the 'build/images' directory.
+  ext.dockerImageOCIFile = { dockerfile, flavor ->
+    // The suffix is '-<FLAVOR>' for Dockerfiles defining a flavor, or
+    // the empty string for those that don't.
+    def flavorSuffix = flavor == null ? "" : "-${flavor}"
+    return new File("${buildDir}/images", "${project.name}${flavorSuffix}-oci-image-${version}.tar.gz")
+  }
+
+  // Returns the directory to use when storing and retrieving the test logs.
+  // The directory is created under the 'build/test/reports/<GROUP>' directory
+  // and has the same name as the test group.
+  ext.dockerTestReportsDirectory = { group ->
+    return new File("${buildDir}/test/reports", group)
+  }
+
+  // Returns the file to use when storing and retrieving the Docker Compose
+  // logs.
+  // The file is stored in the 'build/test/reports/<GROUP>' directory and
+  // has the same name as the test suite plus the '-compose' suffix,
+  // adding the '.log' extension.
+  ext.dockerComposeLogFile = { group, suite ->
+    return new File(dockerTestReportsDirectory(group), "${suite}-compose.log")
+  }
+  
+  // Returns the file to use when storing and retrieving the test logs.
+  // The file is stored in the 'build/test/reports/<GROUP>' directory and
+  // has the same name as the test suite plus the '-test' suffix,
+  // adding the '.log' extension.
+  ext.dockerTestLogFile = { group, suite ->
+    return new File(dockerTestReportsDirectory(group), "${suite}-test.log")
+  }
+
+  // Returns the common set of arguments to pass to the 'docker' executable
+  // when running a 'buildx build' command.
+  // This set of argument allows to reuse the same arguments for multiple
+  // ivocations of the build command and is helpful because, due to the current
+  // limitations in BuildKit, we can't build the images first and then push them
+  // later only when tests succeeded. Push must be contentual to build, so
+  // we basically need to re-build the images from scratch when pushing them
+  // instead of just push the ones we had built in the first step.
+  // The returned arguments do not include the 'docker' executable but includes
+  // 'buildx' and 'build'.
+  ext.dockerBuildArguments = { dockerfile, flavor ->
+    // Initialize the arguments with the command and the BuildKit builder.
+    // The 'dockerBuilder-<FLAVOR>' task must run before any other task using
+    // these arguments or the builder may not be available yet.
+    def argsList = ['buildx', 'build', '--builder', dockerBuilderName(flavor)]
+
+    // Set the Docker Buildkit contexts.
+    if (project.hasProperty("contexts")) {
+      if (!project.getProperty("contexts").isBlank()) {
+        project.getProperty("contexts").split(',').each { context -> 
+          argsList.addAll('--build-context', context)
+        }
+      }
+    }
+
+    // Set the Docker Buildkit cache options.
+    if (project.hasProperty("buildCacheFrom")) {
+      argsList.addAll('--cache-from', project.getProperty("buildCacheFrom"))
+    }
+    if (project.hasProperty("buildCacheTo")) {
+      argsList.addAll('--cache-to', project.getProperty("buildCacheTo"))
+    }
+
+    // Set the Docker Buildkit target option.
+    if (project.hasProperty("target")) {
+      argsList.addAll('--target', project.getProperty("target"))
+    }
+
+    // Add the options to set the target platforms
+    if (project.hasProperty("platforms")) {
+      argsList.addAll('--platform', project.getProperty("platforms"))
+    }
+
+    // Add the options to set the standard labels to the command line arguments
+    // For more see:
+    // - https://github.com/opencontainers/image-spec/blob/main/annotations.md
+    if (project.hasProperty("displayName")) {
+      argsList.addAll('--annotation', "org.opencontainers.image.title=${project.getProperty("displayName")}")
+    }
+    if (project.hasProperty("description")) {
+      argsList.addAll('--annotation', "org.opencontainers.image.description=${project.getProperty("description")}")
+    }
+    if (project.hasProperty("documentationUrl")) {
+      argsList.addAll('--annotation', "org.opencontainers.image.url=${project.getProperty("documentationUrl")}")
+      argsList.addAll('--annotation', "org.opencontainers.image.documentation=${project.getProperty("documentationUrl")}")
+    }
+    if (project.hasProperty("sourceUrl")) {
+      argsList.addAll('--annotation', "org.opencontainers.image.source=${project.getProperty("sourceUrl")}")
+    }
+    argsList.addAll('--annotation', "org.opencontainers.image.created=${timestampStringRFC3339}")
+    argsList.addAll('--annotation', "org.opencontainers.image.version=${version}")
+    argsList.addAll('--annotation', "org.opencontainers.image.revision=${version}")
+    argsList.addAll('--annotation', "org.opencontainers.image.authors=${projectOrganizationName}")
+    argsList.addAll('--annotation', "org.opencontainers.image.vendor=${projectOrganizationName}")
+    if (project.hasProperty("licenses")) {
+      argsList.addAll('--annotation', "org.opencontainers.image.licenses=${project.getProperty("licenses")}")
+    }
+    argsList.addAll('--annotation', "org.opencontainers.image.ref.name=${nyxState.branch}")
+
+    return argsList
+  }
+
+  // Returns the tests representation read from the 'test.json' file for the
+  // given group (if any).
+  // If there is no test directory for the given group (test/<GROUP>) or the
+  // directory exists but has no 'test.json' file this function returns null,
+  // otherwise the file is parsed and returned as a JSON structure.
+  ext.testDefinitions = { group ->
+    def testsFile = new File("${projectDir}/test/${group}", 'test.json')
+    if (testsFile.exists() && testsFile.isFile()) {
+      return new groovy.json.JsonSlurper().parse(testsFile)
+    } else {
+      return null
+    }
+  }
+
+  // This function provides a unified logging facility so that all log entries
+  // have the same format.
+  ext.logTo = { printStream, prefix, body ->
+    printStream.println(String.format("[%s] [%s] %s", logDateFormat.format(new Date()), prefix, body))
+    printStream.flush()
+  }
+
+  // This function provides a unified logging facility so that all log entries
+  // have the same format.
+  // This method allows to format the prefix with common details.
+  ext.logDetailsTo = { printStream, testSuite, testCase, commandIndex, commandTotal, body ->
+    logTo(printStream, String.format("test suite: '%s', test case: '%s', command: '%d/%d'", testSuite, testCase, commandIndex, commandTotal), body)
+    printStream.flush()
+  }
+
+  /*----------------------------------------------------------------------------
+    Additional tasks
+  ----------------------------------------------------------------------------*/
+  task importBinaryDependencies(group: 'build setup', description: 'Imports the binaries generated by other projects') {
+    // Task dependencies
+    dependsOn configurations.binaries
+
+    // The directory where dependencies are stored
+    def outputDir = new File(dependenciesDir, 'binaries')
+
+    // Declare inputs and outputs of this task
+    inputs.files(configurations.binaries.getIncoming().getFiles())
+    outputs.dir(outputDir)
+
+    doLast {
+      logger.quiet("Importing the binaries")
+      configurations.binaries.getIncoming().getFiles().each { f -> 
+        logger.debug("Extracting the binaries from ${f.name} to ${outputDir}")
+        copy {
+          from tarTree(f)
+          into(outputDir)
+        }
+      }
+    }
+  }
+
+  // This is a lifecycle task that will depend on other tasks.
+  task importDependencies(group: 'build setup', description: 'Imports the the dependencies from other projects') {
+    dependsOn importBinaryDependencies
+  }
+
+  // This is a lifecycle task that will depend on other dynamically created
+  // tasks. One task for each Dockerfile (plain or flavoured) is created below.
+  // Since concrete tasks are not known in advance, the dependencies of this
+  // task on others are defined when those tasks are created.
+  task dockerBuild(group: 'build', description: 'Builds the Docker images') {
+  }
+
+  // This is a lifecycle task that will depend on other dynamically created
+  // tasks. One task for each Docker Compose file (either anonymous or containing
+  // a test suite name in its name) is created below.
+  // Since concrete tasks are not known in advance, the dependencies of this
+  // task on others are defined when those tasks are created.
+  task unitTest(group: 'verification', description: 'Runs the unit tests for the Docker images') {
+  }
+
+  // This is a lifecycle task that will depend on other dynamically created
+  // tasks. One task for each Docker Compose file (either anonymous or containing
+  // a test suite name in its name) is created below.
+  // Since concrete tasks are not known in advance, the dependencies of this
+  // task on others are defined when those tasks are created.
+  task integrationTest(group: 'verification', description: 'Runs the integration tests for the Docker images') {
+    // When they are all in the execution plan, run faster tests first.
+    mustRunAfter unitTest
+  }
+
+  // This is a lifecycle task that will depend on other dynamically created
+  // tasks. One task for each Docker Compose file (either anonymous or containing
+  // a test suite name in its name) is created below.
+  // Since concrete tasks are not known in advance, the dependencies of this
+  // task on others are defined when those tasks are created.
+  task functionalTest(group: 'verification', description: 'Runs the functional tests for the Docker images') {
+    // When they are all in the execution plan, run faster tests first.
+    mustRunAfter unitTest
+    mustRunAfter integrationTest
+  }
+
+  // This is a lifecycle task that will depend on other specific test tasks.
+  task test(group: 'verification', description: 'Runs all the tests for the Docker images') {
+    dependsOn unitTest
+    dependsOn integrationTest
+    dependsOn functionalTest
+  }
+
+  // This is a lifecycle task that will depend on other dynamically created
+  // tasks. One task for each Dockerfile (plain or flavoured) is created below.
+  // Since concrete tasks are not known in advance, the dependencies of this
+  // task on others are defined when those tasks are created.
+  task publish(group: 'publishing', description: 'Pushes the Docker images to remote registries') {
+    // Only perform publishing if the Nyx release type enables publishing
+    onlyIf { rootProject.nyxState.newRelease }
+  }
+
+  task deepClean(group: 'build', description: 'Clean the reproducible and reusable artifacts including caches, dependencies etc') {
+    dependsOn clean
+  }
+
+  // This is a lifecycle task that will depend on other dynamically created
+  // tasks. One task for each Docker Compose file (either named or anonymous)
+  // is created below.
+  // Since concrete tasks are not known in advance, the dependencies of this
+  // task on others are defined when those tasks are created.
+  task setUp(group: 'runtime', description: 'Sets up the runtime environment for the Docker image') {
+  }
+
+  // This is a lifecycle task that will depend on other dynamically created
+  // tasks. One task for each Docker Compose file (either named or anonymous)
+  // is created below.
+  // Since concrete tasks are not known in advance, the dependencies of this
+  // task on others are defined when those tasks are created.
+  task tearDown(group: 'runtime', description: 'Tears down the runtime environment for the Docker image') {
+  }
+
+  // This is a lifecycle task that will depend on other dynamically created
+  // tasks. One task for each Docker Compose file (either named or anonymous)
+  // is created below.
+  // Since concrete tasks are not known in advance, the dependencies of this
+  // task on others are defined when those tasks are created.
+  task dockerClean(group: 'build', description: 'Cleans Docker files and cached files') {
+  }
+
+  // Create tasks for each specific Docker flavor (if any) and the plain
+  // Dockerfile (if present).
+  flavors().each { dockerfile, flavor ->
+    // The suffix is '-<FLAVOR>' for Dockerfiles defining a flavor, or
+    // the empty string for those that don't.
+    def flavorSuffix = flavor == null ? "" : "-${flavor}"
+
+    // Create one 'dockerBuilder-<FLAVOR>' task for each flavor or the
+    // 'dockerImage' for the plain Dockerfile (which has no flavors).
+    tasks.create(group: 'build', name: "dockerBuilder${flavorSuffix}", description: "Creates the Docker Buildkit builder for the ${dockerfile}") {
+      // Check id the builder already exists
+      def dockerBuilderPresent = dockerBuilderExists(dockerBuilderName(flavor))
+
+      // Declare inputs and outputs of this task
+      inputs.files(dockerfile)
+      outputs.files(dockerStateBuilderFile(dockerfile))
+      // Although we also run up-to-date checks using input and output
+      // files, we also need to make sure the builder actually exists
+      // to make sure the task is up to date, otherwise in some
+      // environments like CI/CD runners where files are cached but
+      // worker nodes change the builder may not be there even if the
+      // files are up to date.
+      outputs.upToDateWhen { dockerBuilderPresent }
+
+      doLast {
+        if (dockerBuilderPresent) {
+          logger.quiet("The Docker Buildkit builder named ${dockerBuilderName(flavor)} for the Docker image ${dockerfile} already exists")
+        } else {
+          logger.quiet("Creating the Docker Buildkit builder named ${dockerBuilderName(flavor)} for the Docker image ${dockerfile}")
+          // Prepare the dynamic list of command line arguments
+          def argsList = ['buildx', 'create', '--driver', 'docker-container']
+          
+          // Add the options to set the target platforms
+          if (project.hasProperty("platforms")) {
+            argsList.addAll('--platform', project.getProperty("platforms"))
+          }
+
+          // Specify the builder name
+          argsList.addAll('--name', dockerBuilderName(flavor))
+
+          // Eventually run the build command
+          exec {
+            workingDir projectDir
+            executable 'docker'
+            args argsList
+          }
+
+          logger.info("Printing information for builder ${dockerBuilderName(flavor)} used for image ${dockerfile}")
+          exec {
+            // Print to the INFO level
+            logging.captureStandardOutput LogLevel.INFO
+            logging.captureStandardError  LogLevel.ERROR
+            commandLine 'docker', 'buildx', 'inspect', dockerBuilderName(flavor)
+          }
+        }
+        // Save the name of the builder to the output file.
+        dockerStateBuilderFile(dockerfile).text = dockerBuilderName(flavor)
+      }
+    }
+
+    // Create one 'dockerBuildImage-<FLAVOR>' task for each flavor or the
+    // 'dockerBuildImage' for the plain Dockerfile (which has no flavors).
+    tasks.create(group: 'build', name: "dockerBuildImage${flavorSuffix}", description: "Builds the Docker image from the ${dockerfile}") {
+      // Task dependencies
+      dependsOn importBinaryDependencies
+      dependsOn tasks.named("dockerBuilder${flavorSuffix}")
+
+      // Declare inputs and outputs of this task
+      inputs.files(dockerfile)
+      inputs.files(importBinaryDependencies.outputs.files)
+      outputs.files(dockerImageOCIFile(dockerfile, flavor))
+      outputs.files(dockerStateIIDFile(dockerfile))
+
+      doLast {
+        logger.quiet("Building the Docker image ${dockerfile} using the Docker Buildkit builder named ${dockerStateBuilderFile(dockerfile).text} and storing the image to ${dockerImageOCIFile(dockerfile, flavor)}")
+        // Prepare the dynamic list of command line arguments, start from common arguments
+        def argsList = dockerBuildArguments(dockerfile, flavor)
+
+        // Add the tags on the command line (these are not prefixed with registries)
+        resolvedTags(flavor, false).each { tag ->
+          argsList.addAll('--tag', tag)
+        }
+
+        // Also store the output IID (the multi-platform image digest)
+        argsList.addAll('--iidfile', "${dockerStateIIDFile(dockerfile)}")
+
+        // Specify the image output types and their destinations.
+        // Multiple outputs and types can be specified with multiple '--output' options.
+        // Store the output as OCI images in compressed archives in the 'build' directory.
+        argsList.addAll('--output', "type=oci,tar=true,compression=gzip,compression-level=9,dest=${dockerImageOCIFile(dockerfile, flavor)}")
+        // Store the output as a regular Docker image (available in docker image ls)
+        //argsList.addAll('--output', "type=image,name=${project.name}:local")
+        
+        // Specify the Dockerfile to build on the command line
+        argsList.addAll('--file', dockerfile, '.')
+
+        // Eventually run the build command
+        exec {
+          workingDir projectDir
+          executable 'docker'
+          args argsList
+        }
+      }
+    }
+
+    // Create one 'dockerLoadImage-<FLAVOR>' task for each flavor or the
+    // 'dockerLoadImage' for the plain Dockerfile (which has no flavors).
+    tasks.create(group: 'build', name: "dockerLoadImage${flavorSuffix}", description: "Loads the Docker image locally from the ${dockerfile}") {
+      // Task dependencies
+      dependsOn tasks.named("dockerBuildImage${flavorSuffix}")
+
+      // Declare inputs and outputs of this task
+      inputs.files(dockerfile)
+      inputs.files(dockerImageOCIFile(dockerfile, flavor))
+      inputs.files(dockerStateIIDFile(dockerfile))
+      outputs.files(dockerStateSHAFile(dockerfile))
+
+      // Check id the image already exists in the local image store.
+      // We retrieve the image SHA from the IID file (if it exists),
+      // since the IID and SHA are equal.
+      def dockerImagePresent = dockerStateIIDFile(dockerfile).exists() ? dockerImageExists(dockerStateIIDFile(dockerfile).text) : false
+
+      // Although we also run up-to-date checks using input and output
+      // files, we also need to make sure the builder actually exists
+      // to make sure the task is up to date, otherwise in some
+      // environments like CI/CD runners where files are cached but
+      // worker nodes change the builder may not be there even if the
+      // files are up to date.
+      outputs.upToDateWhen { dockerImagePresent }
+      
+      doLast {
+        if (dockerImagePresent) {
+          logger.quiet("The Docker Image with SHA ${dockerStateIIDFile(dockerfile).text} for the Docker image ${dockerfile} already exists in the local image store")
+        } else {
+          logger.quiet("Loading the Docker image ${dockerfile} from ${dockerImageOCIFile(dockerfile, flavor)} to the local Docker image store")
+          exec {
+            commandLine 'docker', 'load', '--input', dockerImageOCIFile(dockerfile, flavor)
+          }
+          // Save the SHA of the image to the output file.
+          dockerStateSHAFile(dockerfile).text = dockerStateIIDFile(dockerfile).text
+        }
+      }
+    }
+    
+    // Create one 'dockerImage-<FLAVOR>' task for each flavor or the
+    // 'dockerImage' for the plain Dockerfile (which has no flavors).
+    tasks.create(group: 'build', name: "dockerImage${flavorSuffix}", description: "Builds the Docker image from the ${dockerfile}") {
+      // Task dependencies
+      dependsOn tasks.named("dockerBuildImage${flavorSuffix}")
+      dependsOn tasks.named("dockerLoadImage${flavorSuffix}")
+
+      // This is basically just a lifecycle task that depends on others
+      // to make sure the image is built and loaded locally.
+      // We need two separate tasks to make the script work both locally
+      // (where building and loading in one step wouldn't cause any
+      // problem) and on CI/CD environments, where tasks dependent on
+      // this one may run on different nodes.
+      // When building and using the images on different nodes, the OCI
+      // image may be carried over by means of caches, so the build
+      // task would be up-to-date, but still some nodes need to load
+      // the image from the OCI tarball without rebuilding the image
+      // from scratch, so that's why we need to split this task in two.
+    }
+
+    // Create one 'dockerPush-<FLAVOR>' task for each flavor or the
+    // 'dockerImage' for the plain Dockerfile (which has no flavors).
+    tasks.create(group: 'publishing', name: "dockerPush${flavorSuffix}", description: "Pushes the Docker images to remote registries from the ${dockerfile}") {
+      // Only perform publishing if the Nyx release type enables publishing
+      onlyIf { nyxState.newRelease }
+
+      // Task dependencies
+      dependsOn tasks.named("dockerBuilder${flavorSuffix}")
+      // The image will be rebuilt anyway, so we can skip this dependency.
+      // Skipping will also save disk space on CI/CD environments.
+      //dependsOn tasks.named("dockerImage${flavorSuffix}")
+
+      // Declare inputs and outputs of this task
+      inputs.files(dockerfile)
+      outputs.files(dockerStatePushFile(dockerfile))
+
+      doLast {
+        if (resolvedTags(flavor, true)) {
+          // Due to the Docker BuildKit limitation we can't reuse nor import images that
+          // were built in the previous stages so, in order to publish the images, we can
+          // only build them again, this time using the '--push' argument.
+          // However, as long as we use the same BuildKit builder created in the
+          // task 'dockerBuilder-<FLAVOR>' (as we do), we can reuse its cached content
+          // so the build process won't actually rebuild everything unless the two tasks
+          // are executed on different nodes (as it likely happens in CI/CD environments),
+          // in which case this task first rebuilds the image by means of the dependency
+          // to the 'dockerImage-<FLAVOR>' task, then reuses its cached contents already
+          // stored inside the builder to push the image(s).
+
+          logger.quiet("Building and pushing the Docker image ${dockerfile} to remote registries using the Docker Buildkit builder named ${dockerStateBuilderFile(dockerfile).text}")
+          // Prepare the dynamic list of command line arguments, start from common arguments
+          def argsList = dockerBuildArguments(dockerfile, flavor)
+
+          // Add the tags on the command line (there are prefixed with the registries)
+          resolvedTags(flavor, true).each { tag ->
+            argsList.addAll('--tag', tag)
+          }
+
+          // Enable pushing to remote registries.
+          // This is a shorthand for --output=type=registry
+          argsList.addAll('--push')
+          
+          // Specify the Dockerfile to build on the command line
+          argsList.addAll('--file', dockerfile, '.')
+
+          // Eventually run the build command
+          exec {
+            workingDir projectDir
+            executable 'docker'
+            args argsList
+          }
+        } else {
+          logger.quiet("No registries have been configured, skipping the push operation.")
+        }
+
+        dockerStatePushFile(dockerfile).text = String.join(", ", resolvedProperties('registries', flavor))
+      }
+    }
+
+    // Create one 'dockerCleanImage-<FLAVOR>' task for each flavor or the
+    // 'dockerCleanImage' for the plain Dockerfile (which has no flavors).
+    tasks.create(group: 'build', name: "dockerCleanImage${flavorSuffix}", description: "Deletes the local Docker images built from the ${dockerfile}") {
+      doLast {
+        if (resolvedTags(flavor, false)) {
+          // Prepare the dynamic list of command line arguments
+          def argsList = ['image', 'rm']
+          def tagsList = []
+          resolvedTags(flavor, false).each { tag ->
+            tagsList.add(tag)
+          }
+          argsList.addAll(tagsList)
+
+          logger.quiet("Deleting the local Docker image ${dockerfile} with tags ${String.join(', ', tagsList)}")
+          exec {
+            ignoreExitValue true
+            executable 'docker'
+            args argsList
+          }
+        }
+        if (dockerStateBuilderFile(dockerfile) != null && dockerStateBuilderFile(dockerfile).exists()) {
+          logger.quiet("Stopping and deleting the Docker BuildKit builder ${dockerStateBuilderFile(dockerfile).text}")
+          exec {
+            ignoreExitValue true
+            commandLine 'docker', 'buildx', 'stop', dockerStateBuilderFile(dockerfile).text
+          }
+          exec {
+            ignoreExitValue true
+            commandLine 'docker', 'buildx', 'rm', dockerStateBuilderFile(dockerfile).text
+          }
+        }
+      }
+    }
+
+    // Make the overall lifecycle tasks depend on the flavor specific build tasks
+    tasks.dockerBuild.dependsOn tasks.named("dockerImage${flavorSuffix}")
+    tasks.publish.dependsOn tasks.named("dockerPush${flavorSuffix}")
+    tasks.dockerClean.dependsOn tasks.named("dockerCleanImage${flavorSuffix}")
+  }
+
+  // Create tasks for each specific Docker Compose environment (if any) and the
+  // anonymous (if present).
+  environments(projectDir).each { composeFile, environmentName ->
+    // The suffix is '-<ENVIRONMENT>' for Docker Compose files defining a named
+    // environment, or the empty string for those that don't.
+    def environmentNameSuffix = environmentName == null ? "" : "-${environmentName}"
+    def composeFileAbsolutePath = new File(projectDir, composeFile).absolutePath
+
+    // Create one 'dockerComposeSetUp-<ENVIRONMENT>' task for each environment or the
+    // 'dockerComposeSetUp' for the anonymous environment (which has no name).
+    tasks.create(group: 'runtime', name: "dockerComposeSetUp${environmentNameSuffix}", description: "Sets up the Docker Compose environment from the ${composeFile}") {
+      // Task dependencies
+      dependsOn assemble
+
+      // Declare inputs and outputs of this task
+      inputs.files(composeFile)
+
+      doLast {
+        logger.quiet("Bringing up the Docker Compose environment for '${composeFile}'")
+        exec {
+          workingDir projectDir
+          commandLine 'docker', 'compose', '--file', composeFile, 'up', '--detach'
+        }
+        logger.info("The Docker Compose environment for '${composeFile}' is up.")
+        logger.info("You can now follow the logs by running:")
+        logger.info("    docker compose --file ${composeFileAbsolutePath} logs --follow --timestamps")
+      }
+    }
+
+    // Create one 'dockerComposeTearDown-<ENVIRONMENT>' task for each environment or the
+    // 'dockerComposeTearDown' for the anonymous environment (which has no name).
+    tasks.create(group: 'runtime', name: "dockerComposeTearDown${environmentNameSuffix}", description: "Tears down the Docker Compose environment from the ${composeFile}") {
+      // Declare inputs and outputs of this task
+      inputs.files(composeFile)
+
+      doLast {
+        logger.quiet("Tearing down the Docker Compose environment for '${composeFile}'")
+        exec {
+          workingDir projectDir
+          commandLine 'docker', 'compose', '--file', composeFile, 'down', '--remove-orphans', '--rmi', 'local', '--volumes'
+        }
+        logger.quiet("Cleaning up the Docker Compose environment for '${composeFile}'")
+        exec {
+          workingDir projectDir
+          commandLine 'docker', 'compose', '--file', composeFile, 'rm', '--force', '--stop', '--volumes'
+        }
+      }
+    }
+
+    tasks.setUp.dependsOn tasks.named("dockerComposeSetUp${environmentNameSuffix}")
+    tasks.tearDown.dependsOn tasks.named("dockerComposeTearDown${environmentNameSuffix}")
+  }
+
+  // Create tasks for each specific test groups.
+  testGroups().each { group, testDirectoryName ->
+    // The directory where tests are stored for this test group
+    def testDirectory = new File("${projectDir}", testDirectoryName)
+
+    // The test group name, capitalized
+    def groupCapitalized = group.capitalize()
+
+    // The tests from the 'test.json' file, deserialized in a structured form
+    def testDefinitions = testDefinitions(group)
+    if (testDefinitions == null) {
+      logger.debug("No test definitions available for group ${group}")
+    } else {
+      if (testDefinitions.containsKey('suites') && testDefinitions.suites.size() > 0) {
+        logger.debug("Loading suite definitions for test group ${group}")
+        testDefinitions.suites.each { suite ->
+          logger.debug("Loading the ${suite.name} suite definition for test group ${group}")
+          
+          // The test suite name, capitalized
+          def suiteCapitalized = suite.name.capitalize()
+
+          def suiteEnvironmentComposeFile = null
+          if (suite.containsKey("environment") && suite.environment.containsKey("composeFile")) {
+            suiteEnvironmentComposeFile = new File(testDirectory, suite.environment.composeFile)
+          }
+
+          // This variable holds a reference to the background process used to listen to
+          // logs and store them to the log file.
+          Process logListenerProcess = null;
+
+          // Create one '<GROUP>TestSuite<SUITE>TearDown' task for each suite.
+          // <GROUP> is replaced by the test group name (i.e. Unit, Integration,
+          // Functional) and <SUITE> by the capitalized name of the suite.
+          tasks.create(group: 'verification', name: "${group}TestSuite${suiteCapitalized}TearDown", description: "Tears down the runtime environment for the ${suite} test suite") {
+            // Only run the task if there an environment definition
+            onlyIf { suiteEnvironmentComposeFile != null }
+            
+            if (suiteEnvironmentComposeFile != null) {
+              // Declare inputs and outputs of this task
+              inputs.dir(testDirectory)
+              // Make sure this task runs if the setup task has run
+              inputs.files(testEnvironmentStateStatusFile(group, suite.name))
+              outputs.files(testEnvironmentStateStatusFile(group, suite.name))
+
+              doLast {
+                logger.quiet("Tearing down the Docker Compose environment for the ${suite.name} test suite using the '${suiteEnvironmentComposeFile}' file")
+                exec {
+                  workingDir testDirectory
+                  commandLine 'docker', 'compose', '--file', suiteEnvironmentComposeFile, 'down', '--remove-orphans', '--rmi', 'local', '--volumes'
+                }
+                logger.quiet("Cleaning up the Docker Compose environment for the ${suite.name} test suite using the '${suiteEnvironmentComposeFile}' file")
+                exec {
+                  workingDir testDirectory
+                  commandLine 'docker', 'compose', '--file', suiteEnvironmentComposeFile, 'rm', '--force', '--stop', '--volumes'
+                }
+
+                // If the log listener process is not null 
+                if (logListenerProcess != null) {
+                  logger.debug("Stopping the log listener background process for the ${suite.name} test suite")
+                  try {
+                    logListenerProcess.destroyForcibly();
+                  } catch (Exception e) {
+                    // At this point there's nothing else we can do
+                  }
+                  logListenerProcess = null;
+                }
+              }
+            }
+          }
+
+          // Create one '<GROUP>TestSuite<SUITE>SetUp' task for each suite.
+          // <GROUP> is replaced by the test group name (i.e. Unit, Integration,
+          // Functional) and <SUITE> by the capitalized name of the suite.
+          tasks.create(group: 'verification', name: "${group}TestSuite${suiteCapitalized}SetUp", description: "Sets up the runtime environment for the ${suite} test suite") {
+            // Only run the task if there an environment definition
+            onlyIf { suiteEnvironmentComposeFile != null }
+
+            // Task dependencies
+            dependsOn assemble
+
+            // When they are all in the execution plan, run faster tests first.
+            if (group == 'integration') {
+              mustRunAfter unitTest
+            } else if (group == 'functional') {
+              mustRunAfter unitTest
+              mustRunAfter integrationTest
+            }
+            
+            if (suiteEnvironmentComposeFile != null) {
+              // Declare inputs and outputs of this task
+              inputs.dir(testDirectory)
+              outputs.files(testEnvironmentStateStatusFile(group, suite.name))
+
+              doLast {
+                mkdir(dockerComposeLogFile(group, suite.name).parent)
+
+                logger.quiet("Bringing up the Docker Compose environment for the ${suite.name} test suite using the '${suiteEnvironmentComposeFile}' file")
+                exec {
+                  workingDir testDirectory
+                  commandLine 'docker', 'compose', '--file', suiteEnvironmentComposeFile, 'up', '--wait', '--build'
+                }
+                logger.quiet("The Docker Compose environment for '${suiteEnvironmentComposeFile}' is up.")
+
+                logger.debug("Starting the log listener background process for the ${suite.name} test suite")
+                // Here we need to manage a process programmatically so we can run it in the background.
+                // The 'docker compose logs' process automatically exits when the 'docker compose down'
+                // command runs (executed by the 'TearDown' task) but we also make sure we terminate it
+                // programmatically (still in the 'TearDown' task) in case it's stale.
+                logListenerProcess = new ProcessBuilder("docker", "compose", "--file", suiteEnvironmentComposeFile.absolutePath, "logs", "--follow", "--timestamps").
+                directory(testDirectory).
+                redirectOutput(dockerComposeLogFile(group, suite.name)).
+                redirectErrorStream(true). // redirect errors to the standard output
+                start()
+
+                logger.info("The log listener background process for the ${suite.name} test suite is up and logs are stored in ${suiteEnvironmentComposeFile.absolutePath}.")
+                logger.info("You can also follow the logs by running:")
+                logger.info("    docker compose --file ${suiteEnvironmentComposeFile.absolutePath} logs --follow --timestamps")
+
+                // Save the task status, for up-to-date-checks
+                testEnvironmentStateStatusFile(group, suite.name).text = logDateFormat.format(new Date())
+              }
+            }
+          }
+
+          // Create one '<GROUP>TestSuite<SUITE>' task for each suite.
+          // <GROUP> is replaced by the test group name (i.e. Unit, Integration,
+          // Functional) and <SUITE> by the capitalized name of the suite.
+          tasks.create(group: 'verification', name: "${group}TestSuite${suiteCapitalized}", description: suite.description) {
+            // Task dependencies
+            dependsOn assemble
+            dependsOn tasks.getByName("${group}TestSuite${suiteCapitalized}SetUp")
+
+            // Task finalization
+            finalizedBy tasks.getByName("${group}TestSuite${suiteCapitalized}TearDown")
+
+            // When they are all in the execution plan, run faster tests first.
+            if (group == 'integration') {
+              mustRunAfter unitTest
+            } else if (group == 'functional') {
+              mustRunAfter unitTest
+              mustRunAfter integrationTest
+            }
+
+            // The reference to the test log file, reused for outputs and streams below
+            def testLogFile = dockerTestLogFile(group, suite.name)
+
+            // Declare inputs and outputs of this task
+            inputs.dir(testDirectory)
+            inputs.files()
+            outputs.files(testStateStatusFile(group, suite.name))
+            // The test logs file is unreliable as it may be flushed too late and give
+            // false positives for up-to-date checks
+            //outputs.files(testLogFile)
+
+            doLast {
+              mkdir(testLogFile.parent)
+
+              // Use this output stream to log both to the log file and the console.
+              // Note that the output file may have more contents than what is written
+              // through this object because the Process streams directly to the output
+              // file, not using this stream
+              // The org.apache.tools.ant.util.TeeOutputStream class is in the Gradle
+              // classpath by default.
+              def testLogOutputStream = new org.apache.tools.ant.util.TeeOutputStream(new FileOutputStream(testLogFile), System.out)
+              // Also create a PrintStream for easier handling of outputs
+              def testLogPrintStream = new java.io.PrintStream(testLogOutputStream)
+
+              if (suite.containsKey("cases") && suite.cases.size() > 0) {
+                // Keep track of the number of succeeded and failed tests for the whole suite
+                def suiteSucceededTests = 0
+                def suiteFailedTests = 0
+
+                suite.cases.each { testCase ->
+                  logger.quiet("Running test case '${suite.name}.${testCase.name}': ${testCase.description}")
+                  logger.info("Logs are stored in ${testLogFile.absolutePath}.")
+
+                  if (testCase.containsKey("commands") && testCase.commands.size() > 0) {
+                    testCase.commands.eachWithIndex { testCommand, testCommandIdx ->
+                      // Just use this utility field for the current command index,
+                      // considering the testCommandIdx starts from 0
+                      def commandIndex = testCommandIdx + 1
+
+                      // This flag is true when the command has failed
+                      def failure = false
+
+                      // We need a temporary file to store each test output, then we'll
+                      // copy its output to the main log and delete the file when done.
+                      // Note we can't do just store the output to the main test logs file
+                      // because the child process would not flush in synch so the output
+                      // would be mixed up, with no temporal ordering.
+                      def tempTestOutput = File.createTempFile(String.format("%s.%s", suite.name, testCase.name), ".tmp", dockerTestReportsDirectory(group))
+                      tempTestOutput.deleteOnExit()
+
+                      logDetailsTo(testLogPrintStream, suite.name, testCase.name, commandIndex, testCase.commands.size(), "command line: ${testCommand.command}")
+
+                      // Start counting the test duration
+                      def startTime = System.currentTimeMillis()
+
+                      // Here we start commands programmatically so we can log and also manage errors.
+                      def process = new ProcessBuilder(testCommand.command).
+                      directory(testDirectory).
+                      redirectOutput(ProcessBuilder.Redirect.appendTo(tempTestOutput)).
+                      redirectErrorStream(true). // redirect errors to the standard output
+                      start()
+                      process.waitFor()
+                      def exitValue = process.exitValue()
+                      def endTime = System.currentTimeMillis()
+                      def duration = endTime - startTime
+                      process.destroy()
+
+                      def tempTestOutputText = tempTestOutput.text
+                      if (tempTestOutputText.trim().isBlank()) {
+                        logDetailsTo(testLogPrintStream, suite.name, testCase.name, commandIndex, testCase.commands.size(), "command did not produce any output")
+                      } else {
+                        logDetailsTo(testLogPrintStream, suite.name, testCase.name, commandIndex, testCase.commands.size(), "command output:")
+                        testLogPrintStream.println(tempTestOutput.text)
+                      }
+
+                      // Evaluate the outputs for success or failure against the exit codes (default: 0)
+                      def exitCodes = [0]
+                      if (testCommand.containsKey("exitCodes")) {
+                        exitCodes = testCommand.exitCodes
+                      }
+                      if (exitCodes.contains(exitValue)) {
+                        logDetailsTo(testLogPrintStream, suite.name, testCase.name, commandIndex, testCase.commands.size(), "exit code: ${exitValue} (SUCCESS)")
+                      } else {
+                        failure = true
+                        logDetailsTo(testLogPrintStream, suite.name, testCase.name, commandIndex, testCase.commands.size(), "exit code: ${exitValue} (FAILURE: exit code is not among succeed codes (${exitCodes.join(', ')}))")
+                      }
+                      // Evaluate the outputs for success or failure against the maximum duration (default: unlimited)
+                      def maxDuration = Integer.MAX_VALUE
+                      if (testCommand.containsKey("duration")) {
+                        maxDuration = testCommand.duration
+                      }
+                      if (duration < maxDuration) {
+                        logDetailsTo(testLogPrintStream, suite.name, testCase.name, commandIndex, testCase.commands.size(), "duration: ${duration} ms (SUCCESS)")
+                      } else {
+                        failure = true
+                        logDetailsTo(testLogPrintStream, suite.name, testCase.name, commandIndex, testCase.commands.size(), "duration: ${duration} ms (FAILURE: test duration exceeded the maximum value (${maxDuration} ms))")
+                      }
+
+                      logDetailsTo(testLogPrintStream, suite.name, testCase.name, commandIndex, testCase.commands.size(), failure ? "result: FAILED" : "result: PASSED")
+
+                      if (failure) {
+                        suiteFailedTests = suiteFailedTests + 1
+                      } else {
+                        suiteSucceededTests = suiteSucceededTests + 1
+                      }
+
+                      // Make the Gradle task fail at the first failure if the test has the 'failFast' flag set
+                      if (suite.containsKey("failFast") && suite.failFast.toBoolean() && suiteFailedTests > 0) {
+                        // Flush and close the log output streams
+                        try {
+                          testLogPrintStream.flush()
+                          testLogPrintStream.close()
+                          testLogOutputStream.flush()
+                          testLogOutputStream.close()
+                        } catch (Exception e) {
+                          // noop
+                        }
+                        throw new GradleException("Some test failed in the '${suite.name}' suite")
+                      }
+
+                      // The temp file is not always deleted by the simple 'deleteOnExit()'
+                      // so we also delete it explicitly to avoi clutter in the build
+                      // directory, after we made sure we copied the content to the main
+                      // test log
+                      try {
+                        tempTestOutput.delete()
+                      } catch (Exception e) {
+                        // Nothing else to try, the file will stay there for debug purpose
+                        // until 'clean' is executed.
+                      }
+                    }
+                  }
+                }
+
+                logTo(testLogPrintStream, "test suite: '${suite.name}''", "tests executed: ${suiteSucceededTests+suiteFailedTests}, tests passed: ${suiteSucceededTests}/${suiteSucceededTests+suiteFailedTests}, tests failed: ${suiteFailedTests}/${suiteSucceededTests+suiteFailedTests}")
+
+                // Make the Gradle task fail if any test failed
+                if (suiteFailedTests > 0) {
+                  throw new GradleException("Some test failed in the '${suite.name}' suite")
+                }
+              }
+
+              // Flush and close the log output streams
+              try {
+                testLogPrintStream.flush()
+                testLogPrintStream.close()
+                testLogOutputStream.flush()
+                testLogOutputStream.close()
+              } catch (Exception e) {
+                // noop
+              }
+
+              // Save the task status, for up-to-date-checks
+              testStateStatusFile(group, suite.name).text = logDateFormat.format(new Date())
+            }
+          }
+
+          // Make the "[unit|integration|functional]Test" lifecycle task depend on this one
+          tasks.getByName("${group}Test").dependsOn tasks.named("${group}TestSuite${suiteCapitalized}")
+        }
+      }
+    }
+  }
+
+  task exportAPIDocumentationArchive(type: Tar, group: 'build', description: 'Builds the API documentation archive for this project') {
+    // This task is of type Tar so:
+    // - we can reuse its outputs for the project artifacts
+    // - we can inherit its copying features from its AbstractCopyTask
+    //   superclass
+    // - we can reuse implicit inputs and outputs
+
+    // Simply copy the README.md, just renaming it to the image name,
+    // so when there are more than one they can be used as API docs
+    // and stored together in the same directory.
+    archiveBaseName = project.name
+    archiveAppendix = 'api-docs'
+    archiveVersion = project.version
+    archiveClassifier = null
+    archiveExtension = 'tar.gz'
+    destinationDirectory = file("${buildDir}/archives")
+    compression = Compression.GZIP
+
+    from(projectDir) {
+      include 'README.md'
+      into("docker/${project.name}/")
+    }
+  }
+
+  // This is a lifecycle task that will depend on other specific tasks.
+  task documentation(group: 'build', description: 'Builds the documentation for this project') {
+    dependsOn exportAPIDocumentationArchive
+  }
+
+  /*----------------------------------------------------------------------------
+    Additional task dependencies
+    ----------------------------------------------------------------------------*/
+  tasks.assemble.dependsOn dockerBuild
+  tasks.build.dependsOn documentation
+  tasks.check.dependsOn test
+  tasks.clean.dependsOn dockerClean
+
+  /*----------------------------------------------------------------------------
+    Artifacts published by this project
+  ----------------------------------------------------------------------------*/
+  // For more on Configurations, Dependencies and Artifacts see:
+  // - https://docs.gradle.org/current/userguide/declaring_dependencies_adv.html
+  // - https://docs.gradle.org/current/userguide/cross_project_publications.html
+  artifacts {
+    // Here we associate artifacts produced by this project to the
+    // configurations so that they can be consumed by other projects.
+
+    // Expose the API documentation.
+    // Here we associate the outputs from the 'exportAPIDocumentationArchive'
+    // task to the 'apiDocumentation' configuration.
+    apiDocumentation tasks.exportAPIDocumentationArchive
+  }
+}
+
+/*------------------------------------------------------------------------------
+  Additional tasks
+  ------------------------------------------------------------------------------*/
+// This is just a lifecycle task
+task unitTest(group: 'verification', description: 'Runs the unit tests for the Docker image') {
+  dependsOn subprojects*.unitTest
+}
+
+// This is just a lifecycle task
+task integrationTest(group: 'verification', description: 'Runs the integration tests for the Docker image') {
+  dependsOn subprojects*.integrationTest
+}
+
+// This is just a lifecycle task
+task functionalTest(group: 'verification', description: 'Runs the functional tests for the Docker image') {
+  dependsOn subprojects*.functionalTest
+}
+
+// This is just a lifecycle task
+task test(group: 'verification', description: 'Runs all the tests for the Docker image') {
+  dependsOn subprojects*.test
+}
+
+// This is just a lifecycle task
+task documentation(group: 'build', description: 'Builds the documentation for this project') {
+  dependsOn subprojects*.documentation
+}
+
+// This is just a lifecycle task
+task publish(group: 'publishing', description: 'Publishes artifacts produced by this project') {
+  // Only perform publishing if the Nyx release type enables publishing
+  onlyIf { nyxState.newRelease }
+
+  dependsOn subprojects*.publish
+}
+
+task deepClean(group: 'build', description: 'Clean the reproducible and reusable artifacts including caches, dependencies etc') {
+  dependsOn clean
+  dependsOn subprojects*.clean
+
+  doLast {
+    logger.quiet("Pruning the Docker build cache")
+    exec {
+      commandLine 'docker', 'buildx', 'prune', '--all', '--force'
+    }
+    logger.info("Pruning unused Docker images")
+    exec {
+      commandLine 'docker', 'image', 'prune', '--all', '--force'
+    }
+    logger.info("Pruning unused Docker BuildKit builders")
+    exec {
+      commandLine 'docker', 'buildx', 'rm', '--all-inactive'
+    }
+  }
+}
+
+// This is just a lifecycle task
+task setUp(group: 'runtime', description: 'Sets up the runtime environment for the Docker image') {
+  dependsOn subprojects*.setUp
+}
+
+// This is just a lifecycle task
+task tearDown(group: 'runtime', description: 'Tears down the runtime environment for the Docker image') {
+  dependsOn subprojects*.tearDown
+}
+
+/*------------------------------------------------------------------------------
+  Additional task dependencies
+------------------------------------------------------------------------------*/
+tasks.assemble.dependsOn subprojects*.assemble
+tasks.build.dependsOn subprojects*.build
+tasks.check.dependsOn subprojects*.check
+tasks.clean.dependsOn subprojects*.clean

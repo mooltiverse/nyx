@@ -1,0 +1,40 @@
+---
+sidebar_position: 4
+tags:
+  - support
+  - examples
+  - configuration
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+import CodeBlock from '@theme/CodeBlock';
+// Importing non-markdown snippets requires the 'raw-loader'. See:
+// - https://docusaurus.io/docs/markdown-features/react#importing-code-snippets
+import ExtendedJSON from '!!raw-loader!../../_includes/.nyx-extended.json';
+import ExtendedYAML from '!!raw-loader!../../_includes/.nyx-extended.yaml';
+import ExtendedGroovy from '!!raw-loader!../../_includes/.nyx-extended.groovy';
+
+# Extended configuration example
+
+Here you can find the example of a large configuration in the supported [`formats`](../../user/introduction/configuration-methods.mdx#supported-file-grammars).
+
+This configuration doesn't use any [preset](../../user/configuration-presets/index.md) but sets many [global configuration options](../../user/configuration-reference/global-options.mdx) explicitly along with [commit message conventions](../../user/configuration-reference/commit-message-conventions.mdx) and [release types](../../user/configuration-reference/release-types.mdx). Where allowed, [templates](../../user/configuration-reference/templates.mdx) are also used.
+
+<Tabs>
+  <TabItem value="json" label="JSON" default>
+    <CodeBlock language="json">{ExtendedJSON}</CodeBlock>
+
+    Source code for this file is available [here](https://raw.githubusercontent.com/mooltiverse/nyx/main/docs/main/docs/_includes/.nyx-extended.json).
+  </TabItem>
+  <TabItem value="yaml" label="YAML">
+    <CodeBlock language="yaml">{ExtendedYAML}</CodeBlock>
+
+    Source code for this file is available [here](https://raw.githubusercontent.com/mooltiverse/nyx/main/docs/main/docs/_includes/.nyx-extended.yaml).
+  </TabItem>
+  <TabItem value="groovy" label="Groovy (Gradle)">
+    <CodeBlock language="groovy">{ExtendedGroovy}</CodeBlock>
+
+    Source code for this file is available [here](https://raw.githubusercontent.com/mooltiverse/nyx/main/docs/main/docs/_includes/.nyx-extended.groovy).
+  </TabItem>
+</Tabs>

@@ -1,0 +1,111 @@
+/*------------------------------------------------------------------------------
+  Plugins DSL block
+  https://docs.gradle.org/current/userguide/plugins.html#sec:plugins_block
+------------------------------------------------------------------------------*/
+plugins {
+  id 'java-gradle-plugin'                             // See: https://docs.gradle.org/current/userguide/java_gradle_plugin.html
+  id 'com.gradle.plugin-publish' version '1.2.1'      // See: https://guides.gradle.org/publishing-plugins-to-gradle-plugin-portal/ and https://plugins.gradle.org/docs/publish-plugin
+}
+
+/*------------------------------------------------------------------------------
+  Local sub-project properties
+------------------------------------------------------------------------------*/
+description = 'The Nyx Gradle plugin'
+
+/*------------------------------------------------------------------------------
+  Configurations
+------------------------------------------------------------------------------*/
+configurations {
+  // this shouldn't be required but without this the plugin metadata is not available in the functional test classpath
+  functionalTestRuntimeOnly.extendsFrom testRuntimeClasspath
+}
+
+/*------------------------------------------------------------------------------
+  Dependencies
+  https://docs.gradle.org/current/userguide/dependency_management_for_java_projects.html
+------------------------------------------------------------------------------*/
+dependencies {
+  // Import dependencies from other modules of this project
+  implementation project(':src:java:main')
+
+  // Add this dependency to use the Git scripts from the main subproject into this project tests
+  integrationTestImplementation project(path: ':src:java:main', configuration: 'integrationTestExport')
+  functionalTestImplementation  project(path: ':src:java:main', configuration: 'integrationTestExport')
+  functionalTestImplementation  project(path: ':src:java:main', configuration: 'functionalTestExport')
+}
+
+
+/*------------------------------------------------------------------------------
+  Extension configurations
+------------------------------------------------------------------------------*/
+// Additional test sets created using the 'jvm-test-suite'
+// These tests are better isolated from unit tests (in the src/test directory of each sub project)
+// as they may take longer.
+testing {
+  suites {
+    // This is the built-in suite
+    test {
+      // Here we can configure additional dependencies, properties and options for these tests
+    }
+
+    // Integration tests can be implemented in the directory src/integrationTest/[java|groovy]
+    integrationTest(JvmTestSuite) {
+      // Here we can configure additional dependencies, properties and options for these tests
+    }
+
+    // Functional tests can be implemented in the directory src/functionalTest/[java|groovy]
+    functionalTest(JvmTestSuite) {
+      // Here we can configure additional dependencies, properties and options for these tests
+    }
+  }
+}
+
+gradlePlugin {
+  website = 'https://github.com/mooltiverse/nyx'
+  vcsUrl = 'https://github.com/mooltiverse/nyx.git'
+
+  plugins {
+    nyxPlugin {
+      id = rootProject.group
+      version = rootProject.version
+      displayName = 'Nyx Gradle plugin'
+      description = project.description
+      implementationClass = 'com.mooltiverse.oss.nyx.gradle.NyxPlugin'
+      tags.set([ 'auto-versioning', 'changelog', 'continuous delivery', 'git', 'github', 'gitlab', 'release', 'semantic', 'semantic-release', 'semantic-version', 'semver', 'version', 'versioning' ])
+    }
+  }
+}
+
+// See https://github.com/gradle/gradle/issues/1246
+task setupPublishPluginCredentials() {
+  group = 'Publishing'
+  description = 'Sets the system properties from environment variables gradlePublishKey and gradlePublishSecret to allow the Gradle Plugin Publish to authenticate'
+
+  doLast {
+    def key = findProperty("gradlePublishKey")
+    def secret = findProperty("gradlePublishSecret")
+
+    if( !key || !secret)
+    {
+      logger.warn("Warning: gradlePublishKey and/or gradlePublishSecret are not defined environment variables. This might be ok if not running the publishing tasks but if you need to publish the Gradle Plugin this prevents the publication.")
+    }
+
+    System.properties.setProperty("gradle.publish.key", key)
+    System.properties.setProperty("gradle.publish.secret", secret)
+  }
+}
+
+/*------------------------------------------------------------------------------
+  Additional task dependencies
+------------------------------------------------------------------------------*/
+tasks.publishPlugins.dependsOn tasks.setupPublishPluginCredentials
+tasks.publish.dependsOn tasks.publishPlugins
+
+// to enforce the fail-fast principle, make sure the main library tests are executed first
+tasks.test.dependsOn project(':src:java:main').tasks.test
+
+afterEvaluate {
+  // The tasks listed here are those not caught in the section above
+  tasks.publish.onlyIf { rootProject.nyxState.newRelease }                    // this actually belongs to the 'publishing' group but doesn't get captured by the above section for some reason
+  tasks.publishPlugins.onlyIf { rootProject.nyxState.newRelease }             // from the 'plugin portal' group
+}

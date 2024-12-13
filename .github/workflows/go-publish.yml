@@ -1,0 +1,242 @@
+# Publish Go artifacts.
+
+name: Go Publish
+
+on:
+  workflow_dispatch:
+  workflow_call:
+    inputs:
+      runs-on:
+        description: |-
+          Define the type of machine to run the job on.
+          Default: ubuntu-latest
+        type: string
+        required: false
+        default: 'ubuntu-latest'
+      verbosity:
+        description: |-
+          Sets the verbosity level to adjust the output logs verbosity.
+          Allowed values are: 'error', 'warning', 'quiet', 'info', 'debug'.
+          Default: quiet
+        type: string
+        required: false
+        default: 'quiet'
+      gradle-arguments:
+        description: |-
+          The whitespace separated list of Gradle arguments to pass on the
+          Gradle command line. See also 'gradle-secret-arguments' for passing
+          sensitive values.
+          For example you may use '--quiet', '--warn', '--info', '--debug' to
+          set the verbosity level.
+          For more see: https://docs.gradle.org/current/userguide/command_line_interface.html.
+          Default: --build-cache --stacktrace'
+        type: string
+        required: false
+        default: "--build-cache --stacktrace"
+      gradle-tasks:
+        description: |-
+          The whitespace separated list of Gradle tasks to run.
+          Default: src:go:publish
+        type: string
+        required: false
+        default: "src:go:publish"
+      install-jdk:
+        description: |-
+          Whether to install the JDK or not.
+          For more see: https://github.com/actions/setup-java.
+          Please note that the tools come preinstalled in many hosted GitHub
+          runner images and re-installing would just slow down the setup process.
+          Consider installing only when the runners don't have it preinstalled or
+          when you need a specific version.
+          To check out if it's already installed see:
+          - https://docs.github.com/en/actions/using-github-hosted-runners/using-github-hosted-runners/about-github-hosted-runners#preinstalled-software
+          Default: false
+        type: boolean
+        required: false
+        default: true
+      install-jdk-distribution:
+        description: |-
+          The JDK distribution to setup if 'install-jdk' is 'true'.
+          For available distributions see: https://github.com/actions/setup-java.
+          Default: temurin
+        type: string
+        required: false
+        default: 'temurin'
+      install-jdk-version:
+        description: |-
+          The JDK version to setup if 'install-jdk' is 'true'.
+          For available versions see: https://github.com/actions/setup-java.
+          Default: 21
+        type: string
+        required: false
+        default: '21'
+      install-gradle:
+        description: |-
+          Whether to install Gradle or not.
+          For more see: https://github.com/gradle/actions/blob/main/docs/setup-gradle.md.
+          Please note that the tools come preinstalled in many hosted GitHub
+          runner images and re-installing would just slow down the setup process.
+          Consider installing only when the runners don't have it preinstalled or
+          when you need a specific version.
+          To check out if it's already installed see:
+          - https://docs.github.com/en/actions/using-github-hosted-runners/using-github-hosted-runners/about-github-hosted-runners#preinstalled-software
+          Default: false
+        type: boolean
+        required: false
+        default: false
+      install-gradle-version:
+        description: |-
+          The Gradle version to setup if 'install-gradle' is 'true'.
+          There are a few aliases that can be used here: 'wrapper' uses the version
+          defined in the Gradle wrapper (recommended), 'current' uses the latest
+          stable release.
+          For available versions see: https://github.com/gradle/actions/blob/main/docs/setup-gradle.md.
+          Default: wrapper
+        type: string
+        required: false
+        default: 'wrapper'
+      install-go:
+        description: |-
+          Whether to install Go or not.
+          For more see: https://github.com/actions/setup-go.
+          Please note that the tools come preinstalled in many hosted GitHub
+          runner images and re-installing would just slow down the setup process.
+          Consider installing only when the runners don't have it preinstalled or
+          when you need a specific version.
+          To check out if it's already installed see:
+          - https://docs.github.com/en/actions/using-github-hosted-runners/using-github-hosted-runners/about-github-hosted-runners#preinstalled-software
+          Default: false
+        type: boolean
+        required: false
+        default: false
+      install-go-version:
+        description: |-
+          The Go SDK version to setup if 'install-go' is 'true'.
+          For available versions see: https://github.com/actions/setup-go.
+          Default: stable
+        type: string
+        required: false
+        default: 'stable'
+      nyx-cache-name-restore-suffix:
+        description: |-
+          The suffix of the name to use for the cache that will be read by this
+          workflow. This is useful to 'chain' caches, so here you can pass the
+          suffix from a previous cache to make this workflow start from that
+          one cache.
+          If the cache to read does not exists a new one will be created from
+          scratch without errors.
+          Default: none
+        type: string
+        required: false
+        default: ""
+      gradle-cache-name-prefix:
+        description: |-
+          The prefix to use for the cache that will be read by this workflow.
+          This is useful to 'chain' caches, so here you can pass the suffix
+          from a previous cache to make this workflow start from that one cache.
+          Moreover, this can be used to override the default Gradle action's
+          cache prefix to make all jobs within the same stream (i.e. a feature)
+          share the same prefix and not overlap with other streams. However,
+          when setting this prefix to some specific feature you won't be
+          able to merge the caches and in case you 'chain' them you can only
+          use one upstream cache for each downstream job.
+          If the cache to read does not exists a new one will be created from
+          scratch without errors.
+          Default: gradle-\$\{\{ github.job \}\}-go (isolate the cache for
+          the 'go' feature).
+        type: string
+        required: false
+        default: "gradle-${{ github.run_id }}-go"
+      gradle-cache-name-restore-suffix:
+        description: |-
+          The suffix of the name to use for the cache that will be read by this
+          workflow. This is useful to 'chain' caches, so here you can pass the
+          suffix from a previous cache to make this workflow start from that
+          one cache.
+          If the cache to read does not exists a new one will be created from
+          scratch without errors.
+          Default: \$\{\{ github.job \}\}
+        type: string
+        required: false
+        default: "${{ github.job }}"
+      go-cache-name-restore-suffix:
+        description: |-
+          The suffix of the name to use for the cache that will be read by this
+          workflow. This is useful to 'chain' caches, so here you can pass the
+          suffix from a previous cache to make this workflow start from that
+          one cache.
+          If the cache to read does not exists a new one will be created from
+          scratch without errors.
+          Default: \$\{\{ github.job \}\}
+        type: string
+        required: false
+        default: "${{ github.job }}"
+    secrets:
+      gradle-secret-arguments:
+        description: |-
+          The whitespace separated list of Gradle arguments to pass on the
+          Gradle command line. This is for passing sensitive values.
+          See also 'gradle-arguments' for passing non sensitive values.
+          For example you may use '--quiet', '--warn', '--info', '--debug' to
+          set the verbosity level.
+          For more see: https://docs.gradle.org/current/userguide/command_line_interface.html.
+        required: false
+    outputs:
+      gradle-cache-name-suffix:
+        description: "The suffix of the name used by the last cache in this workflow. This is useful to 'chain' caches, so you can pass this value as input for other actions or workflows."
+        value: ${{ jobs.publish.outputs.gradle-cache-name-suffix }}
+      go-cache-name-suffix:
+        description: "The suffix of the name used by the last cache in this workflow. This is useful to 'chain' caches, so you can pass this value as input for other actions or workflows."
+        value: ${{ jobs.publish.outputs.go-cache-name-suffix }}
+
+env:
+  # Compute the extra Gradle properties to use for Gradle commands.
+  # Here:
+  # - we add one argument for the verbosity level passed in the 'verbosity' input
+  GRADLE_EXTRA_OPTS: >-
+    ${{ inputs.verbosity == 'warning' && '--warn' || '' }}
+    ${{ inputs.verbosity == 'quiet' && '--quiet' || '' }}
+    ${{ inputs.verbosity == 'info' && '--info' || '' }}
+    ${{ inputs.verbosity == 'debug' && '--debug' || '' }}
+
+jobs:
+  publish:
+    name: Publish
+    runs-on: ${{ inputs.runs-on }}
+    steps:
+    - uses: mooltiverse/nyx/.github/actions/setup-git@main
+      with:
+        verbosity: ${{ inputs.verbosity }}
+    - id: nyx
+      uses: mooltiverse/nyx/.github/actions/setup-nyx@main
+      with:
+        # Just restore the cache
+        enable-action: false
+        verbosity: ${{ inputs.verbosity }}
+        cache-name-restore-suffix: ${{ inputs.nyx-cache-name-restore-suffix }}
+    - id: go
+      uses: mooltiverse/nyx/.github/actions/setup-go@main
+      with:
+        verbosity: ${{ inputs.verbosity }}
+        install-go: ${{ inputs.install-go }}
+        install-go-version: ${{ inputs.install-go-version }}
+        # Restore the cache from the previous job to 'chain' the two caches
+        cache-name-restore-suffix: ${{ inputs.go-cache-name-restore-suffix }}
+    - id: gradle
+      uses: mooltiverse/nyx/.github/actions/setup-gradle@main
+      with:
+        verbosity: ${{ inputs.verbosity }}
+        install-jdk: ${{ inputs.install-jdk }}
+        install-jdk-version: ${{ inputs.install-jdk-version }}
+        install-jdk-distribution: ${{ inputs.install-jdk-distribution }}
+        install-gradle: ${{ inputs.install-gradle }}
+        install-gradle-version: ${{ inputs.install-gradle-version }}
+        cache-name-prefix: ${{ inputs.gradle-cache-name-prefix }}
+        # Restore the cache from the previous job to 'chain' the two caches
+        cache-name-restore-suffix: ${{ inputs.gradle-cache-name-restore-suffix }}
+    - name: Publish the Go artifacts
+      shell: bash
+      run: ./gradlew ${{ inputs.gradle-arguments }} ${{ secrets.gradle-secret-arguments }} ${{ env.GRADLE_EXTRA_OPTS }} ${{ inputs.gradle-tasks }}
+    outputs:
+      go-cache-name-suffix: ${{ steps.go.outputs.cache-name-suffix }}
+      gradle-cache-name-suffix: ${{ steps.gradle.outputs.cache-name-suffix }}

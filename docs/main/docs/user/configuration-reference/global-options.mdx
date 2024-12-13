@@ -1,0 +1,446 @@
+---
+sidebar_position: 1
+tags:
+  - user
+  - guide
+  - reference
+  - configuration
+---
+
+# Global Options
+
+These are the top level options in the configuration:
+
+| Name                                                      | Type    | Command Line Option                                       | Environment Variable                                          | Default  |
+| --------------------------------------------------------- | ------- | --------------------------------------------------------- | ------------------------------------------------------------- | -------- |
+| [`bump`](#bump)                                           | string  | `-b=<NAME>`, `--bump=<NAME>`                              | `NYX_BUMP=<NAME>`                                             | N/A      |
+| [`changelog`](changelog.mdx)                              | object  | See [Changelog](changelog.mdx)                            | See [Changelog](changelog.mdx)                                | N/A      |
+| [`commitMessageConventions`](commit-message-conventions.mdx) | object  | See [Commit Message Conventions](commit-message-conventions.mdx) | See [Commit Message Conventions](commit-message-conventions.mdx) | N/A |
+| [`configurationFile`](#configuration-file)                | string  | `-c=<PATH>`, `--configuration-file=<PATH>`                | `NYX_CONFIGURATION_FILE=<PATH>`                               | N/A      |
+| [`directory`](#directory)                                 | string  | `-d=<PATH>`, `--directory=<PATH>`                         | `NYX_DIRECTORY=<PATH>`                                        | Current working directory |
+| [`dryRun`](#dry-run)                                      | boolean | `--dry-run`, `--dry-run=true`&#124;`false`                | `NYX_DRY_RUN=true`&#124;`false`                               | `false`  |
+| [`git`](git.mdx)                                          | object  | See [Git](git.mdx)                                        | See [Git](git.mdx)                                            | N/A      |
+| [`help`](#help)                                           | flag    | `--help`                                                  | N/A                                                           | N/A      |
+| [`initialVersion`](#initial-version)                      | string  | `--initial-version=<VERSION>`                             | `NYX_INITIAL_VERSION=<VERSION>`                               | Depends on the configured [version scheme](#scheme) |
+| [`preset`](#preset)                                       | string  | `--preset=<NAME>`                                         | `NYX_PRESET=<NAME>`                                           | N/A      |
+| [`releaseAssets`](release-assets.mdx)                     | object  | See [Release Assets](release-assets.mdx)                  | See [Release Assets](release-assets.mdx)                      | N/A      |
+| [`releaseLenient`](#release-lenient)                      | boolean | `--release-lenient`, `--release-lenient=true`&#124;`false`| `NYX_RELEASE_LENIENT=true`&#124;`false`                       | `true`   |
+| [`releasePrefix`](#release-prefix)                        | string  | `--release-prefix=<PREFIX>`                               | `NYX_RELEASE_PREFIX=<PREFIX>`                                 | N/A      |
+| [`releaseTypes`](release-types.mdx)                       | object  | See [Release Types](release-types.mdx)                    | See [Release Types](release-types.mdx)                        | N/A      |
+| [`resume`](#resume)                                       | string  | `--resume`, `resume=true`&#124;`false`                    | `NYX_RESUME=true`&#124;`false`                                | `false`  |
+| [`scheme`](#scheme)                                       | string  | `--scheme=<NAME>`                                         | `NYX_SCHEME=<NAME>`                                           | `SEMVER` |
+| [`services`](services.mdx)                                | object  | See [Services](services.mdx)                              | See [Services](services.mdx)                                  | N/A      |
+| [`sharedConfigurationFile`](#shared-configuration-file)   | string  | `--shared-configuration-file=<PATH>`                      | `NYX_SHARED_CONFIGURATION_FILE=<PATH>`                        | N/A      |
+| [`stateFile`](#state-file)                                | string  | `--state-file=<PATH>`                                     | `NYX_STATE_FILE=<PATH>`                                       | N/A      |
+| [`summary`](#summary)                                     | string  | `--summary`, `summary=true`&#124;`false`                  | `NYX_SUMMARY=true`&#124;`false`                               | `false`  |
+| [`summaryFile`](#summary-file)                            | string  | `--summary-file=<PATH>`                                   | `NYX_SUMMARY_FILE=<PATH>`                                     | N/A      |
+| [`verbosity`](#verbosity)                                 | string  | `--verbosity=<LEVEL>`, `--fatal`, `--error`, `--warning`, `--info`, `--debug`, `--trace` | `NYX_VERBOSITY=<LEVEL>`        | `WARNING`|
+| [`version`](#version)                                     | string  | `-v=<VERSION>`, `--version=<VERSION>`                     | `NYX_VERSION=<VERSION>`                                       | N/A      |
+
+## Bump
+
+|                           |                                                                                          |
+| ------------------------- | ---------------------------------------------------------------------------------------- |
+| Name                      | `bump`                                                                                   |
+| Type                      | string                                                                                   |
+| Default                   | N/A                                                                                      |
+| Command Line Option       | `-b=<NAME>`, `--bump=<NAME>`                                                             |
+| Environment Variable      | `NYX_BUMP=<NAME>`                                                                        |
+| Configuration File Option | `bump`                                                                                   |
+| Related state attributes  | <button class="button button--outline button--info">[bump](../state-reference/global-attributes.mdx#bump)</button> <button class="button button--outline button--info">[newVersion](../state-reference/global-attributes.mdx#new-version)</button> <button class="button button--outline button--info">[scheme](../state-reference/global-attributes.mdx#scheme)</button> <button class="button button--outline button--info">[version](../state-reference/global-attributes.mdx#version)</button> <button class="button button--outline button--info">[releaseScope/previousVersion](../state-reference/release-scope.mdx#previous-version)</button> <button class="button button--outline button--info">[releaseScope/significantCommits](../state-reference/release-scope.mdx#significant-commits)</button> |
+
+Instructs Nyx on which identifier to bump on the past version in order to build the new [version](../state-reference/global-attributes.mdx#version).
+
+This option prevents Nyx to [infer](../introduction/how-nyx-works.mdx#infer) the identifier to bump from the commit history.
+
+Valid values for this options are the identifier names for the current version [`scheme`](#scheme).
+
+Using [Semver](../introduction/version-schemes.mdx#semantic-versioning-semver) they are `core`, `major`, `minor`. Names other than these are interpreted as pre-release identifier names so, for example, if the past version is `1.2.3` and you set this option to `alpha`, the new [`version`](#version) will be `1.2.3-alpha.1` at the first run, `1.2.3-alpha.2` the second and so on.
+
+This option has no effect if [`version`](#version) is also used.
+
+The short option name `-b=<NAME>` has priority over the extended `--bump=<NAME>` in case they are used together.
+
+## Configuration file
+
+|                           |                                                                                          |
+| ------------------------- | ---------------------------------------------------------------------------------------- |
+| Name                      | `configurationFile`                                                                      |
+| Type                      | string                                                                                   |
+| Default                   | N/A                                                                                      |
+| Command Line Option       | `-c=<PATH>`, `--configuration-file=<PATH>`                                               |
+| Environment Variable      | `NYX_CONFIGURATION_FILE=<PATH>`                                                          |
+| Configuration File Option | `configurationFile`                                                                      |
+| Related state attributes  | <button class="button button--outline button--info">[directory](../state-reference/global-attributes.mdx#directory)</button> |
+
+This option allows you to load a configuration file from a location other than default ones. This can be a relative or absolute path to a local file or an URL to load a remote file. This configuration file can override other options, as per the [evaluation order](../introduction/configuration-methods.mdx#evaluation-order), and can be authored as `.yaml` (or `.yml`) or `.json` (the format is inferred by the file extension or JSON is used by default) just like the default configuration files.
+
+Configuration files have higher priority over [shared configuration files](#shared-configuration-file) so they can override specific options inherited from them.
+
+:::info
+Consider using a [standard path for configuration files](../introduction/configuration-methods.mdx#evaluation-order) before using a custom one, so you don't even need to use this option.
+:::
+
+:::info
+In order to avoid chaining this option is ignored when defined in custom configuration files loaded by means of this same option.
+:::
+
+The short option name `-c=<PATH>` has priority over the extended `--configuration-file=<PATH>` in case they are used together.
+
+## Changelog
+
+See [Changelog](changelog.mdx).
+
+## Commit message conventions
+
+See [Commit Message Conventions](commit-message-conventions.mdx).
+
+## Directory
+
+|                           |                                                                                          |
+| ------------------------- | ---------------------------------------------------------------------------------------- |
+| Name                      | `directory`                                                                              |
+| Type                      | string                                                                                   |
+| Default                   | Current working directory                                                                |
+| Command Line Option       | `-d=<PATH>`, `--directory=<PATH>`                                                        |
+| Environment Variable      | `NYX_DIRECTORY=<PATH>`                                                                   |
+| Configuration File Option | `directory`                                                                              |
+| Related state attributes  | <button class="button button--outline button--info">[directory](../state-reference/global-attributes.mdx#directory)</button> |
+
+Sets the working directory for Nyx. The directory is where Nyx searches for the Git repository and is also used as the base path when relative paths to local files or directories.
+
+By default Nyx uses the process' working directory for this.
+
+The [**Gradle plugin**](../introduction/usage.mdx#using-the-gradle-plugin) reads the current working directory by the [`projectDir`](https://docs.gradle.org/current/userguide/writing_build_scripts.html#sec:standard_project_properties) property by default, unless it's overridden by this configuration.
+
+The short option name `-d=<PATH>` has priority over the extended `--directory=<PATH>` in case they are used together.
+
+## Dry run
+
+|                           |                                                                                          |
+| ------------------------- | ---------------------------------------------------------------------------------------- |
+| Name                      | `dryRun`                                                                                 |
+| Type                      | boolean                                                                                  |
+| Default                   | `false`                                                                                  |
+| Command Line Option       | `--dry-run`, `--dry-run=true|false`                                                      |
+| Environment Variable      | `NYX_DRY_RUN=true|false`                                                                 |
+| Configuration File Option | `dryRun`                                                                                 |
+| Related state attributes  |                                                                                          |
+
+When this flag is set to `true` no action altering the repository state, either local or remote, is taken. Instead the actions that would be taken if this flag was not set are printed to the log.
+
+When used with no value on the command line (i.e. `--dry-run` alone) `true` is assumed.
+
+When enabling this flag you probably want to raise the [verbosity](#verbosity).
+
+## Git
+
+See [Git](git.mdx).
+
+## Help
+
+|                           |                                                                                          |
+| ------------------------- | ---------------------------------------------------------------------------------------- |
+| Name                      | `help`                                                                                   |
+| Type                      | flag                                                                                     |
+| Default                   | N/A                                                                                      |
+| Command Line Option       | `--help`                                                                                 |
+| Environment Variable      | N/A                                                                                      |
+| Configuration File Option | N/A                                                                                      |
+| Related state attributes  |                                                                                          |
+
+Prints the command line synopsis and exits with code 0, without running any command. Any other option is ignored.
+
+This option is only available on the command line.
+
+## Initial version
+
+|                           |                                                                                          |
+| ------------------------- | ---------------------------------------------------------------------------------------- |
+| Name                      | `initialVersion`                                                                         |
+| Type                      | string                                                                                   |
+| Default                   | Depends on the configured [version scheme](#scheme)                                      |
+| Command Line Option       | `--initial-version=<VERSION>`                                                            |
+| Environment Variable      | `NYX_INITIAL_VERSION=<VERSION>`                                                          |
+| Configuration File Option | `initialVersion`                                                                         |
+| Related state attributes  | <button class="button button--outline button--info">[scheme](../state-reference/global-attributes.mdx#scheme)</button> <button class="button button--outline button--info">[newVersion](../state-reference/global-attributes.mdx#new-version)</button> <button class="button button--outline button--info">[version](../state-reference/global-attributes.mdx#version)</button> |
+
+The default version to use when no previous version can be [inferred](../introduction/how-nyx-works.mdx#infer) from the commit history (i.e. when the repository has no tagged releases yet). When not specified this value is determined by the configured [version scheme](../introduction/version-schemes.mdx).
+
+This might be useful for project bootstrapping only (from Nyx's perspective) when the default initial version just doesn't fit your need. Remember that this value will be considered **just once** because after the first release (which *consumes* this option) there will be a previous version in the commit history.
+
+This value is ignored when the [version](#version) option is used. See [this example](../../resources/examples/git-history-examples.mdx#custom-initial-version) to see how this option can be used.
+
+## Preset
+
+|                           |                                                                                          |
+| ------------------------- | ---------------------------------------------------------------------------------------- |
+| Name                      | `preset`                                                                                 |
+| Type                      | string                                                                                   |
+| Default                   | N/A                                                                                      |
+| Command Line Option       | `--preset=<NAME>`                                                                        |
+| Environment Variable      | `NYX_PRESET=<NAME>`                                                                      |
+| Configuration File Option | `preset`                                                                                 |
+| Related state attributes  |                                                                                          |
+
+This option allows you to import one [preset configuration](../configuration-presets/index.md) into your configuration to save configuration time and effort.
+
+Presets have low priority in the [evaluation order](../introduction/configuration-methods.mdx#evaluation-order) so you can override their values by several means if you need to. On the other hand they are an effective way to get started in minutes using well known and tested streamlined configurations.
+
+## Release assets
+
+See [Release Assets](release-assets.mdx).
+
+## Release lenient
+
+|                           |                                                                                          |
+| ------------------------- | ---------------------------------------------------------------------------------------- |
+| Name                      | `releaseLenient`                                                                         |
+| Type                      | boolean                                                                                  |
+| Default                   | `true`                                                                                   |
+| Command Line Option       | `--release-lenient`, `--release-lenient=true`&#124;`false`                               |
+| Environment Variable      | `NYX_RELEASE_LENIENT=true`&#124;`false`                                                  |
+| Configuration File Option | `releaseLenient`                                                                         |
+| Related state attributes  |                                                                                          |
+
+When this option is enabled (it is by default), Nyx will attempt to tolerate prefixes and other unnecessary characters (like leading zeroes) when **reading** Git tags from the commit history. When `true`, tags like `vx.y.x`, `relx.y.x` etc will be detected as release tags (for *version* `x.y.x`), regardless of the [prefix Nyx uses to **generate** release names](#release-prefix). On the other hand, when this is `false`, Nyx will only detect tags strictly complying with the version [scheme](#scheme) and the [release prefix](#release-prefix) so, for instance, when `releasePrefix` is set to `v`, Nyx will only detect tags of the form `vx.y.x` while if the `releasePrefix` is not used, only `x.y.x` tags are detected, with no extra leading zeroes etc.
+
+With this option enabled the prefixes of tags parsed by Nyx don't need to use the same prefix as `releasePrefix` so, for instance, if `releasePrefix` is `v`, Nyx can parse tags like `x.y.x`, `vx.y.x`, `relx.y.x` etc.
+
+Unnecessary leading zeroes will still allow version numbers to be parsed although they will be sanitized upon parsing. For example, `1.02.3` has an offending `0` which will not cause the version to be rejected when this option is enabled. However, the version will be parsed as `1.2.3`, with the offending characted sanitized.
+
+When used with no value on the command line (i.e. `--release-lenient` alone) `true` is assumed.
+
+## Release prefix
+
+|                           |                                                                                          |
+| ------------------------- | ---------------------------------------------------------------------------------------- |
+| Name                      | `releasePrefix`                                                                          |
+| Type                      | string                                                                                   |
+| Default                   | N/A                                                                                      |
+| Command Line Option       | `--release-prefix=<PREFIX>`                                                              |
+| Environment Variable      | `NYX_RELEASE_PREFIX=<PREFIX>`                                                            |
+| Configuration File Option | `releasePrefix`                                                                          |
+| Related state attributes  |                                                                                          |
+
+It's a common practice to add a leading string to version numbers to give releases a name. Common prefixes are `v` or `rel` but you might use anything, or no prefix at all.
+
+When specifying a custom prefix, only use alphanumeric characters (no numbers or special characters).
+
+:::info
+Release names are not necessarily equal to versions. For example version `1.2.3` can be issued by the release named `v1.2.3`. This is a small difference but helps [coping with the strict interpretation of valid version identifiers](../../resources/faq/whats-the-difference-between-version-and-release.mdx).
+:::
+
+This option only affects the way Nyx **generates** release names and tags, while [`releaseLenient`](#release-lenient) controls how tolerant Nyx is when **reading** release tags from the Git repository.
+
+## Release types
+
+See [Release Types](release-types.mdx).
+
+## Resume
+
+|                           |                                                                                          |
+| ------------------------- | ---------------------------------------------------------------------------------------- |
+| Name                      | `resume`                                                                                 |
+| Type                      | boolean                                                                                  |
+| Default                   | `false`                                                                                  |
+| Command Line Option       | `--resume`, `--resume=true`&#124;`false`                                                 |
+| Environment Variable      | `NYX_RESUME=true`&#124;`false`                                                           |
+| Configuration File Option | `resume`                                                                                 |
+| Related state attributes  |                                                                                          |
+
+When this flag is set to `true` Nyx tries to load an existing [state file](#state-file) and resume operations from where it left when the state file was saved. This can improve execution time when you need to run Nyx in separate steps (i.e. when you run [Infer](../introduction/how-nyx-works.mdx#infer), then do other tasks external to Nyx and then finalize the release process by running [Infer](../introduction/how-nyx-works.mdx#publish)).
+
+This option only makes sense when you also set a value for the [`stateFile`](#state-file). If no `stateFile` is defined this option just has no effect.
+
+When used with no value on the command line (i.e. `--resume` alone) `true` is assumed.
+
+## Scheme
+
+|                           |                                                                                          |
+| ------------------------- | ---------------------------------------------------------------------------------------- |
+| Name                      | `scheme`                                                                                 |
+| Type                      | string                                                                                   |
+| Default                   | `SEMVER`                                                                                 |
+| Command Line Option       | `--scheme=<NAME>`                                                                        |
+| Environment Variable      | `NYX_SCHEME=<NAME>`                                                                      |
+| Configuration File Option | `scheme`                                                                                 |
+| Related state attributes  | <button class="button button--outline button--info">[bump](../state-reference/global-attributes.mdx#bump)</button> <button class="button button--outline button--info">[coreVersion](../state-reference/global-attributes.mdx#core-version)</button> <button class="button button--outline button--info">[latestVersion](../state-reference/global-attributes.mdx#latest-version)</button> <button class="button button--outline button--info">[newVersion](../state-reference/global-attributes.mdx#new-version)</button> <button class="button button--outline button--info">[scheme](../state-reference/global-attributes.mdx#scheme)</button> <button class="button button--outline button--info">[version](../state-reference/global-attributes.mdx#version)</button> |
+
+Selects the [version scheme](../introduction/version-schemes.mdx) to use. Defaults to [`SEMVER`](../introduction/version-schemes.mdx#semantic-versioning-semver).
+
+## Services
+
+See [Services](services.mdx).
+
+## Shared configuration file
+
+|                           |                                                                                          |
+| ------------------------- | ---------------------------------------------------------------------------------------- |
+| Name                      | `sharedConfigurationFile`                                                                |
+| Type                      | string                                                                                   |
+| Default                   | N/A                                                                                      |
+| Command Line Option       | `--shared-configuration-file=<PATH>`                                                     |
+| Environment Variable      | `NYX_SHARED_CONFIGURATION_FILE=<PATH>`                                                   |
+| Configuration File Option | `sharedConfigurationFile`                                                                |
+| Related state attributes  |                                                                                          |
+
+This option allows you to load a **shared** configuration file from a location other than [default ones](../introduction/configuration-methods.mdx#evaluation-order). This can be a relative or absolute path to a local file or an URL to load a remote file. This configuration file can be authored as `.yaml` (or `.yml`), `.json` (the format is inferred by the file extension or JSON is used by default) just like the default configuration files.
+
+Shared configuration files are meant to share a common set of configuration options among projects and they have lower priority over [regular configuration files](#configuration-file) which, in turn, can be used to override specific options inherited from shared files.
+
+:::info
+Consider using a [standard path for configuration files](../introduction/configuration-methods.mdx#evaluation-order) before using a custom one, so you don't even need to use this option.
+:::
+
+:::info
+In order to avoid chaining this option is ignored when defined in custom configuration files loaded by means of this same option.
+:::
+
+## State file
+
+|                           |                                                                                          |
+| ------------------------- | ---------------------------------------------------------------------------------------- |
+| Name                      | `stateFile`                                                                              |
+| Type                      | string                                                                                   |
+| Default                   | N/A                                                                                      |
+| Command Line Option       | `--state-file=<PATH>`                                                                    |
+| Environment Variable      | `NYX_STATE_FILE=<PATH>`                                                                  |
+| Configuration File Option | `stateFile`                                                                              |
+| Related state attributes  |                                                                                          |
+
+Enables the creation of the [state file](../state-reference/index.md) where Nyx stores its findings and generated values.
+
+The value passed here can be:
+
+* a simple file name that will be interpred as local to the current working directory
+* a relative path that will be interpreted as relative to the current working directory
+* an absolute file name
+
+Nyx will infer the format of the file by the extension, where available ones are [`.yaml`](https://yaml.org/) (or `.yml`), [`.json`](https://www.json.org/). When unable to infer the format by the extension JSON is assumed by default. This way, if you need to read the file for your own purposes, you can have it in the format that is more accessible to you.
+
+:::info
+The suggested name for the file, when used, is `.nyx-state.<EXT>` (so `.nyx-state.yaml`, `.nyx-state.yml` or `.nyx-state.json`). It's recommended to let Git [ignore](https://git-scm.com/docs/gitignore) this file.
+:::
+
+This option can also be used in conjunction with [`resume`](#resume) in case you wish to suspend the execution and resume from where you left at any other time.
+
+Also see [`summaryFile`](#summary-file) in case you're interested in a smaller but easily parseable subset of information.
+
+## Summary
+
+|                           |                                                                                          |
+| ------------------------- | ---------------------------------------------------------------------------------------- |
+| Name                      | `summary`                                                                                |
+| Type                      | boolean                                                                                  |
+| Default                   | `false`                                                                                  |
+| Command Line Option       | `--summary`, `--summary=true`&#124;`false`                                               |
+| Environment Variable      | `NYX_SUMMARY=true`&#124;`false`                                                          |
+| Configuration File Option | `summary`                                                                                |
+| Related state attributes  | <button class="button button--outline button--info">[branch](../state-reference/global-attributes.mdx#branch)</button> <button class="button button--outline button--info">[bump](../state-reference/global-attributes.mdx#bump)</button> <button class="button button--outline button--info">[coreVersion](../state-reference/global-attributes.mdx#core-version)</button> <button class="button button--outline button--info">[latestVersion](../state-reference/global-attributes.mdx#latest-version)</button> <button class="button button--outline button--info">[newRelease](../state-reference/global-attributes.mdx#new-release)</button> <button class="button button--outline button--info">[newVersion](../state-reference/global-attributes.mdx#new-version)</button> <button class="button button--outline button--info">[scheme](../state-reference/global-attributes.mdx#scheme)</button> <button class="button button--outline button--info">[timestamp](../state-reference/global-attributes.mdx#timestamp)</button> <button class="button button--outline button--info">[version](../state-reference/global-attributes.mdx#version)</button> <button class="button button--outline button--info">[previousVersion](../state-reference/release-scope.mdx#previous-version)</button> <button class="button button--outline button--info">[primeVersion](../state-reference/release-scope.mdx#prime-version)</button> |
+
+When this flag is set to `true` a short summary containing relevant information from the [internal state](../state-reference/index.md) is printed to the console. The output is the same as the [summary file](#summary-file) but is printed to the standard output (regardless of the [verbosity](#verbosity)).
+
+When used with no value on the command line (i.e. `--summary` alone) `true` is assumed.
+
+This option is only available on the command line.
+
+## Summary file
+
+|                           |                                                                                          |
+| ------------------------- | ---------------------------------------------------------------------------------------- |
+| Name                      | `summaryFile`                                                                            |
+| Type                      | string                                                                                   |
+| Default                   | N/A                                                                                      |
+| Command Line Option       | `--summary-file=<PATH>`                                                                  |
+| Environment Variable      | `NYX_SUMMARY_FILE=<PATH>`                                                                |
+| Configuration File Option | `summaryFile`                                                                            |
+| Related state attributes  | <button class="button button--outline button--info">[branch](../state-reference/global-attributes.mdx#branch)</button> <button class="button button--outline button--info">[bump](../state-reference/global-attributes.mdx#bump)</button> <button class="button button--outline button--info">[coreVersion](../state-reference/global-attributes.mdx#core-version)</button> <button class="button button--outline button--info">[latestVersion](../state-reference/global-attributes.mdx#latest-version)</button> <button class="button button--outline button--info">[newRelease](../state-reference/global-attributes.mdx#new-release)</button> <button class="button button--outline button--info">[newVersion](../state-reference/global-attributes.mdx#new-version)</button> <button class="button button--outline button--info">[scheme](../state-reference/global-attributes.mdx#scheme)</button> <button class="button button--outline button--info">[timestamp](../state-reference/global-attributes.mdx#timestamp)</button> <button class="button button--outline button--info">[version](../state-reference/global-attributes.mdx#version)</button> <button class="button button--outline button--info">[previousVersion](../state-reference/release-scope.mdx#previous-version)</button> <button class="button button--outline button--info">[primeVersion](../state-reference/release-scope.mdx#prime-version)</button> |
+
+Enables the creation of the summary file where Nyx saves a subset of relevant information from the [internal state](../state-reference/index.md) as name value pairs, easy to parse.
+
+An example of the file content is:
+
+```properties
+branch           = main
+bump             = minor
+core version     = true
+latest version   = true
+new release      = true
+new version      = true
+scheme           = SEMVER
+timestamp        = 1591802533
+current version  = 1.2.3
+previous version = 1.2.2
+prime version    = 1.2.2
+```
+
+The value passed here can be:
+
+* a simple file name that will be interpred as local to the current working directory
+* a relative path that will be interpreted as relative to the current working directory
+* an absolute file name
+
+The output is a simple text file and an example is `.nyx-summary.txt`.
+
+:::info
+When parsing the file you can rely on labels (on the left of the `=` sign) to be consistent and the presence of the `=` sign itself as a separator. Do not rely on the order of rows or the alignment and justification as they may change so you should always find values by *grepping* the line by the label and trim values.
+:::
+
+## Verbosity
+
+|                           |                                                                                          |
+| ------------------------- | ---------------------------------------------------------------------------------------- |
+| Name                      | `verbosity`                                                                              |
+| Type                      | string                                                                                   |
+| Default                   | `WARNING`                                                                                |
+| Command Line Option       | `--verbosity=<LEVEL>`, `--fatal`, `--error`, `--warning`, `--info`, `--debug`, `--trace` |
+| Environment Variable      | `NYX_VERBOSITY=<LEVEL>`                                                                  |
+| Configuration File Option | `verbosity`                                                                              |
+| Related state attributes  |                                                                                          |
+
+Controls the amount of output emitted by Nyx, where values are:
+
+* `FATAL`: only prints critical errors that prevent Nyx to complete. No output is printed when no fatal error is encountered
+* `ERROR`: only prints errors along with some essential information
+* `WARNING`: only prints errors and warnings along with some essential information (like the generated version number)
+* `INFO` : prints high level information about the internal action that Nyx runs
+* `DEBUG`: prints information obout internals that can be useful to debug Nyx in case of anomalies
+* `TRACE`: this is the most verbose option that prints lots of information, including internals
+
+The [**command line**](../introduction/usage.mdx#using-the-command-line) supports a shorthand option for each verbosity level so you can also use `--fatal`, `--error`, `--warning`, `--info`, `--debug`, `--trace` instead of `--verbosity=<LEVEL>`. When multiple verbosity levels are given, the most verbose one is used.
+
+The [Java library](../../developer/java/nyx-main.mdx) ignores this setting as it is supposed to be managed by the application using the library, as explained [here](../../developer/java/nyx-main.mdx#logging).
+
+The [**Gradle plugin**](../introduction/usage.mdx#using-the-gradle-plugin) manages its own [log level](https://docs.gradle.org/current/userguide/command_line_interface.html#setting_log_level) and being the Nyx plugin a [library](../../developer/java/nyx-main.mdx) used by Gradle, it just conforms to Gradle's verbosity. In other words, when using the Gradle plugin you just have to set Gradle's verbosity.
+
+## Version
+
+|                           |                                                                                          |
+| ------------------------- | ---------------------------------------------------------------------------------------- |
+| Name                      | `version`                                                                                |
+| Type                      | string                                                                                   |
+| Default                   | N/A                                                                                      |
+| Command Line Option       | `-v=<VERSION>`, `--version=<VERSION>`                                                    |
+| Environment Variable      | `NYX_VERSION=<VERSION>`                                                                  |
+| Configuration File Option | `version`                                                                                |
+| Related state attributes  | <button class="button button--outline button--info">[bump](../state-reference/global-attributes.mdx#bump)</button> <button class="button button--outline button--info">[coreVersion](../state-reference/global-attributes.mdx#core-version)</button> <button class="button button--outline button--info">[newVersion](../state-reference/global-attributes.mdx#new-version)</button> <button class="button button--outline button--info">[latestVersion](../state-reference/global-attributes.mdx#latest-version)</button> <button class="button button--outline button--info">[scheme](../state-reference/global-attributes.mdx#scheme)</button> <button class="button button--outline button--info">[version](../state-reference/global-attributes.mdx#version)</button> <button class="button button--outline button--info">[releaseScope/previousVersion](../state-reference/release-scope.mdx#previous-version)</button> <button class="button button--outline button--info">[releaseScope/significantCommits](../state-reference/release-scope.mdx#significant-commits)</button> |
+
+Overrides the version and prevents Nyx to [infer](../introduction/how-nyx-works.mdx#infer). When overriding this value you take over the tool and go the *manual versioning* way so Nyx won't try to read past versions from the commit history nor determine which identifiers to bump.
+
+The short option name `-v=<VERSION>` has priority over the extended `--version=<VERSION>` in case they are used together.
+
+### The version in Gradle scripts
+
+In **Gradle** build scripts the [`version` standard Gradle project property](https://docs.gradle.org/current/userguide/writing_build_scripts.html#sec:standard_project_properties) is used instead of an extension configuration to grant consistency between the Gradle environment and Nyx. Example:
+
+```groovy
+version = 'v1.2.3'
+nyx {
+  // no 'version' option here
+}
+```
+
+The entire Gradle script will be able to read the version number inferred by Nyx by reading the [`version`](https://docs.gradle.org/current/userguide/writing_build_scripts.html#sec:standard_project_properties) property. In other words, the `version` property is both a configuration option and an output value to Nyx when used as a Gradle plugin.
+
+In order to [infer](../introduction/how-nyx-works.mdx#infer) the version you should not assign any value to the `version` property in the Gradle script (which is to say you need to remove any `version = ...` definition) but you can still read it.

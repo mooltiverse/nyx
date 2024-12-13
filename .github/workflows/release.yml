@@ -1,0 +1,366 @@
+# Publishes a new release.
+#
+# This job restores the caches from previous jobs and uses the
+# '*-cache-name-restore-suffix' values also as flags to enable or
+# disable certain features. This means that for any feature named
+# 'feature', if the 'feature-cache-name-restore-suffix' is not set,
+# the workflow assumes the 'feature' is not used and no cache is
+# restored for that specific feature.
+
+name: Publish and Release
+
+on:
+  workflow_dispatch:
+  workflow_call:
+    inputs:
+      runs-on:
+        description: |-
+          Define the type of machine to run the job on.
+          Default: ubuntu-latest
+        type: string
+        required: false
+        default: 'ubuntu-latest'
+      verbosity:
+        description: |-
+          Sets the verbosity level to adjust the output logs verbosity.
+          Allowed values are: 'error', 'warning', 'quiet', 'info', 'debug'.
+          Default: quiet
+        type: string
+        required: false
+        default: 'quiet'
+      gradle-arguments:
+        description: |-
+          The whitespace separated list of Gradle arguments to pass on the
+          Gradle command line. See also 'gradle-secret-arguments' for passing
+          sensitive values.
+          For example you may use '--quiet', '--warn', '--info', '--debug' to
+          set the verbosity level.
+          For more see: https://docs.gradle.org/current/userguide/command_line_interface.html.
+          Default: --build-cache --stacktrace
+        type: string
+        required: false
+        default: "--build-cache --stacktrace"
+      gradle-tasks:
+        description: |-
+          The whitespace separated list of Gradle tasks to run.
+          Default: nyxMark nyxPublish
+        type: string
+        required: false
+        default: "nyxMark nyxPublish"
+      install-jdk:
+        description: |-
+          Whether to install the JDK or not.
+          For more see: https://github.com/actions/setup-java.
+          Please note that the tools come preinstalled in many hosted GitHub
+          runner images and re-installing would just slow down the setup process.
+          Consider installing only when the runners don't have it preinstalled or
+          when you need a specific version.
+          To check out if it's already installed see:
+          - https://docs.github.com/en/actions/using-github-hosted-runners/using-github-hosted-runners/about-github-hosted-runners#preinstalled-software
+          Default: false
+        type: boolean
+        required: false
+        default: true
+      install-jdk-distribution:
+        description: |-
+          The JDK distribution to setup if 'install-jdk' is 'true'.
+          For available distributions see: https://github.com/actions/setup-java.
+          Default: temurin
+        type: string
+        required: false
+        default: 'temurin'
+      install-jdk-version:
+        description: |-
+          The JDK version to setup if 'install-jdk' is 'true'.
+          For available versions see: https://github.com/actions/setup-java.
+          Default: 21
+        type: string
+        required: false
+        default: '21'
+      install-gradle:
+        description: |-
+          Whether to install Gradle or not.
+          For more see: https://github.com/gradle/actions/blob/main/docs/setup-gradle.md.
+          Please note that the tools come preinstalled in many hosted GitHub
+          runner images and re-installing would just slow down the setup process.
+          Consider installing only when the runners don't have it preinstalled or
+          when you need a specific version.
+          To check out if it's already installed see:
+          - https://docs.github.com/en/actions/using-github-hosted-runners/using-github-hosted-runners/about-github-hosted-runners#preinstalled-software
+          Default: false
+        type: boolean
+        required: false
+        default: false
+      install-gradle-version:
+        description: |-
+          The Gradle version to setup if 'install-gradle' is 'true'.
+          There are a few aliases that can be used here: 'wrapper' uses the version
+          defined in the Gradle wrapper (recommended), 'current' uses the latest
+          stable release.
+          For available versions see: https://github.com/gradle/actions/blob/main/docs/setup-gradle.md.
+          Default: wrapper
+        type: string
+        required: false
+        default: 'wrapper'
+      install-node:
+        description: |-
+          Whether to install Node or not.
+          For more see: https://github.com/actions/setup-node.
+          Please note that the tools come preinstalled in many hosted GitHub
+          runner images and re-installing would just slow down the setup process.
+          Consider installing only when the runners don't have it preinstalled or
+          when you need a specific version.
+          To check out if it's already installed see:
+          - https://docs.github.com/en/actions/using-github-hosted-runners/using-github-hosted-runners/about-github-hosted-runners#preinstalled-software
+          Default: false
+        type: boolean
+        required: false
+        default: false
+      install-node-version:
+        description: |-
+          The Node SDK version to setup if 'install-node' is 'true'.
+          For available versions see: https://github.com/actions/setup-node.
+          Default: latest
+        type: string
+        required: false
+        default: 'latest'
+      nyx-cache-name-restore-suffix:
+        description: |-
+          The suffix of the name to use for the cache that will be read by this
+          workflow. This is useful to 'chain' caches, so here you can pass the
+          suffix from a previous cache to make this workflow start from that
+          one cache.
+          If the cache to read does not exists a new one will be created from
+          scratch without errors.
+          Default: infer (matches the job from the Initialize workflow)
+        type: string
+        required: false
+        default: "infer"
+      go-cache-name-restore-suffix:
+        description: |-
+          The suffix of the name to use for the cache that will be read by this
+          workflow. This is useful to 'chain' caches, so here you can pass the
+          suffix from a previous cache to make this workflow start from that
+          one cache.
+          If the cache to read does not exists a new one will be created from
+          scratch without errors.
+          If this value is empty (by default) this workflow assumes this
+          feature is not used therefore no cache will be restored.
+          Default: none
+        type: string
+        required: false
+        default: ""
+      java-cache-name-restore-suffix:
+        description: |-
+          The suffix of the name to use for the cache that will be read by this
+          workflow. This is useful to 'chain' caches, so here you can pass the
+          suffix from a previous cache to make this workflow start from that
+          one cache.
+          If the cache to read does not exists a new one will be created from
+          scratch without errors.
+          If this value is empty (by default) this workflow assumes this
+          feature is not used therefore no cache will be restored.
+          Default: none
+        type: string
+        required: false
+        default: ""
+      docker-cache-name-restore-suffix:
+        description: |-
+          The suffix of the name to use for the cache that will be read by this
+          workflow. This is useful to 'chain' caches, so here you can pass the
+          suffix from a previous cache to make this workflow start from that
+          one cache.
+          If the cache to read does not exists a new one will be created from
+          scratch without errors.
+          If this value is empty (by default) this workflow assumes this
+          feature is not used therefore no cache will be restored.
+          Default: none
+        type: string
+        required: false
+        default: ""
+      docusaurus-cache-name-restore-suffix:
+        description: |-
+          The suffix of the name to use for the cache that will be read by this
+          workflow. This is useful to 'chain' caches, so here you can pass the
+          suffix from a previous cache to make this workflow start from that
+          one cache.
+          If the cache to read does not exists a new one will be created from
+          scratch without errors.
+          If this value is empty (by default) this workflow assumes this
+          feature is not used therefore no cache will be restored.
+          Default: none
+        type: string
+        required: false
+        default: ""
+      enable-github-container-registry:
+        description: |-
+          Whether or not authentication to the GitHub Container Registry must
+          be enabled.
+          When true the 'GITHUB_TOKEN' will be used to authenticate.
+          Default: false
+        type: boolean
+        required: false
+        default: false
+      enable-elastic-container-registry:
+        description: |-
+          Whether or not authentication to the AWS Elastic Container Registry (ECR)
+          must be enabled.
+          When true the 'aws-region', 'aws-access-key-id' and 'aws-secret-access-key'
+          will be used to authenticate.
+          Default: false
+        type: boolean
+        required: false
+        default: false
+      aws-access-key-id:
+        description: |-
+          The AWS access key ID to use for remote API.
+          This is usually the value of the AWS_ACCESS_KEY_ID environment variable.
+          See 'enable-elastic-container-registry' to enable authentication.
+        type: string
+        required: false
+      aws-region:
+        description: |-
+          The AWS region to use for remote API.
+          This is usually the value of the AWS_REGION environment variable.
+          See 'enable-elastic-container-registry' to enable authentication.
+        type: string
+        required: false
+      aws-container-registry:
+        description: |-
+          The AWS Elastic Container Registry fully qualified name (i.e.
+          '<aws-account-number>.dkr.ecr.<region>.amazonaws.com').
+          See 'enable-elastic-container-registry' to enable authentication.
+        type: string
+        required: false
+    secrets:
+      gradle-secret-arguments:
+        description: |-
+          The whitespace separated list of Gradle arguments to pass on the
+          Gradle command line. This is for passing sensitive values.
+          See also 'gradle-arguments' for passing non sensitive values.
+          For example you may use '--quiet', '--warn', '--info', '--debug' to
+          set the verbosity level.
+          For more see: https://docs.gradle.org/current/userguide/command_line_interface.html.
+        required: false
+      aws-secret-access-key:
+        description: |-
+          The AWS access key ID to use for remote API.
+          This is usually the value of the AWS_SECRET_ACCESS_KEY environment variable.
+          See 'enable-elastic-container-registry' to enable authentication.
+        required: false
+
+env:
+  # Compute the extra Gradle properties to use for Gradle commands.
+  # Here:
+  # - we add one argument for the verbosity level passed in the 'verbosity' input
+  GRADLE_EXTRA_OPTS: >-
+    ${{ inputs.verbosity == 'warning' && '--warn' || '' }}
+    ${{ inputs.verbosity == 'quiet' && '--quiet' || '' }}
+    ${{ inputs.verbosity == 'info' && '--info' || '' }}
+    ${{ inputs.verbosity == 'debug' && '--debug' || '' }}
+
+jobs:
+  release:
+    name: Release
+    runs-on: ${{ inputs.runs-on }}
+    steps:
+    - uses: mooltiverse/nyx/.github/actions/setup-git@main
+      with:
+        verbosity: ${{ inputs.verbosity }}
+    - id: nyx
+      uses: mooltiverse/nyx/.github/actions/setup-nyx@main
+      with:
+        verbosity: ${{ inputs.verbosity }}
+        cache-name-restore-suffix: ${{ inputs.nyx-cache-name-restore-suffix }}
+    - id: go
+      if: steps.nyx.outputs.newRelease == 'true' && inputs.go-cache-name-restore-suffix != ''
+      uses: mooltiverse/nyx/.github/actions/setup-go@main
+      with:
+        verbosity: ${{ inputs.verbosity }}
+        # Restore the cache from the previous job to 'chain' the two caches
+        cache-name-restore-suffix: ${{ inputs.go-cache-name-restore-suffix }}
+    - id: java
+      if: steps.nyx.outputs.newRelease == 'true' && inputs.java-cache-name-restore-suffix != ''
+      uses: mooltiverse/nyx/.github/actions/setup-java@main
+      with:
+        verbosity: ${{ inputs.verbosity }}
+        # Restore the cache from the previous job to 'chain' the two caches
+        cache-name-restore-suffix: ${{ inputs.java-cache-name-restore-suffix }}
+    - id: docker
+      if: steps.nyx.outputs.newRelease == 'true' && inputs.docker-cache-name-restore-suffix != ''
+      uses: mooltiverse/nyx/.github/actions/setup-docker@main
+      with:
+        verbosity: ${{ inputs.verbosity }}
+        # Restore the cache from the previous job to 'chain' the two caches
+        cache-name-restore-suffix: ${{ inputs.docker-cache-name-restore-suffix }}
+        enable-github-container-registry: ${{ inputs.enable-github-container-registry }}
+        github-user: GITHUB
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        enable-elastic-container-registry: ${{ inputs.enable-elastic-container-registry }}
+        aws-region: ${{ inputs.aws-region }}
+        aws-container-registry: ${{ inputs.aws-container-registry }}
+        aws-access-key-id: ${{ inputs.aws-access-key-id }}
+        aws-secret-access-key: ${{ secrets.aws-secret-access-key }}
+    - id: docusaurus
+      if: steps.nyx.outputs.newRelease == 'true' && inputs.docusaurus-cache-name-restore-suffix != ''
+      uses: mooltiverse/nyx/.github/actions/setup-docusaurus@main
+      with:
+        verbosity: ${{ inputs.verbosity }}
+        install-node: ${{ inputs.install-node }}
+        install-node-version: ${{ inputs.install-node-version }}
+        # Restore the cache from the previous job to 'chain' the two caches
+        cache-name-restore-suffix: ${{ inputs.docusaurus-cache-name-restore-suffix }}
+    - id: gradle
+      if: steps.nyx.outputs.newRelease == 'true'
+      uses: mooltiverse/nyx/.github/actions/setup-gradle@main
+      with:
+        verbosity: ${{ inputs.verbosity }}
+        install-jdk: ${{ inputs.install-jdk }}
+        install-jdk-version: ${{ inputs.install-jdk-version }}
+        install-jdk-distribution: ${{ inputs.install-jdk-distribution }}
+        install-gradle: ${{ inputs.install-gradle }}
+        install-gradle-version: ${{ inputs.install-gradle-version }}
+        # The Gradle cache can't be restored in this workflow because there
+        # would be multiple source caches and they can't merge into one.
+        # A warning is emitted by the Initialize workflow explaining this.
+    - name: Release
+      if: steps.nyx.outputs.newRelease == 'true'
+      env:
+        # The task 'nyxMark' doesn't need extra credentials because Nyx uses
+        # Git under the hood, so it takes the credentials from the GITHUB_TOKEN
+        # (see the 'setup-git' action above).
+        # The task 'nyxPublish', instead, uses the API to publish a release and
+        # needs credentials. These credentials are to be passed in the
+        # 'services' configuration section and there are several options to do
+        # so, either directly as an environment variable or by interpolating a
+        # value, that may as well be an environment variable, inside the Nyx
+        # configuration. Either way, it depende on how Nyx has been configured,
+        # which is project specific, but the following values match our
+        # standard project configurations and layouts.
+        # Here we pass the GitHub Token as:
+        # - 'GITHUB_TOKEN' and 'GH_TOKEN': the two standard forms of the token,
+        #   often used to interpolate the value inside the
+        #   'services.<name>.options.AUTHENTICATION_TOKEN' configuration option
+        #   for Nyx
+        # - NYX_SERVICES_github_OPTIONS_AUTHENTICATION_TOKEN: passing the token
+        #   directly to Nyx as environment variable, whenever the GitHub service
+        #   in the 'services' configuration section is named 'github'
+        # For more see:
+        # - https://mooltiverse.github.io/nyx/guide/user/configuration-reference/services/#github-configuration-options
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        NYX_SERVICES_github_OPTIONS_AUTHENTICATION_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      shell: bash
+      run: ./gradlew ${{ inputs.gradle-arguments }} ${{ secrets.gradle-secret-arguments }} ${{ env.GRADLE_EXTRA_OPTS }} ${{ inputs.gradle-tasks }}
+    - name: Create the 'Release' annotation
+      if: steps.nyx.outputs.newRelease == 'true'
+      shell: bash
+      run: |
+        echo "::notice title=Release=${{ steps.nyx.outputs.version }}::Release ${{ steps.nyx.outputs.version }} has been issued as part of this pipeline"
+    - name: Create the 'Release' summary
+      if: steps.nyx.outputs.newRelease == 'true'
+      shell: bash
+      run: |
+        echo "### Release [${{ steps.nyx.outputs.version }}](https://github.com/${{ github.repository }}/releases/tag/${{ steps.nyx.outputs.version }})" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY # this is a blank line
+        echo "New release [${{ steps.nyx.outputs.version }}](https://github.com/${{ github.repository }}/releases/tag/${{ steps.nyx.outputs.version }}) is available." >> $GITHUB_STEP_SUMMARY

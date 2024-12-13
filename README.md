@@ -1,15 +1,19 @@
-[![.github/workflows/workflow.yml](https://github.com/mooltiverse/nyx/actions/workflows/workflow.yml/badge.svg?branch=main)](https://github.com/mooltiverse/nyx/actions/workflows/workflow.yml) 
-[![Javadoc](https://javadoc.io/badge2/com.mooltiverse.oss.nyx/java/Javadoc.svg)](https://javadoc.io/doc/com.mooltiverse.oss.nyx/java) 
-[![Go Documentation](https://godocs.io/github.com/mooltiverse/nyx/modules/go/nyx?status.svg)](https://godocs.io/github.com/mooltiverse/nyx/modules/go/nyx) 
-[![](https://img.shields.io/badge/powered%20by-Nyx-blue)](https://github.com/mooltiverse/nyx) 
-[![License](https://img.shields.io/badge/License-Apache%202.0-grey.svg)](LICENSE.md) [![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-v2.0%20adopted-grey.svg)](CODE_OF_CONDUCT.md)
+# Nyx
 
-[![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=mooltiverse_nyx&metric=security_rating)](https://sonarcloud.io/summary/new_code?id=mooltiverse_nyx) [![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=mooltiverse_nyx&metric=vulnerabilities)](https://sonarcloud.io/summary/new_code?id=mooltiverse_nyx)
-[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=mooltiverse_nyx&metric=coverage)](https://sonarcloud.io/summary/new_code?id=mooltiverse_nyx) [![Codecov](https://codecov.io/gh/mooltiverse/nyx/branch/main/graph/badge.svg)](https://codecov.io/gh/mooltiverse/nyx)
+[![Release](https://img.shields.io/github/v/release/mooltiverse/nyx?sort=semver)](https://github.com/mooltiverse/nyx/releases)
+[![GitHub Actions](https://github.com/mooltiverse/nyx/actions/workflows/workflow.yml/badge.svg?branch=main)](https://github.com/mooltiverse/nyx/actions/workflows/workflow.yml)
+[![Powered by Nyx](https://img.shields.io/badge/powered%20by-Nyx-blue)](https://github.com/mooltiverse/nyx)
+[![Javadoc](https://javadoc.io/badge2/com.mooltiverse.oss.nyx/java/Javadoc.svg)](https://javadoc.io/doc/com.mooltiverse.oss.nyx/java)
+[![Go Doc](https://godocs.io/github.com/mooltiverse/nyx/src/go/nyx?status.svg)](https://godocs.io/github.com/mooltiverse/nyx/src/go/nyx)
+[![License](https://img.shields.io/badge/License-Apache%202.0-grey.svg)](LICENSE.md) [![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-v2.0%20adopted-grey.svg)](CODE_OF_CONDUCT.md)
 
 [![Documentation](https://img.shields.io/static/v1?label=read%20the&message=documentation&color=blue&style=for-the-badge)](https://mooltiverse.github.io/nyx/)
 
-[Nyx](https://github.com/mooltiverse/nyx) is a powerful, flexible and extremely configurable **semantic release** tool. You can put release management on *auto pilot* regardless of the kind of project, languages, tools and technologies or you can control any aspect of release management manually. Preset configuration values let you get started in minutes without digging into detailed settings.
+----
+
+The one stop semantic release tool.
+
+Nyx is a powerful, flexible and extremely configurable **semantic release** tool. You can put release management on *auto pilot* regardless of the kind of project, languages, tools and technologies or you can control any aspect of release management manually. Preset configuration values let you get started in minutes without digging into detailed settings.
 
 Nyx is the *all in one* tool that gives you integrated support for:
 
@@ -27,6 +31,8 @@ Want to embed the libraries into your own project instead? You're covered as the
 Browse the [documentation](https://mooltiverse.github.io/nyx/) for more. Check out the [**quick start**](https://mooltiverse.github.io/nyx/guide/user/quick-start/) guide to get Nyx running in minutes or see the [developer guide](https://mooltiverse.github.io/nyx/guide/developer/) if you're interested in using the libraries.
 
 The project is open source and hosted on [GitHub](https://github.com/mooltiverse/nyx).
+
+----
 
 ## Getting started in 30 seconds
 
@@ -90,7 +96,7 @@ Available for all platforms in the [latest release](https://github.com/mooltiver
 * [Main Nyx documentation](https://mooltiverse.github.io/nyx/)
   * [user guide](https://mooltiverse.github.io/nyx/guide/user/)
   * [developer guide](https://mooltiverse.github.io/nyx/guide/developer/)
-* [Godoc API](https://godocs.io/github.com/mooltiverse/nyx/modules/go/nyx)
+* [Godoc API](https://godocs.io/github.com/mooltiverse/nyx/src/go/nyx)
 * [Javadoc API](https://javadoc.io/doc/com.mooltiverse.oss.nyx/java)
   
 ### Articles
@@ -98,16 +104,10 @@ Available for all platforms in the [latest release](https://github.com/mooltiver
 * [Nyx, the Semantic Release Automation Tool](https://levelup.gitconnected.com/nyx-the-semantic-release-automation-tool-4e2dfa949f38)
 * [Semantic Release Automation with Gradle using Nyx](https://levelup.gitconnected.com/semantic-release-automation-with-gradle-using-nyx-ba345235a365)
 
-### Reports and metrics
-
-* security: [![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=mooltiverse_nyx&metric=security_rating)](https://sonarcloud.io/summary/new_code?id=mooltiverse_nyx), [![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=mooltiverse_nyx&metric=vulnerabilities)](https://sonarcloud.io/summary/new_code?id=mooltiverse_nyx)
-* code quality: [![Code Smells](https://sonarcloud.io/api/project_badges/measure?project=mooltiverse_nyx&metric=code_smells)](https://sonarcloud.io/summary/new_code?id=mooltiverse_nyx), [![Bugs](https://sonarcloud.io/api/project_badges/measure?project=mooltiverse_nyx&metric=bugs)](https://sonarcloud.io/summary/new_code?id=mooltiverse_nyx), [![Technical Debt](https://sonarcloud.io/api/project_badges/measure?project=mooltiverse_nyx&metric=sqale_index)](https://sonarcloud.io/summary/new_code?id=mooltiverse_nyx), [![Reliability Rating](https://sonarcloud.io/api/project_badges/measure?project=mooltiverse_nyx&metric=reliability_rating)](https://sonarcloud.io/summary/new_code?id=mooltiverse_nyx)
-* code coverage: [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=mooltiverse_nyx&metric=coverage)](https://sonarcloud.io/summary/new_code?id=mooltiverse_nyx), [![Codecov](https://codecov.io/gh/mooltiverse/nyx/branch/main/graph/badge.svg)](https://codecov.io/gh/mooltiverse/nyx) [flaky](https://github.com/mooltiverse/nyx/issues/151)
-
 ## Badge
 
-If you like Nyx please consider showing the badge [![](https://img.shields.io/badge/powered%20by-Nyx-blue)](https://github.com/mooltiverse/nyx) on your project page by inserting this snippet:
+If you like Nyx please consider showing the badge [![Powered by Nyx](https://img.shields.io/badge/Powered%20by-Nyx-blue)](https://github.com/mooltiverse/nyx) on your project page by inserting this snippet:
 
 ```md
-[![](https://img.shields.io/badge/powered%20by-Nyx-blue)](https://github.com/mooltiverse/nyx)
+[![Powered by Nyx](https://img.shields.io/badge/powered%20by-Nyx-blue)](https://github.com/mooltiverse/nyx)
 ```

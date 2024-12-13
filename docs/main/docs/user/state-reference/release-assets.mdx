@@ -1,0 +1,84 @@
+---
+sidebar_position: 3
+tags:
+  - user
+  - guide
+  - reference
+  - state
+---
+
+# Release Assets
+
+The `releaseAssets` element is the list of artifacts that have been actually published along with the release. For each asset you have the file name, the description (or label), the MIME type and the URL to download the published asset.
+
+The assets being published are the ones configured by means of the [`releaseAssets`](../configuration-reference/release-assets.mdx) configuration with a couple of details to keep in mind:
+
+* each [release type](../configuration-reference/release-types.mdx) may use the global definition of release assets (by default) or just a subset of assets (in case it defines the [`assets`](../configuration-reference/release-types.mdx#assets) option)
+* [publication services](../configuration-reference/release-types.mdx#publication-services) may offer different support or have limitations for release assets. Please check the [services](../configuration-reference/services.mdx) page for details
+
+This list is only populated when [`newRelease`](../state-reference/global-attributes.mdx#new-release) is `true` and only after [publish](../introduction/how-nyx-works.mdx#publish) has run.
+
+Following is the list of attributes for each published asset.
+
+## Release asset attributes
+
+The following attributes are children of each item in the `releaseAssets` list:
+
+| Name                                                                | Type    | Values                                                    |
+| ------------------------------------------------------------------- | ------- | --------------------------------------------------------- |
+| [`releaseAssets/<#>/description`](#description)                     | string  | The (short) description (or label) of the published asset |
+| [`releaseAssets/<#>/fileName`](#file-name)                          | string  | The name of the published asset                           |
+| [`releaseAssets/<#>/path`](#path)                                   | string  | The URL of the published asset                            |
+| [`releaseAssets/<#>/type`](#type)                                   | string  | The MIME type of the published asset                      |
+
+### Description
+
+|                               |                                                                                          |
+| ----------------------------- | ---------------------------------------------------------------------------------------- |
+| Name                          | `releaseAssets/<#>/description`                                                          |
+| Type                          | string                                                                                   |
+| Related configuration options | <button class="button button--outline button--success">[description](../configuration-reference/release-assets.mdx#description)</button> <button class="button button--outline button--success">[assets](../configuration-reference/release-types.mdx#assets)</button> |
+| Initialized by task           | <button class="button button--outline button--secondary">[publish](../introduction/how-nyx-works.mdx#publish)</button> |
+
+The short description of the asset, or its label, depending on the semantics used by the [publication service](../configuration-reference/services.mdx).
+
+Unless the [publication service](../configuration-reference/services.mdx) has a custom treatment for this attribute, this is the same of the configured asset [description](../configuration-reference/release-assets.mdx#description). If the configured value is a [template](../configuration-reference/templates.mdx), this value is the outcome of rendering the source.
+
+### File name
+
+|                               |                                                                                          |
+| ----------------------------- | ---------------------------------------------------------------------------------------- |
+| Name                          | `releaseAssets/<#>/fileName`                                                             |
+| Type                          | string                                                                                   |
+| Related configuration options | <button class="button button--outline button--success">[fileName](../configuration-reference/release-assets.mdx#file-name)</button> <button class="button button--outline button--success">[assets](../configuration-reference/release-types.mdx#assets)</button> |
+| Initialized by task           | <button class="button button--outline button--secondary">[publish](../introduction/how-nyx-works.mdx#publish)</button> |
+
+The name of the file, or simply the short name of the asset, that has been published.
+
+Unless the [publication service](../configuration-reference/services.mdx) has a custom treatment for this attribute, this is the same of the configured asset [file name](../configuration-reference/release-assets.mdx#file-name). If the configured value is a [template](../configuration-reference/templates.mdx), this value is the outcome of rendering the source.
+
+### Path
+
+|                               |                                                                                          |
+| ----------------------------- | ---------------------------------------------------------------------------------------- |
+| Name                          | `releaseAssets/<#>/path`                                                                 |
+| Type                          | string                                                                                   |
+| Related configuration options | <button class="button button--outline button--success">[path](../configuration-reference/release-assets.mdx#path)</button> <button class="button button--outline button--success">[assets](../configuration-reference/release-types.mdx#assets)</button> |
+| Initialized by task           | <button class="button button--outline button--secondary">[publish](../introduction/how-nyx-works.mdx#publish)</button> |
+
+The URL that the asset is available to. This URL can be used to download the asset once it's published.
+
+When the [configured asset](../configuration-reference/release-assets.mdx) is a local file, this URL is generated and assigned by the [publication service](../configuration-reference/services.mdx) once the asset has been uploaded. Otherwise, if the configured asset is a remote URL this should be the same as the configured value.
+
+### Type
+
+|                               |                                                                                          |
+| ----------------------------- | ---------------------------------------------------------------------------------------- |
+| Name                          | `releaseAssets/<#>/type`                                                                 |
+| Type                          | string                                                                                   |
+| Related configuration options | <button class="button button--outline button--success">[type](../configuration-reference/release-assets.mdx#type)</button> <button class="button button--outline button--success">[assets](../configuration-reference/release-types.mdx#assets)</button> |
+| Initialized by task           | <button class="button button--outline button--secondary">[publish](../introduction/how-nyx-works.mdx#publish)</button> |
+
+The MIME type of the asset.
+
+Unless the [publication service](../configuration-reference/services.mdx) has a custom treatment for this attribute, this is the same of the configured asset [file name](../configuration-reference/release-assets.mdx#file-name). If the configured value is a [template](../configuration-reference/templates.mdx), this value is the outcome of rendering the source.

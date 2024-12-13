@@ -1,0 +1,775 @@
+---
+sidebar_position: 6
+tags:
+  - user
+  - guide
+  - reference
+  - configuration
+  - release types
+---
+
+# Release Types
+
+Release types are definitions that allow conditional settings to be used depending on *what* Nyx is releasing and *how*. The configuration allows using dynamic values that can also be used as conditionals so you can have multiple degrees of control over the released contents.
+
+Release types are configured within the `releaseTypes` *section*. The section allows one sub-section for each release type and some overall options.
+
+You can have as many release types as you want. You can use [presets](../configuration-presets/index.md) that come bundled with Nyx, override them or define your own from scratch.
+
+## Release types overall options
+
+| Name                                                        | Type   | Command Line Option                            | Environment Variable                             | Configuration File Option              | Default                                  |
+| ----------------------------------------------------------- | -------| ---------------------------------------------- | ------------------------------------------------ | -------------------------------------- | ---------------------------------------- |
+| [`releaseTypes/enabled`](#enabled)                          | list   | `--release-types-enabled=<NAMES>`              | `NYX_RELEASE_TYPES_ENABLED=<NAMES>`              | `releaseTypes/enabled`                 | [ ["`default`"](#default-release-type) ] |
+| [`releaseTypes/publicationServices`](#publication-services) | list   | `--release-types-publication-services=<NAMES>` | `NYX_RELEASE_TYPES_PUBLICATION_SERVICES=<NAMES>` | `releaseTypes/publicationServices`     | Empty                                    |
+| [`releaseTypes/remoteRepositories`](#remote-repositories)   | list   | `--release-types-remote-repositories=<NAMES>`  | `NYX_RELEASE_TYPES_REMOTE_REPOSITORIES=<NAMES>`  | `releaseTypes/remoteRepositories`      | Empty                                    |
+
+### Enabled
+
+|                           |                                                                                          |
+| ------------------------- | ---------------------------------------------------------------------------------------- |
+| Name                      | `releaseTypes/enabled`                                                                   |
+| Type                      | list                                                                                     |
+| Default                   | [ ["`default`"](#default-release-type) ]                                                 |
+| Command Line Option       | `--release-types-enabled=<NAMES>`                                                        |
+| Environment Variable      | `NYX_RELEASE_TYPES_ENABLED=<NAMES>`                                                      |
+| Configuration File Option | `releaseTypes/enabled`                                                                   |
+| Related state attributes  | <button class="button button--outline button--info">[releaseType](../state-reference/global-attributes.mdx#release-type)</button> |
+
+The comma separated list of release types that are enabled for the project. Here you can enable or disable the various release types, either custom or default.
+
+Each item in the list must correspond to a release type [`name`](#name) attribute. Each named release type must exist, but not all defined release types must be enabled here. Release types not listed here will just be ignored by Nyx as if they were not even defined.
+
+:::info
+The order in which release types are listed matters. The types listed first are evaluated first, so in case of ambiguous matches the order disambiguates.
+:::
+
+### Publication services
+
+|                           |                                                                                          |
+| ------------------------- | ---------------------------------------------------------------------------------------- |
+| Name                      | `releaseTypes/publicationServices`                                                       |
+| Type                      | list                                                                                     |
+| Default                   | Empty                                                                                    |
+| Command Line Option       | `--release-types-publication-services=<NAMES>`                                           |
+| Environment Variable      | `NYX_RELEASE_TYPES_PUBLICATION_SERVICES=<NAMES>`                                         |
+| Configuration File Option | `releaseTypes/publicationServices`                                                       |
+| Related state attributes  |                                                                                          |
+
+The comma separated list of service configuration names to be used to publish releases when the matched release type has the [`publish`](#publish) flag enabled. The services listed here are the same for all release types but each release type can toggle publication on or off using the [`publish`](#publish) flag. Each name in the list must be the [`name`](services.mdx#name) of a configured [service](services.mdx), but not all defined service configurations must be used here.
+
+Services listed here must support the `RELEASES` [feature](services.mdx#service-features). If they also support the `RELEASE_ASSETS` feature they can also publish the configured [release assets](release-assets.mdx) along with the release.
+
+:::info
+The order in which services are listed matters. If multiple publication services are defined, publication happens in the same order they are defined here. This might be useful if you're publishing to multiple services and one has dependencies on releases published to others.
+:::
+
+### Remote repositories
+
+|                           |                                                                                          |
+| ------------------------- | ---------------------------------------------------------------------------------------- |
+| Name                      | `releaseTypes/remoteRepositories`                                                        |
+| Type                      | list                                                                                     |
+| Default                   | [`origin`]                                                                               |
+| Command Line Option       | `--release-types-remote-repositories=<NAMES>`                                            |
+| Environment Variable      | `NYX_RELEASE_TYPES_REMOTE_REPOSITORIES=<NAMES>`                                          |
+| Configuration File Option | `releaseTypes/remoteRepositories`                                                        |
+| Related state attributes  |                                                                                          |
+
+The comma separated list of remote repository names to be used to push changes to when the matched release type has the [`gitPush`](#git-push) flag enabled. The remotes listed here are the same for all release types but each release type can toggle publication on or off using the [`gitPush`](#git-push) flag. Each name in the list must be the [`name`](git.mdx#name) of a configured [Git remote repository](git.mdx#remotes), but not all defined Git remotes must be used here.
+
+If this option is not set and the [`gitPush`](#git-push) flag is enabled, the default `origin` remote name is used.
+
+:::info
+The order in which remotes are listed matters. If multiple remotes are defined, push happens in the same order they are defined here. This might be useful if you're pushing to multiple remotes and one has dependencies on changes pushed to others.
+:::
+
+## Default release type
+
+The default release type is named `default` and brings all the default values that you can find in the following sections.
+
+:::info
+This release type should not be used in production configurations and you should always define your own types or use [presets](../configuration-presets/index.md).
+:::
+
+## Release type definition
+
+Within the `releaseTypes` block you can define as many types as you want, each in its own separate block. The `name` identifies the type so to define a brand new release type make sure you give it a `name` that was not already in use. If you use a `name` that was already defined for a release type (given the [evaluation order](../introduction/configuration-methods.mdx#evaluation-order)) then you are **overriding** an existing type. Depending on the [configuration method](../introduction/configuration-methods.mdx) you use the `name` property might be defined inside or outside the block that configures a single type.
+
+Configuring release types gives Nyx information about:
+
+* how to assume which type to select given a certain set of facts that are automatically inferred or overridden by user. The rules defining how to match a release type are [`matchBranches`](#match-branches), [`matchEnvironmentVariables`](#match-environment-variables) and [`matchWorkspaceStatus`](#match-workspace-status) and they are evaluated by an `AND` logic so **they must all evaluate `true` to make a successful match**
+* which tags in the Git history must be considered for the release type so that the commit history can be consistently parsed. The match is done using the regular expression configured as the [`filterTags`](#filter-tags)
+* the actions to take for each release type
+
+Each release type has the following attributes:
+
+| Name                                                                                       | Type    | Command Line Option                                                       | Environment Variable                                                        | Default                                              |
+| ------------------------------------------------------------------------------------------ | ------- | ------------------------------------------------------------------------- | --------------------------------------------------------------------------- | ---------------------------------------------------- |
+| [`releaseTypes/<NAME>/assets`](#assets)                                                    | list    | `--release-types-<NAME>-assets=<NAMES>`                                   | `NYX_RELEASE_TYPES_<NAME>_ASSETS=<NAMES>`                                   | N/A                                                  |
+| [`releaseTypes/<NAME>/collapseVersions`](#collapse-versions)                               | boolean | `--release-types-<NAME>-collapse-versions=true`&#124;`false`              | `NYX_RELEASE_TYPES_<NAME>_COLLAPSE_VERSIONS=true`&#124;`false`              | `false`                                              |
+| [`releaseTypes/<NAME>/collapsedVersionQualifier`](#collapsed-version-qualifier)            | string  | `--release-types-<NAME>-collapsed-version-qualifier=<TEMPLATE>`           | `NYX_RELEASE_TYPES_<NAME>_COLLAPSED_VERSION_QUALIFIER=<TEMPLATE>`           | Empty                                                |
+| [`releaseTypes/<NAME>/description`](#description)                                          | string  | `--release-types-<NAME>-description`                                      | `NYX_RELEASE_TYPES_<NAME>_DESCRIPTION=<TEMPLATE>`                           | `Release {{version}}`                                |
+| [`releaseTypes/<NAME>/filterTags`](#filter-tags)                                           | string  | `--release-types-<NAME>-filter-tags`                                      | `NYX_RELEASE_TYPES_<NAME>_FILTER_TAGS=<TEMPLATE>`                           | Empty                                                |
+| [`releaseTypes/<NAME>/gitCommit`](#git-commit)                                             | string  | `--release-types-<NAME>-git-commit=<TEMPLATE>`                            | `NYX_RELEASE_TYPES_<NAME>_GIT_COMMIT=<TEMPLATE>`                            | `false`                                              |
+| [`releaseTypes/<NAME>/gitCommitMessage`](#git-commit-message)                              | string  | `--release-types-<NAME>-git-commit-message=<TEMPLATE>`                    | `NYX_RELEASE_TYPES_<NAME>_GIT_COMMIT_MESSAGE=<TEMPLATE>`                    | `Release version {{version}}`                        |
+| [`releaseTypes/<NAME>/gitPush`](#git-push)                                                 | string  | `--release-types-<NAME>-git-push=<TEMPLATE>`                              | `NYX_RELEASE_TYPES_<NAME>_GIT_PUSH=<TEMPLATE>`                              | `false`                                              |
+| [`releaseTypes/<NAME>/gitPushForce`](#git-push-force)                                      | string  | `--release-types-<NAME>-git-push-force=<TEMPLATE>`                        | `NYX_RELEASE_TYPES_<NAME>_GIT_PUSH_FORCE=<TEMPLATE>`                        | `false`                                              |
+| [`releaseTypes/<NAME>/gitTag`](#git-tag)                                                   | string  | `--release-types-<NAME>-git-tag=<TEMPLATE>`                               | `NYX_RELEASE_TYPES_<NAME>_GIT_TAG=<TEMPLATE>`                               | `false`                                              |
+| [`releaseTypes/<NAME>/gitTagForce`](#git-tag-force)                                        | string  | `--release-types-<NAME>-git-tag-force=<TEMPLATE>`                         | `NYX_RELEASE_TYPES_<NAME>_GIT_TAG_FORCE=<TEMPLATE>`                         | `false`                                              |
+| [`releaseTypes/<NAME>/gitTagMessage`](#git-tag-message)                                    | string  | `--release-types-<NAME>-git-tag-message=<TEMPLATE>`                       | `NYX_RELEASE_TYPES_<NAME>_GIT_TAG_MESSAGE=<TEMPLATE>`                       | Empty                                                |
+| [`releaseTypes/<NAME>/gitTagNames`](#git-tag-names)                                        | list    | `--release-types-<NAME>-git-tag-names=<TEMPLATES>`                        | `NYX_RELEASE_TYPES_<NAME>_GIT_TAG_NAMES=<TEMPLATES>`                        | [ `{{version}}` ]                                    |
+| [`releaseTypes/<NAME>/identifiers`](#identifiers)                                          | [list](../introduction/configuration-methods.mdx#collections-of-objects)            | `--release-types-<NAME>-identifiers-<#>=<ID_ATTRIBUTE>`                     | `NYX_RELEASE_TYPES_<NAME>_IDENTIFIERS_<#>=<ID_ATTRIBUTE>` | Empty |
+| [`releaseTypes/<NAME>/matchBranches`](#match-branches)                                     | string  | `--release-types-<NAME>-match-branches=<TEMPLATE>`                        | `NYX_RELEASE_TYPES_<NAME>_MATCH_BRANCHES=<TEMPLATE>`                        | Empty                                                |
+| [`releaseTypes/<NAME>/matchEnvironmentVariables`](#match-environment-variables)            | [map](../introduction/configuration-methods.mdx#collections-of-objects)             | `--release-types-<NAME>-match-environment-variables-<VARNAME>=<VALUE>`      | `NYX_RELEASE_TYPES_<NAME>_MATCH_ENVIRONMENT_VARIABLES_<VARNAME>=<VALUE>` | Empty |
+| [`releaseTypes/<NAME>/matchWorkspaceStatus`](#match-workspace-status)                      | string  | `--release-types-<NAME>-match-workspace-status`                           | `NYX_RELEASE_TYPES_<NAME>_MATCH_WORKSPACE_STATUS=<STATUS>`                  | Empty                                                |
+| [`releaseTypes/<NAME>/name`](#name)                                                        | string  | `--release-types-<NAME>-name=<NAME>`                                      | `NYX_RELEASE_TYPES_<NAME>_NAME=<NAME>`                                      | N/A                                                  |
+| [`releaseTypes/<NAME>/publish`](#publish)                                                  | string  | `--release-types-<NAME>-publish=<TEMPLATE>`                               | `NYX_RELEASE_TYPES_<NAME>_PUBLISH=<TEMPLATE>`                               | `false`                                              |
+| [`releaseTypes/<NAME>/publishDraft`](#publish-draft)                                       | string  | `--release-types-<NAME>-publish-draft=<TEMPLATE>`                         | `NYX_RELEASE_TYPES_<NAME>_PUBLISH_DRAFT=<TEMPLATE>`                         | `false`                                              |
+| [`releaseTypes/<NAME>/publishPreRelease`](#publish-pre-release)                            | string  | `--release-types-<NAME>-publish-pre-release=<TEMPLATE>`                   | `NYX_RELEASE_TYPES_<NAME>_PUBLISH_PRE_RELEASE=<TEMPLATE>`                   | `false`                                              |
+| [`releaseTypes/<NAME>/releaseName`](#release-name)                                         | string  | `--release-types-<NAME>-release-name=<TEMPLATE>`                          | `NYX_RELEASE_TYPES_<NAME>_RELEASE_NAME=<TEMPLATE>`                          | Empty                                                |
+| [`releaseTypes/<NAME>/versionRange`](#version-range)                                       | string  | `--release-types-<NAME>-version-range=<TEMPLATE>`                         | `NYX_RELEASE_TYPES_<NAME>_VERSION_RANGE=<TEMPLATE>`                         | Empty (no constrained range)                         |
+| [`releaseTypes/<NAME>/versionRangeFromBranchName`](#version-range-from-branch-name)        | boolean | `--release-types-<NAME>-version-range-from-branch-name=true`&#124;`false` | `NYX_RELEASE_TYPES_<NAME>_VERSION_RANGE_FROM_BRANCH_NAME=true`&#124;`false` | `false`                                              |
+
+:::warning
+When using multiple [configuration methods](../introduction/configuration-methods.mdx) or customizing [presets](../configuration-presets/index.md), these values must be inherited or overridden as a whole. Overriding single values and inheriting others is not supported for this type of configuration option so when they are re-declared at one configuration level, all inherited values from those configuration methods with lower precedence are suppressed.
+:::
+
+### Assets
+
+|                           |                                                                                          |
+| ------------------------- | ---------------------------------------------------------------------------------------- |
+| Name                      | `releaseTypes/<NAME>/assets`                                                             |
+| Type                      | list                                                                                     |
+| Default                   | null                                                                                     |
+| Command Line Option       | `--release-types-<NAME>-assets=<NAMES>`                                                  |
+| Environment Variable      | `NYX_RELEASE_TYPES_<NAME>_ASSETS=<NAMES>`                                                |
+| Configuration File Option | `releaseTypes/items/<NAME>/assets`                                                       |
+| Related state attributes  | <button class="button button--outline button--info">[releaseAssets](../state-reference/release-assets.mdx)</button> |
+
+The comma separated list of release asset [names](release-assets.mdx#name) to be published for this release type.
+
+This option gives you finer control over the assets being published for the release type as:
+
+* when `null` (by default) all the globally configured [release assets](release-assets.mdx) are published for this release type.
+* when defined (not `null`) only the release assets whose [`name`](release-assets.mdx#name) appears in this list are published for this release type
+* when defined but empty no assets are published by this release type
+
+Each item in the list must correspond to a release asset [`name`](release-assets.mdx#name) (not the file name). Each named asset must be configured. Release assets not listed here will just be ignored by Nyx when this release type is matched as if they were not even defined.
+
+Think of this configuration option as a means to filter a subset of assets to publish for this release type.
+
+:::warning
+When using Gradle and [using the plugin configuration](../introduction/usage.mdx#using-the-extension) this option needs to be defined as a string containing a comma separated list of names rather than a list of strings. For example, use `assets = "asset1,asset2"` instead of `assets = [ "asset1", "asset2" ]`. This is because Gradle returns an empty list even when the user doesn't define the option so, when reading it, there is no difference between an undefined list or a list defined as empty. Since we need to distinguish between the two semantics, this workaround was needed.
+:::
+
+### Collapse versions
+
+|                           |                                                                                          |
+| ------------------------- | ---------------------------------------------------------------------------------------- |
+| Name                      | `releaseTypes/<NAME>/collapseVersions`                                                   |
+| Type                      | boolean                                                                                  |
+| Default                   | `false`                                                                                  |
+| Command Line Option       | `--release-types-<NAME>-collapse-versions=true`&#124;`false`                             |
+| Environment Variable      | `NYX_RELEASE_TYPES_<NAME>_COLLAPSE_VERSIONS=true`&#124;`false`                           |
+| Configuration File Option | `releaseTypes/items/<NAME>/collapseVersions`                                             |
+| Related state attributes  | <button class="button button--outline button--info">[bump](../state-reference/global-attributes.mdx#bump)</button> <button class="button button--outline button--info">[releaseScope/previousVersion](../state-reference/release-scope.mdx#previous-version)</button> <button class="button button--outline button--info">[releaseScope/previousVersionCommit](../state-reference/release-scope.mdx#previous-version-commit)</button> <button class="button button--outline button--info">[releaseScope/primeVersion](../state-reference/release-scope.mdx#prime-version)</button> <button class="button button--outline button--info">[releaseScope/primeVersionCommit](../state-reference/release-scope.mdx#prime-version-commit)</button> |
+
+This flag, which defaults to `false`, should be `true` on **all and only** the pre-release branch types as it's what actually makes them different from others.
+
+When this flag is `false` version numbers are bumped linearly starting from the [previous version](../state-reference/release-scope.mdx#previous-version) and the number to bump is determined based on changes since then, bumping the most significant one when more are affected by the changes.
+
+When `true`, instead, version numbers are bumped starting from the [prime version](../state-reference/release-scope.mdx#prime-version) and the number to bump is inferred by cumulating all changes since then, bumping the most significant number based on the changes within the scope.
+
+This concept is better explained by [this article](../../resources/faq/how-does-collapsed-versioning-work.mdx) and [this FAQ](../../resources/faq/whats-the-difference-between-the-prime-version-and-the-previous-version.mdx) but to make the long story short, **enabling this flag tells Nyx to use the *pre-release* version numbering for this release type**.
+
+This way of bumping versions drives to overlappings in *core* version numbers so in order to avoid conflicts an additional identifier is used to distinguish among versions with the same *core* identifiers. When using [SemVer](../introduction/version-schemes.mdx#semantic-versioning-semver) as the versioning [scheme](global-options.mdx#scheme), the identifier is created in the [*pre-release*](https://semver.org/) block.
+
+The extra identifier has a value that is linearly incremented among versions with the same *core* identifiers and is reset when they change. You can also give it a label using the [`collapsedVersionQualifier`](#collapsed-version-qualifier).
+
+Examples of versions generated over time:
+
+| Core identifiers  | Extra identifier    | Generated version |
+| ----------------- | ------------------- | ----------------- |
+| 1.2.3             | 1                   | 1.2.3-1           |
+| 1.2.3             | 2                   | 1.2.3-2           |
+| 1.2.3             | 3                   | 1.2.3-3           |
+| 1.2.4             | 1                   | 1.2.4-1           |
+
+As you can see by the example, as long as the *core* version is `1.2.3`, the extra identifiers `1`, `2` and `3` are appended in the *pre-release* block. It is reset to `1` when the *core* identifiers change to `1.2.4`.
+
+:::info
+Additional extra identifiers can be configured by means of the [identifiers](#identifiers) configuration block. The extra identifier herein described is completely independent by those in the [identifiers](#identifiers) section.
+:::
+
+### Collapsed version qualifier
+
+|                           |                                                                                          |
+| ------------------------- | ---------------------------------------------------------------------------------------- |
+| Name                      | `releaseTypes/<NAME>/collapsedVersionQualifier`                                          |
+| Type                      | string                                                                                   |
+| Default                   | Empty                                                                                    |
+| Command Line Option       | `--release-types-<NAME>-collapsed-version-qualifier=<TEMPLATE>`                          |
+| Environment Variable      | `NYX_RELEASE_TYPES_<NAME>_COLLAPSED_VERSION_QUALIFIER=<TEMPLATE>`                        |
+| Configuration File Option | `releaseTypes/items/<NAME>/collapsedVersionQualifier`                                    |
+| Related state attributes  | <button class="button button--outline button--info">[releaseScope/previousVersion](../state-reference/release-scope.mdx#previous-version)</button> <button class="button button--outline button--info">[releaseScope/previousVersionCommit](../state-reference/release-scope.mdx#previous-version-commit)</button> <button class="button button--outline button--info">[releaseScope/primeVersion](../state-reference/release-scope.mdx#prime-version)</button> <button class="button button--outline button--info">[releaseScope/primeVersionCommit](../state-reference/release-scope.mdx#prime-version-commit)</button> |
+
+This option is only evaluated when [`collapseVersions`](#collapse-versions) is `true` and allows you to define an optional name for the extra identifier used to disambiguate collapsed versions. The qualifier is actually an additional identifier preceding the number that disambiguates among *core* versions.
+
+This option can be defined as a [template](templates.mdx) or an hardcoded string. It's a common practice to use the [name of the current branch](../state-reference/global-attributes.mdx#branch) for this option.
+
+Examples (assuming [`collapseVersions`](#collapse-versions) is `true`):
+
+| Generated version with no collapsed version qualifier | Generated version with collapsed version qualifier = `{{branch}}` |
+| ----------------------------------------------------- | ----------------------------------------------------------------- |
+| 1.2.3-1                                               | 1.2.3-alpha.1                                                     |
+| 1.2.3-2                                               | 1.2.3-alpha.2                                                     |
+| 1.2.3-3                                               | 1.2.3-alpha.3                                                     |
+| 1.2.4-1                                               | 1.2.4-alpha.1                                                     |
+
+In the above example the `collapsedVersionQualifier` defines a [template](templates.mdx) that evaluates to the current branch name (in this case `alpha`).
+
+This option is **mandatory** when [`collapseVersions`](#collapse-versions) is `true` and if a [template](templates.mdx) is used it must resolve to a legal, non empty string.
+
+### Description
+
+|                           |                                                                                          |
+| ------------------------- | ---------------------------------------------------------------------------------------- |
+| Name                      | `releaseTypes/<NAME>/description`                                                        |
+| Type                      | string                                                                                   |
+| Default                   | `Release {{version}}`                                                                    |
+| Command Line Option       | `--release-types-<NAME>-description=<TEMPLATE>`                                          |
+| Environment Variable      | `NYX_RELEASE_TYPES_<NAME>_DESCRIPTION=<TEMPLATE>`                                        |
+| Configuration File Option | `releaseTypes/items/<NAME>/description`                                                  |
+| Related state attributes  |                                                                                          |
+
+A [template](templates.mdx) that, once rendered, gives the description of a release. This may be a short description or a long document like a changelog or a release notes document. The type of content might be Markdown.
+
+Note that this value is also used as the release description when [publishing](#publish) a release using [external services](#publication-services) so make sure the output of this value complies with target services.
+
+This value is optional but may be required by some [publication services](#publication-services).
+
+A common use for this option is a [`fileContent`](templates.mdx#filecontent) template to get the content of a release notes or changelog file. Example: `{{#fileContent}}CHANGELOG.md{{/fileContent}}`.
+
+For more on how to generate a changelog automatically please see the [`changelog`](changelog.mdx) configuration section.
+
+### Filter tags
+
+|                           |                                                                                          |
+| ------------------------- | ---------------------------------------------------------------------------------------- |
+| Name                      | `releaseTypes/<NAME>/filterTags`                                                         |
+| Type                      | string                                                                                   |
+| Default                   | Empty                                                                                    |
+| Command Line Option       | `--release-types-<NAME>-filter-tags=<TEMPLATE>`                                          |
+| Environment Variable      | `NYX_RELEASE_TYPES_<NAME>_FILTER_TAGS=<TEMPLATE>`                                        |
+| Configuration File Option | `releaseTypes/items/<NAME>/filterTags`                                                   |
+| Related state attributes  | <button class="button button--outline button--info">[releaseScope/previousVersion](../state-reference/release-scope.mdx#previous-version)</button> <button class="button button--outline button--info">[releaseScope/previousVersionCommit](../state-reference/release-scope.mdx#previous-version-commit)</button> |
+
+A [template](templates.mdx) that, once rendered, produces a regular expression that filter tags in the commit history so that the [*prime* and *previous* version](../../resources/faq/whats-the-difference-between-the-prime-version-and-the-previous-version.mdx) can be correctly inferred, ignoring non relevant tags that may be found. This is a *positive* filter so, when defined, only tags *matched* by the regular expression are considered, while those not matched are ignored.
+
+By default this is empty so all tags are matched.
+
+:::info
+Please note that this string value is rendered as a template in the first place and then the outcome is used as a regular expression. For example, `"^({{configuration.releasePrefix}})?([0-9]\d*)\.([0-9]\d*)\.([0-9]\d*)$"` is first rendered to `"^(v)?([0-9]\d*)\.([0-9]\d*)\.([0-9]\d*)$"` (assuming the [`releasePrefix`](global-options.mdx#release-prefix) is set to `"v"`), then this regular expression is used to match actual values.
+:::
+
+Be careful when defining this option as it affects the depth of commits browsed by the tool when inferring the [*prime* and *previous* version](../../resources/faq/whats-the-difference-between-the-prime-version-and-the-previous-version.mdx). If your filter is too strict you may miss some tags in the commit history (causing the inspection to go too far in the past), while if it's too loose you may stumble upon unnecessary tags that appear in the commit history. This is something you have to consider especially when:
+
+* you apply extra tags manually, other than those applied by the tool, and the manual tags do not follow the same rules as automatic tags applied by Nyx
+* you are dealing with a repository that already had other tags
+* you are working in a branch with some specific tagging (i.e. a *pre-release* branch, like `1.2.3-alpha`) but your backward search may need to end in a parent branch (i.e. one that uses *core identifiers* only, like `1.2.3`)
+
+A few examples:
+
+* `"^({{configuration.releasePrefix}})?([0-9]\d*)\.([0-9]\d*)\.([0-9]\d*)$"`: matches all the tags representing a [valid SemVer identifier](https://semver.org/#is-there-a-suggested-regular-expression-regex-to-check-a-semver-string) (with *core* identifiers only), tolerating the optional  [`releasePrefix`](global-options.mdx#release-prefix) when configured
+* `"^({{configuration.releasePrefix}})?([0-9]\d*)\.([0-9]\d*)\.([0-9]\d*)(-(develop|development|integration|latest)(\.([0-9]\d*))?)?$"`: matches a [valid SemVer identifier](https://semver.org/#is-there-a-suggested-regular-expression-regex-to-check-a-semver-string) (with *core* identifiers only), tolerating the optional  [`releasePrefix`](global-options.mdx#release-prefix) when configured that may optionally have an extra identifier in the *pre-release* part, like `1.2.3`, `1.2.3-develop`, `1.2.3-develop.2` etc
+
+You can use tools like [https://regex101.com/](https://regex101.com/) to write and test your regular expressions.
+
+:::info
+When extra [identifiers](#identifiers) are used and [tagging](#git-tag) is enabled the regular expression defined here must take into account all the extra identifiers or tagging may become inconsistent.
+:::
+
+### Git commit
+
+|                           |                                                                                          |
+| ------------------------- | ---------------------------------------------------------------------------------------- |
+| Name                      | `releaseTypes/<NAME>/gitCommit`                                                          |
+| Type                      | boolean                                                                                  |
+| Default                   | `false`                                                                                  |
+| Command Line Option       | `--release-types-<NAME>-git-commit=<TEMPLATE>`                                           |
+| Environment Variable      | `NYX_RELEASE_TYPES_<NAME>_GIT_COMMIT=<TEMPLATE>`                                         |
+| Configuration File Option | `releaseTypes/items/<NAME>/gitCommit`                                                    |
+| Related state attributes  |                                                                                          |
+
+When `true` and Nyx is configured to generate artifacts a new commit is created to add the new artifacts to the repository. The new commit becomes the new [final commit](../state-reference/release-scope.mdx#final-commit).
+
+Here you can define a [template](templates.mdx) that is [evaluated as a boolean](templates.mdx#type-conversions) at runtime to make this configuration dynamic.
+
+### Git commit message
+
+|                           |                                                                                          |
+| ------------------------- | ---------------------------------------------------------------------------------------- |
+| Name                      | `releaseTypes/<NAME>/gitCommitMessage`                                                   |
+| Type                      | string                                                                                   |
+| Default                   | `Release version {{version}}`                                                            |
+| Command Line Option       | `--release-types-<NAME>-git-commit-message=<TEMPLATE>`                                   |
+| Environment Variable      | `NYX_RELEASE_TYPES_<NAME>_GIT_COMMIT_MESSAGE=<TEMPLATE>`                                 |
+| Configuration File Option | `releaseTypes/items/<NAME>/gitCommitMessage`                                             |
+| Related state attributes  |                                                                                          |
+
+This is a short [template](templates.mdx) that, once rendered, is used as the commit message of commits when [`gitCommit`](#git-commit) is `true`.
+
+This option is ignored when [`gitCommit`](#git-commit) is `false`.
+
+### Git push
+
+|                           |                                                                                          |
+| ------------------------- | ---------------------------------------------------------------------------------------- |
+| Name                      | `releaseTypes/<NAME>/gitPush`                                                            |
+| Type                      | boolean                                                                                  |
+| Default                   | `false`                                                                                  |
+| Command Line Option       | `--release-types-<NAME>-git-push=<TEMPLATE>`                                             |
+| Environment Variable      | `NYX_RELEASE_TYPES_<NAME>_GIT_PUSH=<TEMPLATE>`                                           |
+| Configuration File Option | `releaseTypes/items/<NAME>/gitPush`                                                      |
+| Related state attributes  |                                                                                          |
+
+When `true` Nyx will push changes (including tags) to the remote repository upon release. When `false` all local changes, including [tags](#git-tag), will stay local and are not propagated remotely.
+
+Here you can define a [template](templates.mdx) that is [evaluated as a boolean](templates.mdx#type-conversions) at runtime to make this decision dynamic.
+
+When this flag is enabled changes are pushed to the default `origin` remote by default unless the [`remoteRepositories`](#remote-repositories) option has been used to set a specific list of remotes to push to.
+
+### Git push force
+
+|                           |                                                                                          |
+| ------------------------- | ---------------------------------------------------------------------------------------- |
+| Name                      | `releaseTypes/<NAME>/gitPushForce`                                                       |
+| Type                      | string                                                                                   |
+| Default                   | Empty (no message)                                                                       |
+| Command Line Option       | `--release-types-<NAME>-git-push-force=<TEMPLATE>`                                       |
+| Environment Variable      | `NYX_RELEASE_TYPES_<NAME>_GIT_PUSH_FORCE=<TEMPLATE>`                                     |
+| Configuration File Option | `releaseTypes/items/<NAME>/gitPushForce`                                                 |
+| Related state attributes  |                                                                                          |
+
+This is a short [template](templates.mdx) that, once rendered, is used as a flag to enable/disable [forcing](https://git-scm.com/docs/git-push#Documentation/git-push.txt---force) git pushing to remote repositories. When enabled, this is equivalent to using the `--force` flag when running [`git push`](https://git-scm.com/docs/git-push).
+
+This template is parsed as a [boolean](templates.mdx#type-conversions). The default behavior when this option is not defined is equivalent to `false`.
+
+You likely need to set this option `true` when using multiple [tag names](#git-tag-names) as tag aliases where tags are updated or overwritten over releases.
+
+This option is ignored when [`gitPush`](#git-push) is `false`.
+
+### Git tag
+
+|                           |                                                                                          |
+| ------------------------- | ---------------------------------------------------------------------------------------- |
+| Name                      | `releaseTypes/<NAME>/gitTag`                                                             |
+| Type                      | boolean                                                                                  |
+| Default                   | `false`                                                                                  |
+| Command Line Option       | `--release-types-<NAME>-git-tag=<TEMPLATE>`                                              |
+| Environment Variable      | `NYX_RELEASE_TYPES_<NAME>_GIT_TAG=<TEMPLATE>`                                            |
+| Configuration File Option | `releaseTypes/items/<NAME>/gitTag`                                                       |
+| Related state attributes  |                                                                                          |
+
+When `true` Nyx will tag the current commit with the new release version. Tags to be applied are defined by the [`gitTagNames`](#git-tag-names) option.
+
+Here you can define a [template](templates.mdx) that is [evaluated as a boolean](templates.mdx#type-conversions) at runtime to make this decision dynamic.
+
+### Git tag force
+
+|                           |                                                                                          |
+| ------------------------- | ---------------------------------------------------------------------------------------- |
+| Name                      | `releaseTypes/<NAME>/gitTagForce`                                                        |
+| Type                      | string                                                                                   |
+| Default                   | Empty (no message)                                                                       |
+| Command Line Option       | `--release-types-<NAME>-git-tag-force=<TEMPLATE>`                                        |
+| Environment Variable      | `NYX_RELEASE_TYPES_<NAME>_GIT_TAG_FORCE=<TEMPLATE>`                                      |
+| Configuration File Option | `releaseTypes/items/<NAME>/gitTagForce`                                                  |
+| Related state attributes  |                                                                                          |
+
+This is a short [template](templates.mdx) that, once rendered, is used as a flag to enable/disable [forcing](https://git-scm.com/docs/git-tag#Documentation/git-tag.txt---force) git tagging. When enabled, this is equivalent to using the `--force` flag when running [`git tag`](https://git-scm.com/docs/git-tag).
+
+This template is parsed as a [boolean](templates.mdx#type-conversions). The default behavior when this option is not defined is equivalent to `false`.
+
+You likely need to set this option `true` when using multiple [tag names](#git-tag-names) as tag aliases where tags are updated or overwritten over releases.
+
+This option is ignored when [`gitTag`](#git-tag) is `false`.
+
+### Git tag message
+
+|                           |                                                                                          |
+| ------------------------- | ---------------------------------------------------------------------------------------- |
+| Name                      | `releaseTypes/<NAME>/gitTagMessage`                                                      |
+| Type                      | string                                                                                   |
+| Default                   | Empty (no message)                                                                       |
+| Command Line Option       | `--release-types-<NAME>-git-tag-message=<TEMPLATE>`                                      |
+| Environment Variable      | `NYX_RELEASE_TYPES_<NAME>_GIT_TAG_MESSAGE=<TEMPLATE>`                                    |
+| Configuration File Option | `releaseTypes/items/<NAME>/gitTagMessage`                                                |
+| Related state attributes  |                                                                                          |
+
+This is a short [template](templates.mdx) that, once rendered, is used as the message of annotated tags when [`gitTag`](#git-tag) is `true`. This option affects all [tag names](#git-tag-names).
+
+If this template is null or empty (the default) then Nyx will create [lightweight](https://git-scm.com/book/en/v2/Git-Basics-Tagging) tags instead of [annotated](https://git-scm.com/book/en/v2/Git-Basics-Tagging).
+
+This option is ignored when [`gitTag`](#git-tag) is `false`.
+
+### Git tag names
+
+|                           |                                                                                          |
+| ------------------------- | ---------------------------------------------------------------------------------------- |
+| Name                      | `releaseTypes/<NAME>/gitTagNames`                                                        |
+| Type                      | list                                                                                     |
+| Default                   | [ `{{version}}` ]                                                                        |
+| Command Line Option       | `--release-types-<NAME>-git-tag-names=<TEMPLATES>`                                       |
+| Environment Variable      | `NYX_RELEASE_TYPES_<NAME>_GIT_TAG_NAMES=<TEMPLATES>`                                     |
+| Configuration File Option | `releaseTypes/items/<NAME>/gitTagNames`                                                  |
+| Related state attributes  | <button class="button button--outline button--info">[version](../state-reference/global-attributes.mdx#version)</button> |
+
+The comma separated list of Git tag [names](https://git-scm.com/docs/git-tag) to be applied when tagging a new release with this release type configuration. These names can be plain strings or [templates](templates.mdx) that, once rendered, are used for tag values.
+
+By default a single tag name is applied using the [version](../state-reference/global-attributes.mdx#version) name. You can add as many tag names as you wish in order to add additional tags or aliases.
+
+If a tag already exists in the repository it is replaced (moved to the current commit). When using tag aliases that need to be updated or rewritten over releases you should consider enabling the [`gitPushForce`](#git-push-force) and [`gitTagForce`](#git-tag-force) options.
+
+This option is ignored when [`gitTag`](#git-tag) is `false`.
+
+### Identifiers
+
+|                           |                                                                                          |
+| ------------------------- | ---------------------------------------------------------------------------------------- |
+| Name                      | `releaseTypes/<NAME>/identifiers`                                                        |
+| Type                      | [list](../introduction/configuration-methods.mdx#collections-of-objects)                 |
+| Default                   | Empty (no custom identifiers)                                                            |
+| Command Line Option       | `--release-types-<NAME>-identifiers-<#>=<ID_ATTRIBUTE>`                                  |
+| Environment Variable      | `NYX_RELEASE_TYPES_<NAME>_IDENTIFIERS_<#>=<ID_ATTRIBUTE>`                                |
+| Configuration File Option | `releaseTypes/items/<NAME>/identifiers`                                                  |
+| Related state attributes  |                                                                                          |
+
+A nested configuration block with the map of additional identifiers that are defined for the release type. Additional identifiers are meant to further qualify releases by adding attributes to version names. Examples of extra identifiers are branch names, timestamps, user names, environment names etc, as follows:
+
+* version `1.2.3` has no extra identifiers
+* version `1.2.3-alpha.12` has the [collapsed version identifier](#collapse-versions) along with the [qualifier](#collapsed-version-qualifier) (`alpha`) configured. This identifier is configured using the [`collapseVersions`](#collapse-versions) and the [`collapsedVersionQualifier`](#collapsed-version-qualifier) options, not using this configuration block
+* version `1.2.3-alpha.12+johndoe` also adds another identifier in the *build* part with the local [user](templates.mdx#environmentuser)
+* version `1.2.3-alpha.12.local+johndoe.20201217130636` adds another identifier in the *pre-release* part showing the environment name (`local`) (which might come from an [environment variable](templates.mdx#environmentvariable)), and the [timestamp](templates.mdx#timestampyyyymmddhhmmss) in the *build* part
+
+These identifiers are made of a qualifier and a value. The qualifier is mandatory while the value is optional. Both may have arbitrary values as long as they comply with the [versioning scheme](../introduction/version-schemes.mdx) being used. When both the qualifier and value are present, they will be represented with the qualifier coming first and then the value, separated by a dot.
+
+:::info
+Do not confuse the identifier *name* and its *qualifier*. The *name* is used internally for configuration purposes only and is never rendered. What is actually rendered to versions is the *qualifier*.
+:::
+
+This nested configuration block allows one element for each extra identifier. You can have as many extra identifiers as you want.
+
+:::info
+The order in which identifiers are listed matters. The identifiers listed first are evaluated and applied first, according to the configured [position](#identifier-position). The identifier [position](#identifier-position) has higher priority over the *enabled* list.
+:::
+
+:::info
+When configuring this map using command line options or environment variables you need to pass flattened values as documented [here](../introduction/configuration-methods.mdx#collections-of-objects). In this case you can pass each identifier as a set of command line options like `--release-types-<NAME>-identifiers-<ORDINAL>-position=PRE_RELEASE|BUILD`, `--release-types-<NAME>-identifiers-<ORDINAL>-qualifier=<TEMPLATE>`, `--release-types-<NAME>-identifiers-<ORDINAL>-value=<TEMPLATE>` or as a set of environment variables like `NYX_RELEASE_TYPES_<NAME>_IDENTIFIERS_<ORDINAL>_POSITION=PRE_RELEASE|BUILD`, `NYX_RELEASE_TYPES_<NAME>_IDENTIFIERS_<ORDINAL>_QUALIFIER=<TEMPLATE>`, `NYX_RELEASE_TYPES_<NAME>_IDENTIFIERS_<ORDINAL>_VALUE=<TEMPLATE>`.
+:::
+
+When applying extra identifiers to a [previous](../state-reference/release-scope.mdx#previous-version) or [prime](../state-reference/release-scope.mdx#prime-version) version that already has extra identifiers, existing identifiers are left in their position and the new ones are appended at the end. You never notice this difference when previous versions have been generated by Nyx using the same configuration but in case the commit history contains existing version tags where extra identifiers have a different order than the one configured here, you need to know this.
+
+:::info
+When using [collapsed versions](#collapse-versions) an extra identifier is also added to disambiguate versions with the same *core* values. This identifier is not affected by the configuration in this block, regardless of whether or not the [collapsed version qualifier](#collapsed-version-qualifier) is also configured.
+:::
+
+:::info
+When extra identifiers are used and [tagging](#git-tag) is enabled the [regular expression that filters tags](#filter-tags) must take into account all the extra identifiers or tagging may become inconsistent.
+:::
+
+Each item in the `identifiers` block is made of a `qualifier`, a `value` and a `position`, as follows.
+
+#### Identifier definition
+
+Within the `releaseTypes/<NAME>/identifiers` block you can define as many identifiers as you want, each in its own separate block.
+
+##### Identifier position
+
+|                           |                                                                                          |
+| ------------------------- | ---------------------------------------------------------------------------------------- |
+| Name                      | `releaseTypes/<NAME>/identifiers/<#>/position`                                           |
+| Type                      | string                                                                                   |
+| Default                   | `BUILD`                                                                                  |
+| Command Line Option       | `--release-types-<NAME>-identifiers-<#>-position=PRE_RELEASE/BUILD`                      |
+| Environment Variable      | `NYX_RELEASE_TYPES_<NAME>_IDENTIFIERS_<#>_POSITION=PRE_RELEASE/BUILD`                    |
+| Configuration File Option | `releaseTypes/items/<NAME>/identifiers/items/<#>/position`                               |
+| Related state attributes  |                                                                                          |
+
+This is only used with the [SemVer](../introduction/version-schemes.mdx#semantic-versioning-semver) version [scheme](global-options.mdx#scheme). Available values are:
+
+* `PRE_RELEASE`: the identifier appears in the [pre-release part](https://semver.org/)
+* `BUILD`: the identifier appears in the [build part](https://semver.org/)
+
+Defaults is `BUILD`.
+
+:::info
+The position has higher priority than the order in which identifiers are listed in the [`enabled`](#enabled) identifiers.
+:::
+
+##### Identifier qualifier
+
+|                           |                                                                                          |
+| ------------------------- | ---------------------------------------------------------------------------------------- |
+| Name                      | `releaseTypes/<NAME>/identifiers/<#>/qualifier`                                          |
+| Type                      | string                                                                                   |
+| Default                   | Empty (no qualifier)                                                                     |
+| Command Line Option       | `--release-types-<NAME>-identifiers-<#>-qualifier=<TEMPLATE>`                            |
+| Environment Variable      | `NYX_RELEASE_TYPES_<NAME>_IDENTIFIERS_<#>_QUALIFIER=<TEMPLATE>`                          |
+| Configuration File Option | `releaseTypes/items/<NAME>/identifiers/items/<#>/qualifier`                              |
+| Related state attributes  |                                                                                          |
+
+This is a short [template](templates.mdx) that, once rendered, is used as the leftmost part of the extra qualifier. This string is mandatory and must evaluate to non empty and will be used for the leftmost part of the identifier in the version and if the value is non empty, the two will be separated by a dot.
+
+Defaults to the empty string (no qualifier).
+
+##### Identifier value
+
+|                           |                                                                                          |
+| ------------------------- | ---------------------------------------------------------------------------------------- |
+| Name                      | `releaseTypes/<NAME>/identifiers/<#>/value`                                              |
+| Type                      | string                                                                                   |
+| Default                   | Empty (no value)                                                                         |
+| Command Line Option       | `--release-types-<NAME>-identifiers-<#>-value=<TEMPLATE>`                                |
+| Environment Variable      | `NYX_RELEASE_TYPES_<NAME>_IDENTIFIERS_<#>_VALUE=<TEMPLATE>`                              |
+| Configuration File Option | `releaseTypes/items/<NAME>/identifiers/items/<#>/value`                                  |
+| Related state attributes  |                                                                                          |
+
+This is a short optional [template](templates.mdx) that, once rendered, is used as the rightmost part of the extra qualifier. If empty the version will only show the identifier [qualifier](#identifier-qualifier). If not empty the result of the template evaluation will be used for the rightmost part (after the [qualifier](#identifier-qualifier) and the dot) of the identifier in the version.
+
+Defaults to the empty string (no qualifier).
+
+When the value evaluates to non empty it will overwrite the value of the same identifier in the [previous](../state-reference/release-scope.mdx#previous-version) or [prime](../state-reference/release-scope.mdx#prime-version) version, if any. If, instead, the value evaluates to empty or is not defined and the previous identifier had a value, then the previous identifier will have the value unchanged. This is because Nyx has no means to know if the **next** identifier is a value or a standalone identifier. You might incur in this caveat only if you have previous tags in the commit history generated by other means or different Nyx configurations.
+
+:::info
+When using the [SemVer](../introduction/version-schemes.mdx#semantic-versioning-semver) version [scheme](global-options.mdx#scheme) and you want to use the identifier in the [pre release](#identifier-position) part, the value must be a valid integer al leading zeroes will be removed as part of the conversion to an integer. If you need values other than valid integers you need to use an additional identifier using the value as the [qualifier](#identifier-qualifier) or simply put the identifier in the [build](#identifier-position) part. These constraints are needed to comply with [Semantic Versioning](https://semver.org/);
+:::
+
+### Match branches
+
+|                           |                                                                                          |
+| ------------------------- | ---------------------------------------------------------------------------------------- |
+| Name                      | `releaseTypes/<NAME>/matchBranches`                                                      |
+| Type                      | string                                                                                   |
+| Default                   | Empty (matches any branch)                                                               |
+| Command Line Option       | `--release-types-<NAME>-match-branches=<TEMPLATE>`                                       |
+| Environment Variable      | `NYX_RELEASE_TYPES_<NAME>_MATCH_BRANCHES=<TEMPLATE>`                                     |
+| Configuration File Option | `releaseTypes/items/<NAME>/matchBranches`                                                |
+| Related state attributes  |                                                                                          |
+
+A [template](templates.mdx) that, once rendered, produces a regular expression that evaluates `true` when it *matches* the [current Git branch](https://git-scm.com/docs/git-branch).
+
+By default this is empty so any branch is matched.
+
+:::info
+Please note that this string value is rendered as a template in the first place and then the outcome is used as a regular expression. For example, `"^({{configuration.releasePrefix}})?([0-9]\d*)\.([0-9]\d*)\.([0-9]\d*)$"` is first rendered to `"^(v)?([0-9]\d*)\.([0-9]\d*)\.([0-9]\d*)$"` (assuming the [`releasePrefix`](global-options.mdx#release-prefix) is set to `"v"`), then this regular expression is used to match actual values.
+:::
+
+A few examples:
+
+* `^main$`: matches only the whole word `main`. This is useful if you need to specify a single branch name. Note that if you use the simple `main` regular expression (without the `^` and `$` assertions) you still match the `main` branch but you'd also match values like `futuremain`, `mainclass` as they just *contain* the `master string`
+* `^(master|main)$`: matches only the whole words `master` or `main`. This is useful if you need to specify a list of exact branch names. As for the previous examples, removing the `^` and `$` assertions would also match partial words
+* `^feature\/[[:alnum:]]+$`: matches only the words starting with `feature/` with any non empty alphanumeric string after the `/`. Note the slash `/` needs to be escaped by a backslash `\` to be interpreded as literal
+* `^(release[-\/](0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)|feature[-\/][[:alnum:]]+)$`: matches the words like `release/1.2.3` **or** `feature/XYZ`, where the delimiter can be either `/` or `-` (so it can adapt to flat or hierarchical naming conventions). The `release/` must be followed by a [valid SemVer identifier](https://semver.org/#is-there-a-suggested-regular-expression-regex-to-check-a-semver-string) (with the *major*.*minor*.*patch* values only and without any prefix like `v`), while the `feature/` can be followed by any non empty alphanumeric string
+
+You can use tools like [https://regex101.com/](https://regex101.com/) to write and test your regular expressions.
+
+When using this option, the release type is only evaluated when the current branch name is matched by the regular expression, otherwise it is ignored. You can use this option to constrain certain release types to be issued by a specific set of branches only.
+
+### Match environment variables
+
+|                           |                                                                                          |
+| ------------------------- | ---------------------------------------------------------------------------------------- |
+| Name                      | `releaseTypes/<NAME>/matchEnvironmentVariables`                                          |
+| Type                      | [map](../introduction/configuration-methods.mdx#collections-of-objects)                  |
+| Default                   | Empty (matches anything)                                                                 |
+| Command Line Option       | `--release-types-<NAME>-match-environment-variables-<VARNAME>=<VALUE>`                   |
+| Environment Variable      | `NYX_RELEASE_TYPES_<NAME>_MATCH_ENVIRONMENT_VARIABLES_<VARNAME>=<VALUE>`                 |
+| Configuration File Option | `releaseTypes/items/<NAME>/matchEnvironmentVariables`                                    |
+| Related state attributes  |                                                                                          |
+
+A map where each entry is an environment variable to match. In order for the overall matching to succeed all environment variables must match.
+
+The key of each entry is the name of an environment variable to match, while the value is a regular expression that needs to match the current environment variable value.
+
+You can use tools like [https://regex101.com/](https://regex101.com/) to write and test your regular expressions.
+
+This option can be used to enable or disable a release type based on the environment. For example you may want to limit issuing official releases on authoritative CI servers only (where some specific environment variable is defined) and disable it on all other environments (like developer workstations).
+
+The default is the empty map, which matches any environment, making the release type independent from the environment.
+
+:::info
+When configuring this map using command line options or environment variables you need to pass flattened values as documented [here](../introduction/configuration-methods.mdx#collections-of-objects). In this case you can pass each environment variable to be matched as a command line option like `--release-types-<NAME>-match-environment-variables-<VARNAME>=<REGEX>` or as an environment variable like `NYX_RELEASE_TYPES_<NAME>_MATCH_ENVIRONMENT_VARIABLES_<VARNAME>=<REGEX>`.
+:::
+
+### Match workspace status
+
+|                           |                                                                                          |
+| ------------------------- | ---------------------------------------------------------------------------------------- |
+| Name                      | `releaseTypes/<NAME>/matchWorkspaceStatus`                                               |
+| Type                      | string                                                                                   |
+| Default                   | Empty                                                                                    |
+| Command Line Option       | `--release-types-<NAME>-match-workspace-status=CLEAN`&#124;`DIRTY`                       |
+| Environment Variable      | `NYX_RELEASE_TYPES_<NAME>_MATCH_WORKSPACE_STATUS=CLEAN`&#124;`DIRTY`                     |
+| Configuration File Option | `releaseTypes/items/<NAME>/matchWorkspaceStatus`                                         |
+| Related state attributes  |                                                                                          |
+
+This option lets you select a specific Git workspace status for the release type to be selected. Allowed values are `CLEAN` and `DIRTY`. When using `CLEAN` the release type is matched only when the workspace has no uncommitted changes. When using `DIRTY` the release type is matched only when the workspace does have uncommitted changes. Leaving this value empty or undefined matches any workspace status.
+
+You may use this option to issue certain releases only when the workspace is *clean* or have multiple release types with similar configuration but a few details, and having one or the other selected based on the workspace status.
+
+### Name
+
+|                           |                                                                                          |
+| ------------------------- | ---------------------------------------------------------------------------------------- |
+| Name                      | `releaseTypes/<NAME>`                                                                    |
+| Type                      | string                                                                                   |
+| Default                   | N/A                                                                                      |
+| Command Line Option       | `--release-types-<NAME>=<NAME>`                                                          |
+| Environment Variable      | `NYX_RELEASE_TYPES_<NAME>=<NAME>`                                                        |
+| Configuration File Option | `releaseTypes/items/<NAME>`                                                              |
+| Related state attributes  | <button class="button button--outline button--info">[releaseType](../state-reference/global-attributes.mdx#release-type)</button> |
+
+The short name that identifies this release type. This is also the value you can use in the [enabled](#enabled) release types. This is actually not a field to be set within a release type section but instead the key of the map element.
+
+This option is **mandatory**.
+
+### Publish
+
+|                           |                                                                                          |
+| ------------------------- | ---------------------------------------------------------------------------------------- |
+| Name                      | `releaseTypes/<NAME>/publish`                                                            |
+| Type                      | boolean                                                                                  |
+| Default                   | `false`                                                                                  |
+| Command Line Option       | `--release-types-<NAME>-publish=<TEMPLATE>`                                              |
+| Environment Variable      | `NYX_RELEASE_TYPES_<NAME>_PUBLISH=<TEMPLATE>`                                            |
+| Configuration File Option | `releaseTypes/items/<NAME>/publish`                                                      |
+| Related state attributes  |                                                                                          |
+
+When `true` Nyx will run the [publish](../introduction/how-nyx-works.mdx#publish) steps, when needed, otherwise will skip the step.
+
+For this flag to take effect you also need to enable the [`gitTag`](#git-tag) and [`gitPush`](#git-push) flags otherwise the new release can't be published. This is because the remote server requires a tag to bind the release to. Publishing a new release without a corresponding tag would result in a remote error.
+
+Here you can define a [template](templates.mdx) that is evaluated at runtime to make this decision dynamic.
+
+When this value evaluates to *true* releases are published to the [services](services.mdx) listed in the [`releaseTypes/publicationServices`](#publication-services) option. Otherwise, when this evaluates to *false*, no publication is done.
+
+Also see [`assets`](#assets) for more on the assets attached to releases upon publication.
+
+### Publish draft
+
+|                           |                                                                                          |
+| ------------------------- | ---------------------------------------------------------------------------------------- |
+| Name                      | `releaseTypes/<NAME>/publishDraft`                                                       |
+| Type                      | string                                                                                   |
+| Default                   | EMpty                                                                                    |
+| Command Line Option       | `--release-types-<NAME>-publish-draft=<TEMPLATE>`                                        |
+| Environment Variable      | `NYX_RELEASE_TYPES_<NAME>_PUBLISH_DRAFT=<TEMPLATE>`                                      |
+| Configuration File Option | `releaseTypes/items/<NAME>/publishDraft`                                                 |
+| Related state attributes  |                                                                                          |
+
+When this value evaluates to *true* Nyx will [publish](../introduction/how-nyx-works.mdx#publish) the releases from this release type as *draft*. The semantics of *draft*, when supported, depend on the target [services](services.mdx) the release is published to. Not all services support this option. Please refer to the [services](services.mdx) documentation to know more.
+
+Here you can define a [template](templates.mdx) that is evaluated at runtime to make this decision dynamic.
+
+This option only takes effect when [`publish`](#publish) evaluates `true`.
+
+### Publish pre-release
+
+|                           |                                                                                          |
+| ------------------------- | ---------------------------------------------------------------------------------------- |
+| Name                      | `releaseTypes/<NAME>/publishPreRelease`                                                  |
+| Type                      | string                                                                                   |
+| Default                   | EMpty                                                                                    |
+| Command Line Option       | `--release-types-<NAME>-publish-pre-release=<TEMPLATE>`                                  |
+| Environment Variable      | `NYX_RELEASE_TYPES_<NAME>_PUBLISH_PRE_RELEASE=<TEMPLATE>`                                |
+| Configuration File Option | `releaseTypes/items/<NAME>/publishPreRelease`                                            |
+| Related state attributes  |                                                                                          |
+
+When this value evaluates to *true* Nyx will [publish](../introduction/how-nyx-works.mdx#publish) the releases from this release type as *pre-release*. The semantics of *pre-release*, when supported, depend on the target [services](services.mdx) the release is published to. Not all services support this option. Please refer to the [services](services.mdx) documentation to know more.
+
+Here you can define a [template](templates.mdx) that is evaluated at runtime to make this decision dynamic.
+
+This option only takes effect when [`publish`](#publish) evaluates `true`.
+
+### Release name
+
+|                           |                                                                                          |
+| ------------------------- | ---------------------------------------------------------------------------------------- |
+| Name                      | `releaseTypes/<NAME>/releaseName`                                                        |
+| Type                      | string                                                                                   |
+| Default                   | EMpty                                                                                    |
+| Command Line Option       | `--release-types-<NAME>-release-name=<TEMPLATE>`                                         |
+| Environment Variable      | `NYX_RELEASE_TYPES_<NAME>_RELEASE_NAME=<TEMPLATE>`                                       |
+| Configuration File Option | `releaseTypes/items/<NAME>/releaseName`                                                  |
+| Related state attributes  | <button class="button button--outline button--info">[version](../state-reference/global-attributes.mdx#version)</button> |
+
+A [template](templates.mdx) that is evaluated at runtime to define the name of the releases to be published.
+
+This option only takes effect when [`publish`](#publish) evaluates `true`.
+
+When this option is not defined or is empty the [version](../state-reference/global-attributes.mdx#version) is used for the release name.
+
+### Version range
+
+|                           |                                                                                          |
+| ------------------------- | ---------------------------------------------------------------------------------------- |
+| Name                      | `releaseTypes/<NAME>/versionRange`                                                       |
+| Type                      | string                                                                                   |
+| Default                   | Empty (no constrained range)                                                             |
+| Command Line Option       | `--release-types-<NAME>-version-range=<TEMPLATE>`                                        |
+| Environment Variable      | `NYX_RELEASE_TYPES_<NAME>_VERSION_RANGE=<TEMPLATE>`                                      |
+| Configuration File Option | `releaseTypes/items/<NAME>/versionRange`                                                 |
+| Related state attributes  | <button class="button button--outline button--info">[version](../state-reference/global-attributes.mdx#version)</button> <button class="button button--outline button--info">[versionRange](../state-reference/global-attributes.mdx#version-range)</button> |
+
+This option allows to define a constraint on the versions issued by this release type. When defined it is a [template](templates.mdx) that, once rendered, produces a regular expression which is evaluated against the generated version number. If the version being issued matches the regular expression the release process can proceed, otherwise it's interrupted by an error.
+
+:::info
+Please note that this string value is rendered as a template in the first place and then the outcome is used as a regular expression. For example, `"^({{configuration.releasePrefix}})?([0-9]\d*)\.([0-9]\d*)\.([0-9]\d*)$"` is first rendered to `"^(v)?([0-9]\d*)\.([0-9]\d*)\.([0-9]\d*)$"` (assuming the [`releasePrefix`](global-options.mdx#release-prefix) is set to `"v"`), then this regular expression is used to match actual values.
+:::
+
+A typical case where these constraints are used is for [post-release](../best-practice/branching-models.mdx) ([*maintenance*](../best-practice/branching-models.mdx#maintenance-branches) or [*release*](../best-practice/branching-models.mdx#release-branches)) release types, when you need to put boundaries to issued releases to avoid conflicts. See [this example](../../resources/examples/git-history-examples.mdx#version-constrained-branch) for more on this.
+
+If you use a standard naming for your [release](../best-practice/branching-models.mdx#release-branches) and [maintenance](../best-practice/branching-models.mdx#maintenance-branches) branches consider using the [`versionRangeFromBranchName`](#version-range-from-branch-name) instead of this option to let Nyx infer the range directly from the branch name. This option has prority over [`versionRangeFromBranchName`](#version-range-from-branch-name) so declaring both makes this one come first.
+
+You can use tools like [https://regex101.com/](https://regex101.com/) to write and test your regular expressions.
+
+### Version range from branch name
+
+|                           |                                                                                          |
+| ------------------------- | ---------------------------------------------------------------------------------------- |
+| Name                      | `releaseTypes/<NAME>/versionRangeFromBranchName`                                         |
+| Type                      | boolean                                                                                  |
+| Default                   | `false`                                                                                  |
+| Command Line Option       | `--release-types-<NAME>-version-range-from-branch-name=true`&#124;`false`                |
+| Environment Variable      | `NYX_RELEASE_TYPES_<NAME>_VERSION_RANGE_FROM_BRANCH_NAME=true`&#124;`false`              |
+| Configuration File Option | `releaseTypes/items/<NAME>/versionRange`                                                 |
+| Related state attributes  | <button class="button button--outline button--info">[version](../state-reference/global-attributes.mdx#version)</button> <button class="button button--outline button--info">[versionRange](../state-reference/global-attributes.mdx#version-range)</button> |
+
+This option (disabled by default) lets you make this release type constrained on the versions that can be issued but allowing you not to define a specific regular expression for defining the allowed releases.
+
+This is much more powerful than [`versionRange`](#version-range) as it can be defined only once for one release type, while if you use `versionRange` you may need to update your configuration as the release numbers increase for your project.
+
+To use this option you just need to use a standard naming convention for your [release](../best-practice/branching-models.mdx#release-branches) and [maintenance](../best-practice/branching-models.mdx#maintenance-branches) branches (or any other type of branch you want to constrain) and let Nyx infer the regular expression from the branch name. For example, when this option is `true`, the following branch names would yield to these regular expression ranges:
+
+* `1`, `v1`, `1.x`, `v1.x`, `1.x.x`, `v1.x.x` yield the regular expression `^1\.(0|[1-9]\d*)\.(0|[1-9]\d*)?$`, which constrains the *major* number to be `1` but lets the *minor* and *patch* numbers to be anything
+* `1.2`, `v1.2`, `1.2.x`, `v1.2.x` yield the regular expression `^1\.2\.(0|[1-9]\d*)?$`, which constrains the *major* and *minor* numbers to be `1` and `2`, respectively, *patch* number to be anything
+
+The rule of thumb is that the `x` is used as a wildcard for the identifier in the position it appears. You don't need to specify all identifiers as the missing ones are just assumed to be wildcarded. On the other hand, the identifiers specifying a specific number are assumed to be matched exactly. Wildcards may appear in any place, also in more significant identifiers when less significant ones have fixed values (i.e. `x.2.x`).
+
+Only *core* version identifiers can be constrained while extra identifiers are tolerated but not checked.
+
+Nyx tries to be as tolerant as it can when parsing branch names trying to infer the constraints and as long as it's able to detect a *version like* pattern in **any** position it just ignores the rest. While the above examples are the simplest (and most frequently used) some more examples are:
+
+* `1`: interpreted as `1.x.x`
+* `x.2.x`: interpreted as `x.2.x` (note the wildcard may also be followed by fixed values)
+* `vx`: interpreted as `x.x.x` (a simple `x` is interpreted as a *major* wildcard)
+* `rel/1.x`: interpreted as `1.x.x`
+* `release-v1.2`: interpreted as `1.2.x`
+* `relv1.2.x-alpha`: interpreted as `1.2.x` (`alpha` is also ignored)
+* `release-vx.2.3-abc.123+def.456`: interpreted as `x.23x`
+
+What this feature does, actually, is similar to populating the [`versionRange`](#version-range) regular expression automatically, if it's not already defined. Using both options is not an error but since the [`versionRange`](#version-range) comes first, it wouldn't make sense.
+
+See [this example](../../resources/examples/git-history-examples.mdx#version-constrained-branch) for more on this.

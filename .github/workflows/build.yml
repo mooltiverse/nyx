@@ -1,0 +1,34 @@
+# Waypoint between all upstream building jobs and downstream testing
+# and release.
+# This Workflow is used to make sure that all upstream building jobs
+# have completed successfully before going any further in the pipeline.
+
+name: Waypoint
+
+on:
+  workflow_dispatch:
+  workflow_call:
+    inputs:
+      runs-on:
+        description: |-
+          Define the type of machine to run the job on.
+          Default: ubuntu-latest
+        type: string
+        required: false
+        default: 'ubuntu-latest'
+      verbosity:
+        description: |-
+          Sets the verbosity level to adjust the output logs verbosity.
+          Allowed values are: 'error', 'warning', 'quiet', 'info', 'debug'.
+          Default: quiet
+        type: string
+        required: false
+        default: 'quiet'
+
+jobs:
+  waypoint:
+    name: Build
+    runs-on: ${{ inputs.runs-on }}
+    steps:
+    - shell: bash
+      run: echo "Waypoint reached!"
