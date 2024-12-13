@@ -1,8 +1,8 @@
 # Nyx Release Notes
 
-## 3.1.0
+## 3.0.12
 
-This release is available at [this link](https://github.com/mooltiverse/nyx/releases/tag/3.1.0).
+This release is available at [this link](https://github.com/mooltiverse/nyx/releases/tag/3.0.12).
 
 ### Upgrade instructions
 

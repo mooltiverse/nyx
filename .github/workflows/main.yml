@@ -38,13 +38,9 @@ on:
 # may receive the same version and try to create overlapping tags and releases.
 # With this concurrency settings jobs are on hold until previous pipelines
 # have completed.
-# Since we also use 'concurrency' specs at the job level we need to only use it
-# for jobs (see below) or we encounter unexpected errors like:
-#    Canceling since a higher priority waiting request for 'access-to-rate-limited-remote-services' exists
-# even if all jobs belonging to that concurrency group have already completed.
-#concurrency:
-#  group: project
-#  cancel-in-progress: false
+concurrency:
+  group: project
+  cancel-in-progress: false
 
 #env:
   # We can't use the 'env' context for reusable workflows, so we need to hardcode
@@ -58,12 +54,6 @@ jobs:
   #############################################################################
   initialize:
     name: Initialize
-    # Avoid jobs generating version and tags to run concurrently for the whole
-    # project or we may hit some conditions where multiple pipelines generate
-    # the same version tags.
-    concurrency:
-      group: version-tagging
-      cancel-in-progress: false
     uses: mooltiverse/nyx/.github/workflows/initialize.yml@main
   
   build:
@@ -95,12 +85,6 @@ jobs:
     - go-publish
     - docker-publish
     - docusaurus-publish
-    # Avoid jobs generating version and tags to run concurrently for the whole
-    # project or we may hit some conditions where multiple pipelines generate
-    # the same version tags.
-    concurrency:
-      group: version-tagging
-      cancel-in-progress: false
     if: needs.initialize.outputs.release == 'true'
     uses: mooltiverse/nyx/.github/workflows/release.yml@main
     with:
@@ -139,9 +123,14 @@ jobs:
     if: needs.initialize.outputs.javaChanged == 'true' || needs.initialize.outputs.release == 'true'
     # Avoid jobs invoking remote services to run in parallel to avoid throttling down by those services (with consequent test failures).
     # See https://github.com/mooltiverse/nyx/issues/206 for more
-    concurrency:
-      group: access-to-rate-limited-remote-services
-      cancel-in-progress: false
+    # Enabling this concurrency constraint often causes an error like:
+    #   Canceling since a higher priority waiting request for 'access-to-rate-limited-remote-services' exists
+    # which prevents job to run even when manually restarting them so we need
+    # to keep it disabled, even if this causes us to re-run jobs multiple times
+    # when they fail due to rate limits.
+    #concurrency:
+    #  group: access-to-rate-limited-remote-services
+    #  cancel-in-progress: false
     # The recommended JDK version is 17 or above but since we need to test for backward compatibility to JVMs 17 or newer we
     # need a matrix here. Depending on the JDK version the set of Gradle version that the tests run on will change, according
     # to the Gradle compatibility matrix. See CONTRIBUTING.md in the root directory or the Gradle functional test suites for more.
@@ -234,8 +223,16 @@ jobs:
     - initialize
     - go-build
     if: needs.initialize.outputs.goChanged == 'true' || needs.initialize.outputs.release == 'true'
-    concurrency:
-      group: access-to-rate-limited-remote-services
+    # Avoid jobs invoking remote services to run in parallel to avoid throttling down by those services (with consequent test failures).
+    # See https://github.com/mooltiverse/nyx/issues/206 for more
+    # Enabling this concurrency constraint often causes an error like:
+    #   Canceling since a higher priority waiting request for 'access-to-rate-limited-remote-services' exists
+    # which prevents job to run even when manually restarting them so we need
+    # to keep it disabled, even if this causes us to re-run jobs multiple times
+    # when they fail due to rate limits.
+    #concurrency:
+    #  group: access-to-rate-limited-remote-services
+    #  cancel-in-progress: false
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
