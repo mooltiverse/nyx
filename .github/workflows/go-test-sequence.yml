@@ -286,6 +286,12 @@ jobs:
     needs:
     - test-unit
     runs-on: ${{ inputs.runs-on }}
+    # Avoid jobs invoking remote services to run in parallel to avoid throttling
+    # down by those services (with consequent test failures).
+    # See https://github.com/mooltiverse/nyx/issues/206 for more
+    concurrency:
+      group: access-to-rate-limited-remote-services
+      cancel-in-progress: false
     steps:
     - uses: mooltiverse/nyx/.github/actions/setup-git@main
       with:
@@ -335,6 +341,12 @@ jobs:
     needs:
     - test-integration
     runs-on: ${{ inputs.runs-on }}
+    # Avoid jobs invoking remote services to run in parallel to avoid throttling
+    # down by those services (with consequent test failures).
+    # See https://github.com/mooltiverse/nyx/issues/206 for more
+    concurrency:
+      group: access-to-rate-limited-remote-services
+      cancel-in-progress: false
     steps:
     - uses: mooltiverse/nyx/.github/actions/setup-git@main
       with:

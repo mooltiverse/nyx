@@ -121,13 +121,16 @@ jobs:
     - initialize
     - java-build
     if: needs.initialize.outputs.javaChanged == 'true' || needs.initialize.outputs.release == 'true'
-    # Avoid jobs invoking remote services to run in parallel to avoid throttling down by those services (with consequent test failures).
+    # Avoid jobs invoking remote services to run in parallel to avoid throttling
+    # down by those services (with consequent test failures).
     # See https://github.com/mooltiverse/nyx/issues/206 for more
-    # Enabling this concurrency constraint often causes an error like:
+    # Enabling this concurrency constraint at this level often causes an error like:
     #   Canceling since a higher priority waiting request for 'access-to-rate-limited-remote-services' exists
     # which prevents job to run even when manually restarting them so we need
     # to keep it disabled, even if this causes us to re-run jobs multiple times
     # when they fail due to rate limits.
+    # Instead, we have the same constraints applied in integration and functional
+    # tests inside the called reusable workflow.
     #concurrency:
     #  group: access-to-rate-limited-remote-services
     #  cancel-in-progress: false
@@ -223,13 +226,16 @@ jobs:
     - initialize
     - go-build
     if: needs.initialize.outputs.goChanged == 'true' || needs.initialize.outputs.release == 'true'
-    # Avoid jobs invoking remote services to run in parallel to avoid throttling down by those services (with consequent test failures).
+    # Avoid jobs invoking remote services to run in parallel to avoid throttling
+    # down by those services (with consequent test failures).
     # See https://github.com/mooltiverse/nyx/issues/206 for more
-    # Enabling this concurrency constraint often causes an error like:
+    # Enabling this concurrency constraint at this level often causes an error like:
     #   Canceling since a higher priority waiting request for 'access-to-rate-limited-remote-services' exists
     # which prevents job to run even when manually restarting them so we need
     # to keep it disabled, even if this causes us to re-run jobs multiple times
     # when they fail due to rate limits.
+    # Instead, we have the same constraints applied in integration and functional
+    # tests inside the called reusable workflow.
     #concurrency:
     #  group: access-to-rate-limited-remote-services
     #  cancel-in-progress: false
