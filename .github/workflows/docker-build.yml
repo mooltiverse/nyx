@@ -416,7 +416,7 @@ jobs:
       with:
         verbosity: ${{ inputs.verbosity }}
     - id: nyx
-      uses: mooltiverse/nyx/.github/actions/setup-nyx@@main
+      uses: mooltiverse/nyx/.github/actions/setup-nyx@main
       with:
         # Just restore the cache
         enable-action: false
@@ -424,14 +424,14 @@ jobs:
         cache-name-restore-suffix: ${{ inputs.nyx-cache-name-restore-suffix }}
     - id: go
       if: inputs.go-cache-name-restore-suffix != ''
-      uses: mooltiverse/nyx/.github/actions/setup-go@@main
+      uses: mooltiverse/nyx/.github/actions/setup-go@main
       with:
         verbosity: ${{ inputs.verbosity }}
         # Restore the cache from the previous job to 'chain' the two caches
         cache-name-restore-suffix: ${{ inputs.go-cache-name-restore-suffix }}
     - id: java
       if: inputs.java-cache-name-restore-suffix != ''
-      uses: mooltiverse/nyx/.github/actions/setup-java@@main
+      uses: mooltiverse/nyx/.github/actions/setup-java@main
       with:
         verbosity: ${{ inputs.verbosity }}
         # Restore the cache from the previous job to 'chain' the two caches

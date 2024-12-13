@@ -17,6 +17,7 @@ This is the general purpose runbook for the project. Here you can find the scrip
 ```bash
 # Clean the artifacts from previous builds
 ./gradlew clean
+
 # Clean the artifacts from previous builds, including external cached contents
 # and test projects created on target platforms (GitHub, GitLab)
 ./gradlew deepClean
@@ -25,10 +26,13 @@ This is the general purpose runbook for the project. Here you can find the scrip
 ```bash
 # Run all tests
 ./gradlew tests
+
 # Run all unit tests
 ./gradlew unitTest
+
 # Run all integration tests
 ./gradlew integrationTest
+
 # Run all functional tests
 ./gradlew functionalTest
 ```
