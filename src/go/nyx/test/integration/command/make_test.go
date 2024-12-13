@@ -954,10 +954,6 @@ func TestMakeRunWithCustomTemplateFromLocalFile(t *testing.T) {
 }
 
 func TestMakeRunWithCustomTemplateFromURL(t *testing.T) {
-	// TODO: WAIT FOR MERGE: Skip the test until all sources have been merged
-	// to main or the the the template won't be available to load from the URL.
-	// Just remove the following 't.Skip()' statement
-	t.Skip()
 	logLevel := log.GetLevel()   // save the previous logging level
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 	for _, command := range cmdtpl.CommandInvocationProxies(cmd.MAKE, gittools.ONE_BRANCH_SHORT_CONVENTIONAL_COMMITS()) {

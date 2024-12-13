@@ -278,24 +278,18 @@ jobs:
     #  name: github-pages
     #  url: ${{ steps.github-pages-deploy.outputs.page_url }}
     steps:
-    # TODO: WAIT FOR MERGE: replace the following tag '@retrofitting'
-    # with '@main' as soon as the branch has been merged to main.
-    - uses: mooltiverse/nyx/.github/actions/setup-git@retrofitting
+    - uses: mooltiverse/nyx/.github/actions/setup-git@main
       with:
         verbosity: ${{ inputs.verbosity }}
     - id: nyx
-      # TODO: WAIT FOR MERGE: replace the following tag '@retrofitting'
-      # with '@main' as soon as the branch has been merged to main.
-      uses: mooltiverse/nyx/.github/actions/setup-nyx@retrofitting
+      uses: mooltiverse/nyx/.github/actions/setup-nyx@main
       with:
         # Just restore the cache
         enable-action: false
         verbosity: ${{ inputs.verbosity }}
         cache-name-restore-suffix: ${{ inputs.nyx-cache-name-restore-suffix }}
     - id: docusaurus
-      # TODO: WAIT FOR MERGE: replace the following tag '@retrofitting'
-      # with '@main' as soon as the branch has been merged to main.
-      uses: mooltiverse/nyx/.github/actions/setup-docusaurus@retrofitting
+      uses: mooltiverse/nyx/.github/actions/setup-docusaurus@main
       with:
         verbosity: ${{ inputs.verbosity }}
         install-node: ${{ inputs.install-node }}
@@ -303,9 +297,7 @@ jobs:
         # Restore the cache from the previous job to 'chain' the two caches
         cache-name-restore-suffix: ${{ inputs.docusaurus-cache-name-restore-suffix }}
     - id: gradle
-      # TODO: WAIT FOR MERGE: replace the following tag '@retrofitting'
-      # with '@main' as soon as the branch has been merged to main.
-      uses: mooltiverse/nyx/.github/actions/setup-gradle@retrofitting
+      uses: mooltiverse/nyx/.github/actions/setup-gradle@main
       with:
         verbosity: ${{ inputs.verbosity }}
         install-jdk: ${{ inputs.install-jdk }}

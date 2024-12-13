@@ -27,8 +27,6 @@ import java.nio.file.Files;
 import java.util.List;
 import java.util.Map;
 
-// TODO: WAIT FOR MERGE: Remove the import to org.junit.jupiter.api.Disabled
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.TestTemplate;
@@ -775,10 +773,6 @@ public class MakeTestTemplates {
         @TestTemplate
         @DisplayName("Make.run() with custom template from a remote URL > yield to custom changelog")
         @Baseline(Scenario.ONE_BRANCH_SHORT_CONVENTIONAL_COMMITS)
-        // TODO: WAIT FOR MERGE: Skip the test until all sources have been merged
-        // to main or the the the template won't be available to load from the URL.
-        // Just remove the following '@Disabled' annotation
-        @Disabled
         void runTestWithCustomTemplateFromURL(@CommandSelector(Commands.MAKE) CommandProxy command, Script script)
             throws Exception {
             script.getWorkingDirectory().deleteOnExit();

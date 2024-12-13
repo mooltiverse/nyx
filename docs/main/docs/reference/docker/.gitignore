@@ -1,13 +1,5 @@
 # Ignore all the generated .md files stored in this directory
 # except the index.md, which is authored by hand.
-# ***************************************************************************
-# TODO: SCAFFOLDING: adjust the contents of this file.
-# This version assumes that only the 'index.md' file is manually authored,
-# while all other '.md' files and directories are imported and therefore they
-# must not be committed to Git.
-# Change these settings in case this assumptions doesn't hold true for your
-# site.
-# **************************************************************************
 *.md
 !index.md
 */**

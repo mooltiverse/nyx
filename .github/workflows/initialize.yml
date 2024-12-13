@@ -90,46 +90,34 @@ jobs:
     # Software setups and caches are disabled at this stage as we just need
     # to detect whether or not certain workflows must be enabled.
     - id: git
-      # TODO: WAIT FOR MERGE: replace the following tag '@retrofitting'
-      # with '@main' as soon as the branch has been merged to main.
-      uses: mooltiverse/nyx/.github/actions/setup-git@retrofitting
+      uses: mooltiverse/nyx/.github/actions/setup-git@main
       with:
         verbosity: ${{ inputs.verbosity }}
     - id: nyx
-      # TODO: WAIT FOR MERGE: replace the following tag '@retrofitting'
-      # with '@main' as soon as the branch has been merged to main.
-      uses: mooltiverse/nyx/.github/actions/setup-nyx@retrofitting
+      uses: mooltiverse/nyx/.github/actions/setup-nyx@main
       with:
         verbosity: ${{ inputs.verbosity }}
         enable-artifacts: true
     - id: go
-      # TODO: WAIT FOR MERGE: replace the following tag '@retrofitting'
-      # with '@main' as soon as the branch has been merged to main.
-      uses: mooltiverse/nyx/.github/actions/setup-go@retrofitting
+      uses: mooltiverse/nyx/.github/actions/setup-go@main
       with:
         verbosity: ${{ inputs.verbosity }}
         enable-cache: false
         install-go: false
     - id: java
-      # TODO: WAIT FOR MERGE: replace the following tag '@retrofitting'
-      # with '@main' as soon as the branch has been merged to main.
-      uses: mooltiverse/nyx/.github/actions/setup-java@retrofitting
+      uses: mooltiverse/nyx/.github/actions/setup-java@main
       with:
         verbosity: ${{ inputs.verbosity }}
         enable-cache: false
         install-jdk: false
     - id: docker
-      # TODO: WAIT FOR MERGE: replace the following tag '@retrofitting'
-      # with '@main' as soon as the branch has been merged to main.
-      uses: mooltiverse/nyx/.github/actions/setup-docker@retrofitting
+      uses: mooltiverse/nyx/.github/actions/setup-docker@main
       with:
         verbosity: ${{ inputs.verbosity }}
         enable-cache: false
         enable-containerd-image-store: false
     - id: docusaurus
-      # TODO: WAIT FOR MERGE: replace the following tag '@retrofitting'
-      # with '@main' as soon as the branch has been merged to main.
-      uses: mooltiverse/nyx/.github/actions/setup-docusaurus@retrofitting
+      uses: mooltiverse/nyx/.github/actions/setup-docusaurus@main
       with:
         verbosity: ${{ inputs.verbosity }}
         enable-cache: false

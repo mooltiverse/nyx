@@ -54,9 +54,7 @@ jobs:
   #############################################################################
   initialize:
     name: Initialize
-    # TODO: WAIT FOR MERGE: replace the following tag '@retrofitting'
-    # with '@main' as soon as the branch has been merged to main.
-    uses: mooltiverse/nyx/.github/workflows/initialize.yml@retrofitting
+    uses: mooltiverse/nyx/.github/workflows/initialize.yml@main
   
   build:
     name: Waypoint
@@ -66,9 +64,7 @@ jobs:
     - go-build
     - docker-build
     - docusaurus-build
-    # TODO: WAIT FOR MERGE: replace the following tag '@retrofitting'
-    # with '@main' as soon as the branch has been merged to main.
-    uses: mooltiverse/nyx/.github/workflows/build.yml@retrofitting
+    uses: mooltiverse/nyx/.github/workflows/build.yml@main
   
   test:
     name: Waypoint
@@ -78,9 +74,7 @@ jobs:
     - java-test
     - go-test
     - docker-test
-    # TODO: WAIT FOR MERGE: replace the following tag '@retrofitting'
-    # with '@main' as soon as the branch has been merged to main.
-    uses: mooltiverse/nyx/.github/workflows/test.yml@retrofitting
+    uses: mooltiverse/nyx/.github/workflows/test.yml@main
 
   release:
     name: Release
@@ -92,9 +86,7 @@ jobs:
     - docker-publish
     - docusaurus-publish
     if: needs.initialize.outputs.release == 'true'
-    # TODO: WAIT FOR MERGE: replace the following tag '@retrofitting'
-    # with '@main' as soon as the branch has been merged to main.
-    uses: mooltiverse/nyx/.github/workflows/release.yml@retrofitting
+    uses: mooltiverse/nyx/.github/workflows/release.yml@main
     with:
       verbosity: info
       install-jdk: true
@@ -115,9 +107,7 @@ jobs:
     needs:
     - initialize
     if: needs.initialize.outputs.javaChanged == 'true' || needs.initialize.outputs.release == 'true'
-    # TODO: WAIT FOR MERGE: replace the following tag '@retrofitting'
-    # with '@main' as soon as the branch has been merged to main.
-    uses: mooltiverse/nyx/.github/workflows/java-build.yml@retrofitting
+    uses: mooltiverse/nyx/.github/workflows/java-build.yml@main
     with:
       verbosity: info
       install-jdk: true
@@ -142,9 +132,7 @@ jobs:
     strategy:
       matrix:
         java: [ '17', '20' ]
-    # TODO: WAIT FOR MERGE: replace the following tag '@retrofitting'
-    # with '@main' as soon as the branch has been merged to main.
-    uses: mooltiverse/nyx/.github/workflows/java-test-sequence.yml@retrofitting
+    uses: mooltiverse/nyx/.github/workflows/java-test-sequence.yml@main
     with:
       verbosity: info
       artifacts-name-prefix: java-${{ matrix.java }}
@@ -181,9 +169,7 @@ jobs:
     - java-build
     - java-test
     if: needs.initialize.outputs.javaChanged == 'true' || needs.initialize.outputs.release == 'true'
-    # TODO: WAIT FOR MERGE: replace the following tag '@retrofitting'
-    # with '@main' as soon as the branch has been merged to main.
-    uses: mooltiverse/nyx/.github/workflows/java-publish.yml@retrofitting
+    uses: mooltiverse/nyx/.github/workflows/java-publish.yml@main
     with:
       verbosity: info
       install-jdk: true
@@ -216,9 +202,7 @@ jobs:
     needs:
     - initialize
     if: needs.initialize.outputs.goChanged == 'true' || needs.initialize.outputs.release == 'true'
-    # TODO: WAIT FOR MERGE: replace the following tag '@retrofitting'
-    # with '@main' as soon as the branch has been merged to main.
-    uses: mooltiverse/nyx/.github/workflows/go-build.yml@retrofitting
+    uses: mooltiverse/nyx/.github/workflows/go-build.yml@main
     with:
       verbosity: info
       install-go: true
@@ -239,9 +223,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
-    # TODO: WAIT FOR MERGE: replace the following tag '@retrofitting'
-    # with '@main' as soon as the branch has been merged to main.
-    uses: mooltiverse/nyx/.github/workflows/go-test-sequence.yml@retrofitting
+    uses: mooltiverse/nyx/.github/workflows/go-test-sequence.yml@main
     with:
       verbosity: info
       runs-on: ${{ matrix.os }}
@@ -281,9 +263,7 @@ jobs:
     - go-build
     - go-test
     if: needs.initialize.outputs.goChanged == 'true' || needs.initialize.outputs.release == 'true'
-    # TODO: WAIT FOR MERGE: replace the following tag '@retrofitting'
-    # with '@main' as soon as the branch has been merged to main.
-    uses: mooltiverse/nyx/.github/workflows/go-publish.yml@retrofitting
+    uses: mooltiverse/nyx/.github/workflows/go-publish.yml@main
     with:
       verbosity: info
       install-go: true
@@ -305,9 +285,7 @@ jobs:
     - initialize
     - go-build
     if: needs.initialize.outputs.dockerChanged == 'true' || needs.initialize.outputs.goChanged == 'true' || needs.initialize.outputs.release == 'true'
-    # TODO: WAIT FOR MERGE: replace the following tag '@retrofitting'
-    # with '@main' as soon as the branch has been merged to main.
-    uses: mooltiverse/nyx/.github/workflows/docker-build.yml@retrofitting
+    uses: mooltiverse/nyx/.github/workflows/docker-build.yml@main
     with:
       verbosity: info
       install-jdk: true
@@ -323,9 +301,7 @@ jobs:
     - go-build
     - docker-build
     if: needs.initialize.outputs.dockerChanged == 'true' || needs.initialize.outputs.goChanged == 'true' || needs.initialize.outputs.release == 'true'
-    # TODO: WAIT FOR MERGE: replace the following tag '@retrofitting'
-    # with '@main' as soon as the branch has been merged to main.
-    uses: mooltiverse/nyx/.github/workflows/docker-test-compact.yml@retrofitting
+    uses: mooltiverse/nyx/.github/workflows/docker-test-compact.yml@main
     with:
       verbosity: info
       install-jdk: true
@@ -363,9 +339,7 @@ jobs:
     - docker-build
     - docker-test
     if: needs.initialize.outputs.dockerChanged == 'true' || needs.initialize.outputs.goChanged == 'true' || needs.initialize.outputs.release == 'true'
-    # TODO: WAIT FOR MERGE: replace the following tag '@retrofitting'
-    # with '@main' as soon as the branch has been merged to main.
-    uses: mooltiverse/nyx/.github/workflows/docker-publish.yml@retrofitting
+    uses: mooltiverse/nyx/.github/workflows/docker-publish.yml@main
     with:
       verbosity: info
       install-jdk: true
@@ -395,9 +369,7 @@ jobs:
     needs:
     - initialize
     if: needs.initialize.outputs.docusaurusChanged == 'true' || needs.initialize.outputs.release == 'true'
-    # TODO: WAIT FOR MERGE: replace the following tag '@retrofitting'
-    # with '@main' as soon as the branch has been merged to main.
-    uses: mooltiverse/nyx/.github/workflows/docusaurus-build.yml@retrofitting
+    uses: mooltiverse/nyx/.github/workflows/docusaurus-build.yml@main
     with:
       verbosity: info
       install-jdk: true
@@ -412,9 +384,7 @@ jobs:
     - test
     - docusaurus-build
     if: needs.initialize.outputs.docusaurusChanged == 'true' || needs.initialize.outputs.release == 'true'
-    # TODO: WAIT FOR MERGE: replace the following tag '@retrofitting'
-    # with '@main' as soon as the branch has been merged to main.
-    uses: mooltiverse/nyx/.github/workflows/docusaurus-publish.yml@retrofitting
+    uses: mooltiverse/nyx/.github/workflows/docusaurus-publish.yml@main
     with:
       verbosity: info
       install-jdk: true
