@@ -403,9 +403,11 @@ jobs:
       go-cache-name-restore-suffix: ${{ needs.go-build.outputs.go-cache-name-suffix }}
       docker-cache-name-restore-suffix: ${{ needs.docker-build.outputs.docker-cache-name-suffix }}
       enable-dockerhub-container-registry: true
+      enable-github-container-registry: true
       dockerhub-user: ${{ vars.DOCKER_HUB_USERNAME }}
     secrets:
       dockerhub-token: ${{ secrets.DOCKER_HUB_TOKEN }}
+      github-token: ${{ secrets.GITHUB_TOKEN }}
 
   #############################################################################
   # Docusaurus Jobs
