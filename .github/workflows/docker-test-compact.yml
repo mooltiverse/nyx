@@ -391,6 +391,23 @@ on:
         type: string
         required: false
         default: "${{ github.job }}"
+      enable-dockerhub-container-registry:
+        description: |-
+          Whether or not authentication to the Docker Hub Container Registry must
+          be enabled.
+          When true the 'dockerhub-user' and the 'dockerhub-token' will be used to
+          authenticate.
+          Default: false
+        type: boolean
+        required: false
+        default: false
+      dockerhub-user:
+        description: |-
+          The Docker Hub user to use for remote API.
+          See 'enable-dockerhub-container-registry' to enable authentication.
+        type: string
+        required: false
+        default: ''
       enable-github-container-registry:
         description: |-
           Whether or not authentication to the GitHub Container Registry must
@@ -452,6 +469,11 @@ on:
           set the verbosity level.
           For more see: https://docs.gradle.org/current/userguide/command_line_interface.html.
         required: false
+      dockerhub-token:
+        description: |-
+          The Docker Hub token to use for remote API.
+          See 'enable-dockerhub-container-registry' to enable authentication.
+        required: false
       aws-secret-access-key:
         description: |-
           The AWS access key ID to use for remote API.
@@ -480,6 +502,12 @@ jobs:
   test:
     name: Test
     runs-on: ${{ inputs.runs-on }}
+    # Avoid jobs invoking remote services to run in parallel to avoid throttling
+    # down by those services (with consequent test failures).
+    # See https://github.com/mooltiverse/nyx/issues/206 for more
+    concurrency:
+      group: access-to-rate-limited-remote-services
+      cancel-in-progress: false
     steps:
     # Free up to 30+ GB of space by removing pre-installed packages
     # This is required to prevent the 'no space left on device'.
@@ -531,6 +559,9 @@ jobs:
         verbosity: ${{ inputs.verbosity }}
         # Restore the cache from the previous job to 'chain' the two caches
         cache-name-restore-suffix: ${{ inputs.docker-cache-name-restore-suffix }}
+        enable-dockerhub-container-registry: ${{ inputs.enable-dockerhub-container-registry }}
+        dockerhub-user: ${{ inputs.dockerhub-user }}
+        dockerhub-token: ${{ secrets.dockerhub-token }}
         enable-github-container-registry: ${{ inputs.enable-github-container-registry }}
         github-user: ${{ inputs.github-user }}
         github-token: ${{ secrets.GITHUB_TOKEN }}
