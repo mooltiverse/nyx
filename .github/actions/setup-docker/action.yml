@@ -137,7 +137,7 @@ inputs:
     description: |-
       Whether or not authentication to the Docker Hub Container Registry must
       be enabled.
-      When true the 'dockerhub-user' and the 'dockerhub-password' will be used to
+      When true the 'dockerhub-user' and the 'dockerhub-token' will be used to
       authenticate.
       Default: false
     required: false
@@ -148,9 +148,9 @@ inputs:
       See 'enable-dockerhub-container-registry' to enable authentication.
     required: false
     default: ''
-  dockerhub-password:
+  dockerhub-token:
     description: |-
-      The Docker Hub password to use for remote API.
+      The Docker Hub token to use for remote API.
       See 'enable-dockerhub-container-registry' to enable authentication.
     required: false
     default: ''
@@ -308,7 +308,7 @@ runs:
     if: ${{ inputs.enable-dockerhub-container-registry == 'true' }}
     with:
       username: ${{ inputs.dockerhub-user }}
-      password: ${{ inputs.dockerhub-password }}
+      password: ${{ inputs.dockerhub-token }}
   - name: Log in to the GitHub Container Registry
     uses: docker/login-action@v3
     if: ${{ inputs.enable-github-container-registry == 'true' }}

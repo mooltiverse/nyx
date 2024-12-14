@@ -210,8 +210,8 @@ jobs:
       # Also see:
       # - https://docs.gradle.org/current/userguide/build_environment.html#setting_a_project_property
       gradle-secret-arguments: >-
-        -Dorg.gradle.project.gitHubUser: ${{ github.actor }}
-        -Dorg.gradle.project.gitHubToken: ${{ secrets.GITHUB_TOKEN }}
+        -Dorg.gradle.project.gitHubUser=GITHUB
+        -Dorg.gradle.project.gitHubToken=${{ secrets.GITHUB_TOKEN }}
         -Dorg.gradle.project.ossrhUsername="${{ secrets.MAVEN_USER }}"
         -Dorg.gradle.project.ossrhPassword="${{ secrets.MAVEN_PASSWORD }}"
         -Dorg.gradle.project.signingKeyBase64="${{ secrets.GPG_PRIVATE_KEY_BASE64 }}"
