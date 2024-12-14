@@ -17,7 +17,7 @@
 /*
 This is the state package for Nyx, providing objects to share the current state of execution within the program.
 
-See https://mooltiverse.github.io/nyx/guide/developer/go/ for the developer's guide.
+See https://mooltiverse.github.io/nyx/docs/developer/go/ for the developer's guide.
 */
 package state
 

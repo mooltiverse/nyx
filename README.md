@@ -28,7 +28,7 @@ Nyx is the *all in one* tool that gives you integrated support for:
 
 Want to embed the libraries into your own project instead? You're covered as they are published just for that. See the [available libraries](#libraries) for more.
 
-Browse the [documentation](https://mooltiverse.github.io/nyx/) for more. Check out the [**quick start**](https://mooltiverse.github.io/nyx/guide/user/quick-start/) guide to get Nyx running in minutes or see the [developer guide](https://mooltiverse.github.io/nyx/guide/developer/) if you're interested in using the libraries.
+Browse the [documentation](https://mooltiverse.github.io/nyx/) for more. Check out the [**quick start**](https://mooltiverse.github.io/nyx/docs/user/quick-start/) guide to get Nyx running in minutes or see the [developer guide](https://mooltiverse.github.io/nyx/docs/developer/go/) if you're interested in using the libraries.
 
 The project is open source and hosted on [GitHub](https://github.com/mooltiverse/nyx).
 
@@ -85,17 +85,17 @@ Available for all platforms in the [latest release](https://github.com/mooltiver
 ### Libraries
 
 * Main library:
-  * [for Go](https://mooltiverse.github.io/nyx/guide/developer/go/nyx-main/)
-  * [for Java](https://mooltiverse.github.io/nyx/guide/developer/java/nyx-main/)
+  * [for Go](https://mooltiverse.github.io/nyx/docs/developer/go/nyx-main)
+  * [for Java](https://mooltiverse.github.io/nyx/docs/developer/java/nyx-main)
 * [Semantic Version](https://semver.org/) library:
-  * [for Go](https://mooltiverse.github.io/nyx/guide/developer/java/semantic-version/)
-  * [for Java](https://mooltiverse.github.io/nyx/guide/developer/java/semantic-version/)
+  * [for Go](https://mooltiverse.github.io/nyx/docs/developer/go/semantic-version)
+  * [for Java](https://mooltiverse.github.io/nyx/docs/developer/java/semantic-version)
 
 ## Documentation
 
 * [Main Nyx documentation](https://mooltiverse.github.io/nyx/)
-  * [user guide](https://mooltiverse.github.io/nyx/guide/user/)
-  * [developer guide](https://mooltiverse.github.io/nyx/guide/developer/)
+  * [user guide](https://mooltiverse.github.io/nyx/docs/user/quick-start/)
+  * [developer guide](https://mooltiverse.github.io/nyx/docs/developer/go/)
 * [Godoc API](https://godocs.io/github.com/mooltiverse/nyx/src/go/nyx)
 * [Javadoc API](https://javadoc.io/doc/com.mooltiverse.oss.nyx/java)
   

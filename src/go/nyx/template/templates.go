@@ -17,7 +17,7 @@
 /*
 This is the templates package for Nyx, providing functions to render text templates.
 
-See https://mooltiverse.github.io/nyx/guide/developer/go/ for the developer's guide.
+See https://mooltiverse.github.io/nyx/docs/developer/go/ for the developer's guide.
 */
 package templates
 

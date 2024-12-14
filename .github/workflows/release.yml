@@ -371,7 +371,7 @@ jobs:
         #   directly to Nyx as environment variable, whenever the GitHub service
         #   in the 'services' configuration section is named 'github'
         # For more see:
-        # - https://mooltiverse.github.io/nyx/guide/user/configuration-reference/services/#github-configuration-options
+        # - https://mooltiverse.github.io/nyx/docs/user/configuration-reference/services#github
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         NYX_SERVICES_github_OPTIONS_AUTHENTICATION_TOKEN: ${{ secrets.GITHUB_TOKEN }}

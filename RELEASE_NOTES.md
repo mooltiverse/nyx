@@ -216,7 +216,7 @@ This release:
 
 * adds support for commit message conventions matching multiple portions of commit messages (yielding to multiple bump identifiers per commit), useful for merge commits ([#125](https://github.com/mooltiverse/nyx/issues/125))
 * improves regular expressions used for the Conventional Commits convention
-* adds the unofficial `conventionalCommitsForMerge` convention (disabled by default) to the [extended preset](https://mooltiverse.github.io/nyx/guide/user/configuration-presets/extended/), useful for merge commits ([#125](https://github.com/mooltiverse/nyx/issues/125))
+* adds the unofficial `conventionalCommitsForMerge` convention (disabled by default) to the [extended preset](https://mooltiverse.github.io/nyx/docs/user/configuration-presets/extended), useful for merge commits ([#125](https://github.com/mooltiverse/nyx/issues/125))
 
 ### Fixed issues
 
@@ -236,13 +236,13 @@ There are no actions to take for backward compatibility.
 
 This release:
 
-* adds support for arbitrary [substitutions](https://mooltiverse.github.io/nyx/guide/user/configuration-reference/substitutions/) in text files within the project using dynamic values from the [State](https://mooltiverse.github.io/nyx/guide/user/state-reference/) ([#182](https://github.com/mooltiverse/nyx/issues/182)) ([#223](https://github.com/mooltiverse/nyx/issues/223))
-* adds support for multiple Git tag [names](https://mooltiverse.github.io/nyx/guide/user/configuration-reference/release-types/#git-tag-names) that can be used to change the default git tag or add some tag aliases ([#243](https://github.com/mooltiverse/nyx/issues/243))
-* adds support for the new [`gitPushForce`](https://mooltiverse.github.io/nyx/guide/user/configuration-reference/release-types/#git-push-force), [`gitTagForce`](https://mooltiverse.github.io/nyx/guide/user/configuration-reference/release-types/#git-tag-force) flags to control whether Git push and tag operations need to use the `--force` flag, useful when using tag aliases in the Git tag [names](https://mooltiverse.github.io/nyx/guide/user/configuration-reference/release-types/#git-tag-names) ([#243](https://github.com/mooltiverse/nyx/issues/243))
-* adds support for the new `versionMajorNumber`, `versionMinorNumber`, `versionPatchNumber`, `versionPreReleaseIdentifier`, `versionBuildMetadata` [state attributes](https://mooltiverse.github.io/nyx/guide/user/state-reference/global-attributes/)
-* adds support for the new [`releaseName`](https://mooltiverse.github.io/nyx/guide/user/configuration-reference/release-types/#release-name) configuration option to control the name of releases published to remote services ([#238](https://github.com/mooltiverse/nyx/issues/238))
-* adds support for the new [`publishDraft`](https://mooltiverse.github.io/nyx/guide/user/configuration-reference/release-types/#publish-draft) and [`publishPreRelease`](https://mooltiverse.github.io/nyx/guide/user/configuration-reference/release-types/#publish-pre-release) configuration options to control extra flags of releases published to remote services (as of now only [supported by GitHub](https://docs.github.com/en/repositories/releasing-projects-on-github/managing-releases-in-a-repository)) ([#238](https://github.com/mooltiverse/nyx/issues/238))
-* adds support for the new [`append`](https://mooltiverse.github.io/nyx/guide/user/configuration-reference/changelog/#append) configuration option to control whether the [changelog](https://mooltiverse.github.io/nyx/guide/user/configuration-reference/changelog/) file is overwritten or appended and, if appended, in which order ([#183](https://github.com/mooltiverse/nyx/issues/183))
+* adds support for arbitrary [substitutions](https://mooltiverse.github.io/nyx/docs/user/configuration-reference/substitutions/) in text files within the project using dynamic values from the [State](https://mooltiverse.github.io/nyx/docs/user/state-reference/) ([#182](https://github.com/mooltiverse/nyx/issues/182)) ([#223](https://github.com/mooltiverse/nyx/issues/223))
+* adds support for multiple Git tag [names](https://mooltiverse.github.io/nyx/docs/user/configuration-reference/release-types/#git-tag-names) that can be used to change the default git tag or add some tag aliases ([#243](https://github.com/mooltiverse/nyx/issues/243))
+* adds support for the new [`gitPushForce`](https://mooltiverse.github.io/nyx/docs/user/configuration-reference/release-types/#git-push-force), [`gitTagForce`](https://mooltiverse.github.io/nyx/docs/user/configuration-reference/release-types/#git-tag-force) flags to control whether Git push and tag operations need to use the `--force` flag, useful when using tag aliases in the Git tag [names](https://mooltiverse.github.io/nyx/docs/user/configuration-reference/release-types/#git-tag-names) ([#243](https://github.com/mooltiverse/nyx/issues/243))
+* adds support for the new `versionMajorNumber`, `versionMinorNumber`, `versionPatchNumber`, `versionPreReleaseIdentifier`, `versionBuildMetadata` [state attributes](https://mooltiverse.github.io/nyx/docs/user/state-reference/global-attributes)
+* adds support for the new [`releaseName`](https://mooltiverse.github.io/nyx/docs/user/configuration-reference/release-types/#release-name) configuration option to control the name of releases published to remote services ([#238](https://github.com/mooltiverse/nyx/issues/238))
+* adds support for the new [`publishDraft`](https://mooltiverse.github.io/nyx/docs/user/configuration-reference/release-types/#publish-draft) and [`publishPreRelease`](https://mooltiverse.github.io/nyx/docs/user/configuration-reference/release-types/#publish-pre-release) configuration options to control extra flags of releases published to remote services (as of now only [supported by GitHub](https://docs.github.com/en/repositories/releasing-projects-on-github/managing-releases-in-a-repository)) ([#238](https://github.com/mooltiverse/nyx/issues/238))
+* adds support for the new [`append`](https://mooltiverse.github.io/nyx/docs/user/configuration-reference/changelog/#append) configuration option to control whether the [changelog](https://mooltiverse.github.io/nyx/docs/user/configuration-reference/changelog/) file is overwritten or appended and, if appended, in which order ([#183](https://github.com/mooltiverse/nyx/issues/183))
 * adds support for Git tag updates so existing tags can be replaced and overwritten ([#243](https://github.com/mooltiverse/nyx/issues/243))
 * adds support for Gradle `8.2.1` and `8.3`.
 
@@ -478,7 +478,7 @@ This release is available at [this link](https://github.com/mooltiverse/nyx/rele
 
 This release:
 
-* adds support for remote [changelog templates](https://mooltiverse.github.io/nyx/guide/user/configuration-reference/changelog/#template) ([#158](https://github.com/mooltiverse/nyx/issues/158))
+* adds support for remote [changelog templates](https://mooltiverse.github.io/nyx/docs/user/configuration-reference/changelog/#template) ([#158](https://github.com/mooltiverse/nyx/issues/158))
 * adds support for Gradle 8.0 ([#162](https://github.com/mooltiverse/nyx/issues/162)), while backward compatibility doesn't change
 
 ### Fixed issues
@@ -528,14 +528,14 @@ There are no fixes in this release.
 
 ## 2.0.0
 
-* when using the Java (Gradle) version, the minimum Java version is now `15` and the minimum Gradle version is `7.0` (see [here](https://mooltiverse.github.io/nyx/guide/user/introduction/usage/#requisites-1) and [here](https://docs.gradle.org/current/userguide/compatibility.html)); Gradle versions from `6.7` on should still work but they are no longer tested
+* when using the Java (Gradle) version, the minimum Java version is now `15` and the minimum Gradle version is `7.0` (see [here](https://mooltiverse.github.io/nyx/docs/user/introduction/requirements) and [here](https://docs.gradle.org/current/userguide/compatibility.html)); Gradle versions from `6.7` on should still work but they are no longer tested
 * the public key (SSH) authentication method is now supported for Git ([#94](https://github.com/mooltiverse/nyx/issues/94))
 * the Git internal library (`github.com/mooltiverse/nyx/modules/go/nyx/git` package for Go, `com.mooltiverse.oss.nyx.git` package for Java) has been refactored in order to support multiple authentication mechanisms (with the new SSH method) and some methods have been replaced while others have been added
-* support for deprecated [template functions](https://mooltiverse.github.io/nyx/guide/user/configuration-reference/templates/#functions) `environment.user`, `environment.variable`, `file.content`, `file.exists` has been removed, replaced by `environmentUser`, `environmentVariable`, `fileContent`, `fileExists`
-* new parametric [template functions](https://mooltiverse.github.io/nyx/guide/user/configuration-reference/templates/) are now available: `capture`, `cutLeft`, `cutRight`, `replace`, `timeFormat` ([#104](https://github.com/mooltiverse/nyx/issues/104), ([#119](https://github.com/mooltiverse/nyx/issues/119)))
+* support for deprecated [template functions](https://mooltiverse.github.io/nyx/docs/user/configuration-reference/templates/#functions) `environment.user`, `environment.variable`, `file.content`, `file.exists` has been removed, replaced by `environmentUser`, `environmentVariable`, `fileContent`, `fileExists`
+* new parametric [template functions](https://mooltiverse.github.io/nyx/docs/user/configuration-reference/templates/) are now available: `capture`, `cutLeft`, `cutRight`, `replace`, `timeFormat` ([#104](https://github.com/mooltiverse/nyx/issues/104), ([#119](https://github.com/mooltiverse/nyx/issues/119)))
 * Java template functions in `com.mooltiverse.oss.nyx.template.Functions.java` no longer implement the `java.util.function.Function` interface which was provided for backward compatibility; from now on they only implement the `com.github.jknack.handlebars.Helper` interface provided by [Handlebars](https://github.com/jknack/handlebars.java)
 * release assets published to GitLab now show their Description instead of the File Name ([#128](https://github.com/mooltiverse/nyx/issues/128))
-* the [state](https://mooltiverse.github.io/nyx/guide/user/state-reference/global-attributes/) now has two additional boolean attributes: `coreVersion` and `latestVersion`, telling if the current version is a *core* version (using only core identifiers) and if it is the latest version (compared to all tags in the repository) ([#105](https://github.com/mooltiverse/nyx/issues/105))
+* the [state](https://mooltiverse.github.io/nyx/docs/user/state-reference/global-attributes) now has two additional boolean attributes: `coreVersion` and `latestVersion`, telling if the current version is a *core* version (using only core identifiers) and if it is the latest version (compared to all tags in the repository) ([#105](https://github.com/mooltiverse/nyx/issues/105))
 
 This release is available at [this link](https://github.com/mooltiverse/nyx/releases/tag/2.0.0).
 
@@ -543,13 +543,13 @@ This release is available at [this link](https://github.com/mooltiverse/nyx/rele
 
 * if you are using the Java (Gradle) version make sure you run Java `15` and Gradle `7.0` or newer
 * if you embedded Nyx in your code and used the `github.com/mooltiverse/nyx/modules/go/nyx/git` Go package or the `com.mooltiverse.oss.nyx.git` package, fix your code reflecting the changes made to the API
-* if you plan to use Git SSH authentication please refer to [the configuration reference](https://mooltiverse.github.io/nyx/guide/user/configuration-reference/git/) for the required configuration options
-* replace usage of deprecated [template functions](https://mooltiverse.github.io/nyx/guide/user/configuration-reference/templates/#functions) `environment.user`, `environment.variable`, `file.content`, `file.exists` (with dots) with `environmentUser`, `environmentVariable`, `fileContent`, `fileExists` (camel case names) in the configuration
+* if you plan to use Git SSH authentication please refer to [the configuration reference](https://mooltiverse.github.io/nyx/docs/user/configuration-reference/git/) for the required configuration options
+* replace usage of deprecated [template functions](https://mooltiverse.github.io/nyx/docs/user/configuration-reference/templates/#functions) `environment.user`, `environment.variable`, `file.content`, `file.exists` (with dots) with `environmentUser`, `environmentVariable`, `fileContent`, `fileExists` (camel case names) in the configuration
 
 ### New features and improvements
 
 * the public key (SSH) authentication method is now supported for Git ([#94](https://github.com/mooltiverse/nyx/issues/94))
-* new parametric [template functions](https://mooltiverse.github.io/nyx/guide/user/configuration-reference/templates/) are now available: `capture`, `cutLeft`, `cutRight`, `replace`, `timeFormat`
+* new parametric [template functions](https://mooltiverse.github.io/nyx/docs/user/configuration-reference/templates/) are now available: `capture`, `cutLeft`, `cutRight`, `replace`, `timeFormat`
 
 ### Fixed issues
 
@@ -714,7 +714,7 @@ This release is available at [this link](https://github.com/mooltiverse/nyx/rele
 
 ### Upgrade instructions
 
-If you use Gradle and [configure Nyx through the Gradle Extension](https://mooltiverse.github.io/nyx/guide/user/introduction/usage/#using-the-extension) with some [release assets](https://mooltiverse.github.io/nyx/guide/user/configuration-reference/release-assets/) and also filter release assets within release types using the [assets filter](https://mooltiverse.github.io/nyx/guide/user/configuration-reference/release-types/#assets) you need to update the assets filter configuration to use a simple string (defining a comma separated list of asset names to enable for the release type) instead of a native list. For example you need to replace `assets = [ "asset1", "asset2" ]` with `assets = [ "asset1,asset2" ]` within each [release type](https://mooltiverse.github.io/nyx/guide/user/configuration-reference/release-types/).
+If you use Gradle and [configure Nyx through the Gradle Extension](https://mooltiverse.github.io/nyx/docs/user/introduction/usage#using-the-extension) with some [release assets](https://mooltiverse.github.io/nyx/docs/user/configuration-reference/release-assets/) and also filter release assets within release types using the [assets filter](https://mooltiverse.github.io/nyx/docs/user/configuration-reference/release-types/#assets) you need to update the assets filter configuration to use a simple string (defining a comma separated list of asset names to enable for the release type) instead of a native list. For example you need to replace `assets = [ "asset1", "asset2" ]` with `assets = [ "asset1,asset2" ]` within each [release type](https://mooltiverse.github.io/nyx/docs/user/configuration-reference/release-types/).
 
 ### New features and improvements
 
@@ -724,8 +724,8 @@ There are no new features or improvements in this release.
 
 This release:
 
-* fixes the issue with release type [assets](https://mooltiverse.github.io/nyx/guide/user/configuration-reference/release-types/#assets) filter configured through the Gradle plugin [#110](https://github.com/mooltiverse/nyx/issues/110)
-* fixes the issue with the [resume](https://mooltiverse.github.io/nyx/guide/user/configuration-reference/global-options/#resume) flag causing NullPointerException [#81](https://github.com/mooltiverse/nyx/issues/81)
+* fixes the issue with release type [assets](https://mooltiverse.github.io/nyx/docs/user/configuration-reference/release-types/#assets) filter configured through the Gradle plugin [#110](https://github.com/mooltiverse/nyx/issues/110)
+* fixes the issue with the [resume](https://mooltiverse.github.io/nyx/docs/user/configuration-reference/global-options/#resume) flag causing NullPointerException [#81](https://github.com/mooltiverse/nyx/issues/81)
 
 ### Known issues
 
@@ -743,7 +743,7 @@ There are no actions to take for backward compatibility.
 
 This release:
 
-* adds support for release assets so that published releases can also contain artifacts. You can configure release assets following [these instructions](https://mooltiverse.github.io/nyx/guide/user/configuration-reference/release-assets/)
+* adds support for release assets so that published releases can also contain artifacts. You can configure release assets following [these instructions](https://mooltiverse.github.io/nyx/docs/user/configuration-reference/release-assets/)
 
 ### Fixed issues
 
@@ -791,8 +791,8 @@ There are no new features or improvements in this release.
 
 This release:
 
-* fixes the [Extended](https://mooltiverse.github.io/nyx/guide/user/configuration-presets/extended/) preset to also support the *Fix* release type [#89](https://github.com/mooltiverse/nyx/issues/89)
-* fixes the [Make](https://mooltiverse.github.io/nyx/guide/user/introduction/how-nyx-works/#make) command to comply with the [`dryRun`](https://mooltiverse.github.io/nyx/guide/user/configuration-reference/global-options/#dry-run) flag [#81](https://github.com/mooltiverse/nyx/issues/81)
+* fixes the [Extended](https://mooltiverse.github.io/nyx/docs/user/configuration-presets/extended) preset to also support the *Fix* release type [#89](https://github.com/mooltiverse/nyx/issues/89)
+* fixes the [Make](https://mooltiverse.github.io/nyx/docs/user/introduction/how-nyx-works#make) command to comply with the [`dryRun`](https://mooltiverse.github.io/nyx/docs/user/configuration-reference/global-options/#dry-run) flag [#81](https://github.com/mooltiverse/nyx/issues/81)
 
 ### Known issues
 

@@ -17,7 +17,7 @@
 /*
 This is the configuration package for Nyx, providing layered configuration logic among different configuration means.
 
-See https://mooltiverse.github.io/nyx/guide/developer/go/ for the developer's guide.
+See https://mooltiverse.github.io/nyx/docs/developer/go/ for the developer's guide.
 */
 package configuration
 

@@ -9,7 +9,7 @@ This project and everyone participating in it is governed by the [Contributor Co
 Feel free to open new [issues](https://github.com/mooltiverse/nyx/issues) for bugs and support requests. Before doing so we ask you to:
 
 1. search for similar requests that might have been opened in the past to avoid repetitiveness
-2. read through the [docs](https://mooltiverse.github.io/nyx/) and see if a similar was already addressed. Also read through the [examples](https://mooltiverse.github.io/nyx/examples/)
+2. read through the [docs](https://mooltiverse.github.io/nyx/) and see if a similar was already addressed. Also read through the [examples](https://mooltiverse.github.io/nyx/docs/resources/examples/)
 3. make sure you're running the [latest release](https://github.com/mooltiverse/nyx/releases)
 
 If you can't find any answer, when submitting a new issue please provide as much information as you can to help us understand. Don't forget to:
@@ -20,7 +20,7 @@ If you can't find any answer, when submitting a new issue please provide as much
 * describe the expected behavior and the current behavior
 * tell us about the kind of deliverable you're using and their version and describe the environment so we can reproduce it
 
-We will do our best to take relevant requests and update the documentation or publish a new [example post](https://mooltiverse.github.io/nyx/examples/) about the specific use case in order to make it reusable by others.
+We will do our best to take relevant requests and update the documentation or publish a new [example post](https://mooltiverse.github.io/nyx/docs/resources/examples/) about the specific use case in order to make it reusable by others.
 
 ### Version scheme
 
