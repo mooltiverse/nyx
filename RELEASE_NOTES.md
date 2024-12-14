@@ -14,6 +14,7 @@ This release:
 
 * adds support for Gradle `8.10.2`, `8.11`, `8.11.1`
 * upgraded all libraries
+* replaced the former and deprecated `github.com/xanzy/go-gitlab` Go library with `gitlab.com/gitlab-org/api/client-go`
 
 ## 3.0.12
 
