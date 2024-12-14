@@ -687,9 +687,6 @@ tasks.check.dependsOn tasks.testReport
 // so that we can run all Java unit tests with one task
 tasks.test.dependsOn subprojects*.test
 
-// Make this overall publish task dependent on subprojects publish tasks
-tasks.publish.dependsOn subprojects*.publish
-
 // Publish artifacts to the Staging Sonatype Nexus
 //
 // Retrieve and print the stagingProfileId using the getStagingProfile task

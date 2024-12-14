@@ -202,6 +202,7 @@ jobs:
       nyx-cache-name-restore-suffix: ${{ needs.initialize.outputs.nyx-cache-name-suffix }}
       gradle-cache-name-restore-suffix: ${{ needs.java-build.outputs.gradle-cache-name-suffix }}
       java-cache-name-restore-suffix: ${{ needs.java-build.outputs.java-cache-name-suffix }}
+      gradle-tasks: src:java:publish src:java:gradle:publish
     secrets:
       # Pass extra properties used by the Gradle scripts to run tests.
       # See the top level

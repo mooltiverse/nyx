@@ -1,7 +1,7 @@
 # Nyx
 
 [![Release](https://img.shields.io/github/v/release/mooltiverse/nyx?sort=semver)](https://github.com/mooltiverse/nyx/releases)
-[![GitHub Actions](https://github.com/mooltiverse/nyx/actions/workflows/workflow.yml/badge.svg?branch=main)](https://github.com/mooltiverse/nyx/actions/workflows/workflow.yml)
+[![GitHub Actions](https://github.com/mooltiverse/nyx/actions/workflows/main.yml/badge.svg?branch=main)](https://github.com/mooltiverse/nyx/actions/workflows/main.yml)
 [![Powered by Nyx](https://img.shields.io/badge/powered%20by-Nyx-blue)](https://github.com/mooltiverse/nyx)
 [![Javadoc](https://javadoc.io/badge2/com.mooltiverse.oss.nyx/java/Javadoc.svg)](https://javadoc.io/doc/com.mooltiverse.oss.nyx/java)
 [![Go Doc](https://godocs.io/github.com/mooltiverse/nyx/src/go/nyx?status.svg)](https://godocs.io/github.com/mooltiverse/nyx/src/go/nyx)
