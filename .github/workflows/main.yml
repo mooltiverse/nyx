@@ -139,14 +139,7 @@ jobs:
     # to the Gradle compatibility matrix. See CONTRIBUTING.md in the root directory or the Gradle functional test suites for more.
     strategy:
       matrix:
-        # TODO: SHORTEN TESTS: uncomment the following line after the whole
-        # pipeline has been verified.
-        # Some tests have been suspended to make the pipeline quicker while
-        # testing some downstream jobs that are still failing.
-        # Meanwhile, all source code has already been fully tested by previous
-        # commits.
-        #java: [ '17', '20' ]
-        java: [ '17' ]
+        java: [ '17', '20' ]
     uses: mooltiverse/nyx/.github/workflows/java-test-sequence.yml@main
     with:
       verbosity: info
@@ -157,15 +150,6 @@ jobs:
       nyx-cache-name-restore-suffix: ${{ needs.initialize.outputs.nyx-cache-name-suffix }}
       gradle-cache-name-restore-suffix: ${{ needs.java-build.outputs.gradle-cache-name-suffix }}
       java-cache-name-restore-suffix: ${{ needs.java-build.outputs.java-cache-name-suffix }}
-      # TODO: SHORTEN TESTS: remove the following lines after the whole
-      # pipeline has been verified.
-      # Always run unit tests instead of integration and functional tests
-      # to make the pipeline quicker while testing some downstream jobs
-      # that are still failing.
-      # Meanwhile, all source code has already been fully tested by previous
-      # commits.
-      gradle-integration-test-tasks: src:java:unitTest
-      gradle-functional-test-tasks: src:java:unitTest
     secrets:
       # Pass extra properties used by the Gradle scripts to run tests.
       # See the top level
@@ -260,14 +244,7 @@ jobs:
     #  cancel-in-progress: false
     strategy:
       matrix:
-        # TODO: SHORTEN TESTS: uncomment the following line after the whole
-        # pipeline has been verified.
-        # Some tests have been suspended to make the pipeline quicker while
-        # testing some downstream jobs that are still failing.
-        # Meanwhile, all source code has already been fully tested by previous
-        # commits.
-        #os: [ubuntu-latest, macos-latest, windows-latest]
-        os: [ubuntu-latest]
+        os: [ubuntu-latest, macos-latest, windows-latest]
     uses: mooltiverse/nyx/.github/workflows/go-test-sequence.yml@main
     with:
       verbosity: info
@@ -281,15 +258,6 @@ jobs:
       nyx-cache-name-restore-suffix: ${{ needs.initialize.outputs.nyx-cache-name-suffix }}
       gradle-cache-name-restore-suffix: ${{ needs.go-build.outputs.gradle-cache-name-suffix }}
       go-cache-name-restore-suffix: ${{ needs.go-build.outputs.go-cache-name-suffix }}
-      # TODO: SHORTEN TESTS: remove the following lines after the whole
-      # pipeline has been verified.
-      # Always run unit tests instead of integration and functional tests
-      # to make the pipeline quicker while testing some downstream jobs
-      # that are still failing.
-      # Meanwhile, all source code has already been fully tested by previous
-      # commits.
-      gradle-integration-test-tasks: src:go:unitTest
-      gradle-functional-test-tasks: src:go:unitTest
     secrets:
       # Pass extra properties used by the Gradle scripts to run tests.
       # See the top level
