@@ -35,7 +35,7 @@ type JSONTestIPOutput struct {
 func TestFileMapperLoadFromURL(t *testing.T) {
 	target := JSONTestIPOutput{}
 
-	path, err := url.Parse("http://ip.jsontest.com/")
+	path, err := url.Parse("https://jsonplaceholder.typicode.com/todos")
 	assert.NoError(t, err)
 
 	err = LoadFromURL(*path, &target)

@@ -54,15 +54,9 @@ public class FileMapperTests {
         @DisplayName("FileMapper.load(URL, ?)")
         void loadFromURLTest()
             throws Exception {
-            URL url = new URI("http://ip.jsontest.com/").toURL();
-
-            try {
-                JSONTestIPOutput testOutput = FileMapper.load(url, JSONTestIPOutput.class);
-                assertNotNull(testOutput.ip);
-            }
-            catch (DataAccessException dae) {
-                // do nothing, just skip the test as sometimes http://ip.jsontest.com/ is unavailable and the call yields to a 500 server error
-            }
+            URL url = new URI("https://jsonplaceholder.typicode.com/todos").toURL();
+            JSONTestIPOutput testOutput = FileMapper.load(url, JSONTestIPOutput.class);
+            assertNotNull(testOutput.ip);
         }
     }
 }
