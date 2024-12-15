@@ -129,7 +129,6 @@ Available for all platforms in the [latest release](https://github.com/mooltiver
 * [Nyx, the Semantic Release Automation Tool](https://levelup.gitconnected.com/nyx-the-semantic-release-automation-tool-4e2dfa949f38)
 * [Semantic Release Automation with Gradle using Nyx](https://levelup.gitconnected.com/semantic-release-automation-with-gradle-using-nyx-ba345235a365)
 
-
 ## Badge
 
 If you like Nyx please consider showing the badge [![Powered by Nyx](https://img.shields.io/badge/Powered%20by-Nyx-blue)](https://github.com/mooltiverse/nyx) on your project page by inserting this snippet:
