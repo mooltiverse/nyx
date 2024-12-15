@@ -28,17 +28,21 @@ import (
 	assert "github.com/stretchr/testify/assert" // https://pkg.go.dev/github.com/stretchr/testify/assert
 )
 
-type JSONTestIPOutput struct {
-	Ip *string
+type Todo struct {
+	// For the type of data returned see:
+	// - https://jsonplaceholder.typicode.com/todos/1
+	id        *string
+	userId    *string
+	title     *string
+	completed *bool
 }
 
 func TestFileMapperLoadFromURL(t *testing.T) {
-	target := JSONTestIPOutput{}
+	target := Todo{}
 
-	path, err := url.Parse("https://jsonplaceholder.typicode.com/todos")
+	path, err := url.Parse("https://jsonplaceholder.typicode.com/todos/1")
 	assert.NoError(t, err)
 
 	err = LoadFromURL(*path, &target)
 	assert.NoError(t, err)
-	assert.NotEmpty(t, *target.Ip)
 }
