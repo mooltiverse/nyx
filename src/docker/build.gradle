@@ -1328,14 +1328,17 @@ task deepClean(group: 'build', description: 'Clean the reproducible and reusable
   doLast {
     logger.quiet("Pruning the Docker build cache")
     exec {
+      ignoreExitValue true
       commandLine 'docker', 'buildx', 'prune', '--all', '--force'
     }
     logger.info("Pruning unused Docker images")
     exec {
+      ignoreExitValue true
       commandLine 'docker', 'image', 'prune', '--all', '--force'
     }
     logger.info("Pruning unused Docker BuildKit builders")
     exec {
+      ignoreExitValue true
       commandLine 'docker', 'buildx', 'rm', '--all-inactive'
     }
   }
