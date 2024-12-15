@@ -10,4 +10,71 @@ tags:
 
 # GitHub Action
 
-Please refer to the [GitHub Action home page](https://mooltiverse.github.io/nyx-github-action).
+In the simplest case you just need the Action to [compute](../introduction/how-nyx-works.mdx#infer) the version number from the repository commit history. [This example](https://github.com/mooltiverse/nyx/blob/main/.github/workflows/example-get-version-using-action.yml) shows how:
+
+```yaml
+jobs:
+  infer-version:
+    name: Infer the repository version with Nyx
+    runs-on: ubuntu-latest
+    steps:
+    - name: Git checkout
+      uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+    // highlight-start
+    - name: Nyx infer
+      id: nyx
+      uses: mooltiverse/nyx@main
+    // highlight-end
+    - name: Print version # This step uses the version inferred by Nyx
+      run: echo the inferred version is ${{ steps.nyx.outputs.version }}
+```
+
+Very simple, and you can then use the version as `${{ steps.nyx.outputs.version }}`.
+
+If you want Nyx not just to *read* the repository but also [publish](../introduction/how-nyx-works.mdx#publish) a release or [push](../introduction/how-nyx-works.mdx#mark) changes to a remote repository, you also need to pass the [credentials](../configuration-reference/services.mdx#github-configuration-options) using the `GITHUB_TOKEN` and giving the `mark` or `publish` [command](../introduction/how-nyx-works.mdx), like in [this example](https://github.com/mooltiverse/nyx/blob/main/.github/workflows/example-publish-uning-action.yml):
+
+```yaml
+jobs:
+  infer-version:
+    name: Publish the release (if any) with Nyx
+    runs-on: ubuntu-latest
+    steps:
+    - name: Git checkout
+      uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+    // highlight-start
+    - name: Nyx publish
+      id: nyx
+      uses: mooltiverse/nyx@main
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        NYX_VERBOSITY: 'INFO'
+      with:
+        command: 'publish'
+        changelogPath: 'CHANGELOG.md'
+        preset: 'extended'
+        releaseLenient: 'true'
+        stateFile: '.nyx-state.json'
+        summaryFile: '.nyx-summary.txt'
+    // highlight-end
+```
+
+Here the [*verbosity*](../configuration-reference/global-options.mdx#verbosity) is passed as an environment variable (`NYX_VERBOSITY`) just like the `GITHUB_TOKEN` secret, while we also use the [*extended*](../configuration-presets/extended.mdx) [preset](../configuration-presets/index.md) and generate a few other files from Nyx. The `GH_TOKEN` is an arbitrary name and needs to match the one used for the configured [`AUTHENTICATION_TOKEN`](https://mooltiverse.github.io/nyx/docs/user/configuration-reference/services/#github-configuration-options).
+
+In order to avoid hardcoding values, secrets can be fetched from environment variables, like in this configuration snippet from a `.nyx.json` [configuration file](../configuration-reference/global-options.mdx#configuration-file) (to be stored in your Git repository):
+
+```json
+"services":{
+    "github": {
+      "type": "GITHUB",
+      "options": {
+        "AUTHENTICATION_TOKEN": "{{#environmentVariable}}GH_TOKEN{{/environmentVariable}}",
+        "REPOSITORY_NAME": "myrepo",
+        "REPOSITORY_OWNER": "acme"
+      }
+    }
+  },
+```
