@@ -215,7 +215,7 @@ jobs:
     name: Go Build
     needs:
     - initialize
-    if: needs.initialize.outputs.goChanged == 'true' || needs.initialize.outputs.release == 'true'
+    if: needs.initialize.outputs.goChanged == 'true' || needs.initialize.outputs.dockerChanged == 'true' || needs.initialize.outputs.release == 'true'
     uses: mooltiverse/nyx/.github/workflows/go-build.yml@main
     with:
       verbosity: info
