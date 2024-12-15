@@ -1,0 +1,28 @@
+# A simple example, just retrieving the version once Nyx has inferred
+
+name: Example retrieving the repository version using Nyx
+# Run only when manually triggered
+on: workflow_dispatch
+
+jobs:
+  infer-version:
+    name: Infer the repository version with Nyx
+    runs-on: ubuntu-latest
+    steps:
+    - name: Git checkout
+      uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+    - name: Nyx infer
+      id: nyx
+      uses: mooltiverse/nyx@main
+    - name: Print version # This step uses the version inferred by Nyx
+      run: echo the inferred version is ${{ steps.nyx.outputs.version }}
+
+  use-version:
+    name: Print the version
+    runs-on: ubuntu-latest
+    needs: infer-version
+    steps:
+    - name: Print version # This step uses the version inferred by Nyx in another job
+      run: echo the inferred version is ${{ needs.infer-version.outputs.version }}
