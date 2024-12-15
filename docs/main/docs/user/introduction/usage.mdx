@@ -483,6 +483,10 @@ In this example `dumpSomeDiagnostics` represents some arbitrary task that depend
 
 ## Using the GitHub Action
 
+:::tip
+Check out [this section](../quick-start/docker-container.mdx) for a quick introduction on the GitHub Action.
+:::
+
 To use the GitHub Ation just configure it as a job in your workflow, like:
 
 ```yaml
@@ -525,7 +529,7 @@ See below for a full reference.
 | `command` | Selects which [Nyx command](../introduction/how-nyx-works.mdx) to run. Allowed values are: `clean`, `infer` (default), `make`, `mark`, `publish`. When selecting `infer` Nyx will only read the repository and give you back the inferred `version`. `make` will build the changelog, `mark` will apply tags, make commits and push changes to the remote repository. `publish` will publish the release to the configured services |
 | [`bump`](../configuration-reference/global-options.mdx#bump) | Instructs Nyx on which identifier to bump on the past version in order to build the new `version`. This option prevents Nyx to [infer](../introduction/how-nyx-works.mdx#infer) the identifier to bump from the commit history. |
 | [`changelogPath`](../configuration-reference/changelog.mdx#path) | The absolute or relative path to a local file where the changelog is saved when generated. If a file already exists at the given location it is overwritten. Setting this value also enables the changelog creation, which is to say, when this option is not defined no changelog is generated. A common value used for this option is `CHANGELOG.md` |
-| [`changelogTemplate`](../configuration-reference/changelog.mdx##template) | The absolute or relative path to a local file to use as a template instead of the Nyx built-in. The file must contain a valid [Handlebars](https://handlebarsjs.com/) template ([Mustache](https://mustache.github.io/) templates are also supported). Template [functions](../configuration-reference/templates.mdx#functions) can be used in custom templates |
+| [`changelogTemplate`](../configuration-reference/changelog.mdx#template) | The absolute or relative path to a local file to use as a template instead of the Nyx built-in. The file must contain a valid [Handlebars](https://handlebarsjs.com/) template ([Mustache](https://mustache.github.io/) templates are also supported). Template [functions](../configuration-reference/templates.mdx#functions) can be used in custom templates |
 | [`commitMessageConventionsEnabled`](../configuration-reference/commit-message-conventions.mdx#enabled) | The comma separated list of commit message convention names that are enabled for the project. Here you can enable or disable the various conventions, either custom or default. The list of [available conventions](../configuration-reference/commit-message-conventions.mdx) is defined by the configured `preset` or a [configuration file](../introduction/configuration-methods.mdx#evaluation-order) |
 | [`configurationFile`](../configuration-reference/global-options.mdx#configuration-file) | This option allows you to load a configuration file from a location other than default ones. This can be a relative (to the Action's working directory) path to a local file or an URL to load a remote file. This configuration file can override other options, as per the [evaluation order](../introduction/configuration-methods.mdx#evaluation-order), and can be authored as `.yaml` (or `.yml`) or `.json` (the format is inferred by the file extension or JSON is used by default) just like the default configuration files |
 | [`directory`](../configuration-reference/global-options.mdx#directory) | Sets the working directory for Nyx. The directory is where Nyx searches for the Git repository and is also used as the base path when relative paths to local files or directories. By default Nyx uses the Action's working directory for this. Paths defined here must be relative to the Action's working directory |
