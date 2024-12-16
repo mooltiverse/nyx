@@ -90,6 +90,10 @@ description = 'Java binaries'
   This is the configuration for this project and all sub-projects
 ------------------------------------------------------------------------------*/
 allprojects {
+  // All sub projects must belong to the same group as the root project.
+  // This also affects the metadata in published jars, their POMs etc.
+  group = rootProject.group
+
   /*------------------------------------------------------------------------------
     Plugins DSL block
     https://docs.gradle.org/current/userguide/plugins.html#sec:plugins_block
@@ -437,7 +441,7 @@ allprojects.each {prj ->
         pom {
           name = prj.name
           // prj.description fails to evaluate because it's not yet available when publications are defined
-          description = "$prj.group:$prj.name:$rootProject.version $prj.description"
+          description = "$prj.group:$prj.name:$rootProject.version"
           url = projectURL
           licenses {
             license {
