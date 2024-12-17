@@ -91,6 +91,23 @@ public class Suites {
             extensiveTestVersions.add("8.3");
         }
         if (javaVersion <= 19) {
+            // GRADLE MULTI-RELEASE JARS ERROR
+            // Gradle versions < 8.4 have a bug that prevents testing with JVMs
+            // older or equal to 19 when using multi-release Jars (like 
+            // FasterXML Jackson JSON/YAML). The resulting errors look like:
+            //      > [...]
+            //      > Caused by: org.gradle.api.GradleException: Failed to create Jar file /home/runner/work/nyx/nyx/src/java/gradle/build/tmp/functionalTest/work/.gradle-test-kit/caches/jars-9/c8e276d49d9707e627b0335d34e6571f/jackson-core-2.18.1.jar.
+            //      > Caused by: java.io.IOException: Failed to process the entry 'META-INF/versions/21/com/fasterxml/jackson/core/internal/shaded/fdp/v2_18_1/FastDoubleSwar.class' from '/home/runner/.gradle/caches/modules-2/files-2.1/com.fasterxml.jackson.core/jackson-core/2.18.1/9e2284c539e2dedd2aa1487c781e20a0f575d695/jackson-core-2.18.1.jar'
+            //      > Caused by: java.lang.IllegalArgumentException: Unsupported class file major version 65
+            // It also looks there has been a regression on Gradle version 8.11
+            // so the following tests need to be suspended.
+            // 
+            // For more see:
+            // - https://github.com/gradle/gradle/issues/25434
+            // - https://github.com/gradle/gradle/issues/24390
+            // - https://github.com/gradle/gradle/issues/27156
+            // - https://github.com/FasterXML/jackson-core/issues/955
+            /*
             // the latest version is always among the 'quick' tests
             quickTestVersions.add("8.2.1");
             extensiveTestVersions.add("8.2");
@@ -106,6 +123,7 @@ public class Suites {
             extensiveTestVersions.add("7.6.2");
             extensiveTestVersions.add("7.6.1");
             extensiveTestVersions.add("7.6");
+            */
         }
         if (javaVersion <= 18) {
             // Gradle versions between 7.0.x and 7.5.x have a bug that prevents using some jars
@@ -129,12 +147,16 @@ public class Suites {
             */
         }
         if (javaVersion <= 16) {
+            // These tests are suspended due to the 'GRADLE MULTI-RELEASE JARS ERROR'
+            // commented above.
+            /*
             extensiveTestVersions.add("7.2");
             extensiveTestVersions.add("7.1.1");
             extensiveTestVersions.add("7.1");
             extensiveTestVersions.add("7.0.2");
             extensiveTestVersions.add("7.0.1");
             extensiveTestVersions.add("7.0");
+            */
         }
         // Gradle versions between 6.0 and 7.0 (excluded) are not recommended but still supported for backward compatibility,
         // with exceptions as per https://github.com/mooltiverse/nyx/issues/153
@@ -163,11 +185,19 @@ public class Suites {
             extensiveTestVersions.add("6.5.1");
             //extensiveTestVersions.add("6.5"); // - this version has a bug (https://github.com/gradle/gradle/issues/13367) that prevents us to test, fixed in "6.5.1"
             */
+
+            // These tests are suspended due to the 'GRADLE MULTI-RELEASE JARS ERROR'
+            // commented above.
+            /*
             extensiveTestVersions.add("6.4.1");
             extensiveTestVersions.add("6.4");
             extensiveTestVersions.add("6.3");
+            */
         }
         if (javaVersion <= 13) {
+            // These tests are suspended due to the 'GRADLE MULTI-RELEASE JARS ERROR'
+            // commented above.
+            /*
             extensiveTestVersions.add("6.2.2");
             extensiveTestVersions.add("6.2.1");
             extensiveTestVersions.add("6.2");
@@ -175,6 +205,7 @@ public class Suites {
             extensiveTestVersions.add("6.1");
             extensiveTestVersions.add("6.0.1");
             extensiveTestVersions.add("6.0");
+            */
         }
         /* Gradle versions prior than 6.0 fails to test with an exception like:
                 > Could not find method services() for arguments [build_4o3mdmvy94ykemibox706yopu$_run_closure1$_closure2@18c3fdb5] on object of type com.mooltiverse.oss.nyx.gradle.NyxExtension.
