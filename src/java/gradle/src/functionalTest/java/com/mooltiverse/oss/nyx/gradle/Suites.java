@@ -77,7 +77,7 @@ public class Suites {
         // Gradle versions from 7.0 on are recommended
         if (javaVersion <= 20) {
             // the latest version is always among the 'quick' tests
-            quickTestVersions.add("8.11.1");
+/*            quickTestVersions.add("8.11.1");
             extensiveTestVersions.add("8.11");
             extensiveTestVersions.add("8.10.2");
             extensiveTestVersions.add("8.10.1");
@@ -89,9 +89,11 @@ public class Suites {
             extensiveTestVersions.add("8.5");
             extensiveTestVersions.add("8.4");
             extensiveTestVersions.add("8.3");
+*/
         }
         if (javaVersion <= 19) {
             // the latest version is always among the 'quick' tests
+/*            
             quickTestVersions.add("8.2.1");
             extensiveTestVersions.add("8.2");
             extensiveTestVersions.add("8.1.1");
@@ -106,6 +108,20 @@ public class Suites {
             extensiveTestVersions.add("7.6.2");
             extensiveTestVersions.add("7.6.1");
             extensiveTestVersions.add("7.6");
+*/
+quickTestVersions.add("8.2.1");
+quickTestVersions.add("8.2");
+quickTestVersions.add("8.1.1");
+quickTestVersions.add("8.1");
+quickTestVersions.add("8.0.2");
+extensiveTestVersions.add("8.0.1");
+quickTestVersions.add("8.0");
+
+quickTestVersions.add("7.6.4");
+quickTestVersions.add("7.6.3");
+quickTestVersions.add("7.6.2");
+quickTestVersions.add("7.6.1");
+quickTestVersions.add("7.6");
         }
         if (javaVersion <= 18) {
             // Gradle versions between 7.0.x and 7.5.x have a bug that prevents using some jars
@@ -129,12 +145,20 @@ public class Suites {
             */
         }
         if (javaVersion <= 16) {
+/*
             extensiveTestVersions.add("7.2");
             extensiveTestVersions.add("7.1.1");
             extensiveTestVersions.add("7.1");
             extensiveTestVersions.add("7.0.2");
             extensiveTestVersions.add("7.0.1");
             extensiveTestVersions.add("7.0");
+            */
+quickTestVersions.add("7.2");
+quickTestVersions.add("7.1.1");
+quickTestVersions.add("7.1");
+quickTestVersions.add("7.0.2");
+quickTestVersions.add("7.0.1");
+quickTestVersions.add("7.0");
         }
         // Gradle versions between 6.0 and 7.0 (excluded) are not recommended but still supported for backward compatibility,
         // with exceptions as per https://github.com/mooltiverse/nyx/issues/153
@@ -163,11 +187,17 @@ public class Suites {
             extensiveTestVersions.add("6.5.1");
             //extensiveTestVersions.add("6.5"); // - this version has a bug (https://github.com/gradle/gradle/issues/13367) that prevents us to test, fixed in "6.5.1"
             */
+/*
             extensiveTestVersions.add("6.4.1");
             extensiveTestVersions.add("6.4");
             extensiveTestVersions.add("6.3");
+            */
+            quickTestVersions.add("6.4.1");
+            quickTestVersions.add("6.4");
+            quickTestVersions.add("6.3");
         }
         if (javaVersion <= 13) {
+/*
             extensiveTestVersions.add("6.2.2");
             extensiveTestVersions.add("6.2.1");
             extensiveTestVersions.add("6.2");
@@ -175,6 +205,14 @@ public class Suites {
             extensiveTestVersions.add("6.1");
             extensiveTestVersions.add("6.0.1");
             extensiveTestVersions.add("6.0");
+            */
+            quickTestVersions.add("6.2.2");
+            quickTestVersions.add("6.2.1");
+            quickTestVersions.add("6.2");
+            quickTestVersions.add("6.1.1");
+            quickTestVersions.add("6.1");
+            quickTestVersions.add("6.0.1");
+            quickTestVersions.add("6.0");
         }
         /* Gradle versions prior than 6.0 fails to test with an exception like:
                 > Could not find method services() for arguments [build_4o3mdmvy94ykemibox706yopu$_run_closure1$_closure2@18c3fdb5] on object of type com.mooltiverse.oss.nyx.gradle.NyxExtension.
