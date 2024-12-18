@@ -66,7 +66,6 @@ nyx {
         collapseVersions = false
         filterTags = '^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)$'
         gitCommit = 'false'
-        gitCommitMessage = 'Release version {{version}}'
         gitPush = 'true'
         gitPushForce = 'true'
         gitTag = 'true'
