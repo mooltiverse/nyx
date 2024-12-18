@@ -779,6 +779,7 @@ subprojects {
       onlyIf { nyxState.newRelease }
 
       // Task dependencies
+      dependsOn importBinaryDependencies
       dependsOn tasks.named("dockerBuilder${flavorSuffix}")
       // The image will be rebuilt anyway, so we can skip this dependency.
       // Skipping will also save disk space on CI/CD environments.
@@ -786,6 +787,7 @@ subprojects {
 
       // Declare inputs and outputs of this task
       inputs.files(dockerfile)
+      inputs.files(importBinaryDependencies.outputs.files)
       outputs.files(dockerStatePushFile(dockerfile))
 
       doLast {
