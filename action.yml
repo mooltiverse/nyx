@@ -195,7 +195,7 @@ outputs:
 runs:
   using: 'docker'
   # TODO: replace the 'alpha' tag with 'latest' here after testing
-  image: 'docker://mooltiverse/nyx:alpha'
+  image: 'docker://mooltiverse/nyx:3.1.0-alpha.1'
   entrypoint: '/action-entrypoint.sh'
   args:
     - --bump=${{ inputs.bump }}
