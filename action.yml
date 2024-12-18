@@ -194,8 +194,7 @@ outputs:
       or inferred the 'initialVersion' is used
 runs:
   using: 'docker'
-  # TODO: replace the '3.1.0-alpha.1' tag with 'latest' here after testing
-  image: 'docker://mooltiverse/nyx:3.1.0-alpha.1'
+  image: 'docker://mooltiverse/nyx:latest'
   entrypoint: '/action-entrypoint.sh'
   args:
     - --bump=${{ inputs.bump }}
