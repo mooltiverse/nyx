@@ -179,7 +179,7 @@ jobs:
     - test
     - java-build
     - java-test
-    if: needs.initialize.outputs.javaChanged == 'true' || needs.initialize.outputs.release == 'true'
+    if: needs.initialize.outputs.release == 'true'
     uses: mooltiverse/nyx/.github/workflows/java-publish.yml@main
     with:
       verbosity: info
@@ -290,7 +290,7 @@ jobs:
     - test
     - go-build
     - go-test
-    if: needs.initialize.outputs.goChanged == 'true' || needs.initialize.outputs.release == 'true'
+    if: needs.initialize.outputs.release == 'true'
     uses: mooltiverse/nyx/.github/workflows/go-publish.yml@main
     with:
       verbosity: info
@@ -366,7 +366,7 @@ jobs:
     - go-build
     - docker-build
     - docker-test
-    if: needs.initialize.outputs.dockerChanged == 'true' || needs.initialize.outputs.goChanged == 'true' || needs.initialize.outputs.release == 'true'
+    if: needs.initialize.outputs.release == 'true'
     uses: mooltiverse/nyx/.github/workflows/docker-publish.yml@main
     with:
       verbosity: info
@@ -406,7 +406,7 @@ jobs:
     - initialize
     - test
     - docusaurus-build
-    if: needs.initialize.outputs.docusaurusChanged == 'true' || needs.initialize.outputs.release == 'true'
+    if: needs.initialize.outputs.release == 'true'
     uses: mooltiverse/nyx/.github/workflows/docusaurus-publish.yml@main
     with:
       verbosity: info

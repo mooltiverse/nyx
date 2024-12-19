@@ -21,7 +21,8 @@ package com.mooltiverse.oss.nyx.entities;
  */
 public class Substitution {
     /**
-     * The glob expression to select the text files to replace the matched strings into.
+     * The regular path or glob expression to select the text files to replace the
+     * matched strings into.
      */
     private String files;
 
@@ -45,7 +46,8 @@ public class Substitution {
     /**
      * Standard constructor.
      * 
-     * @param files the glob expression to select the text files to replace the matched strings into.
+     * @param files the regular path or glob expression to select the text files to replace the
+     * matched strings into.
      * @param match the regular expression used to match the text to be replaced replace in files.
      * @param replace the template expression defining the text to use when replacing all matched tokens.
      */
@@ -57,7 +59,8 @@ public class Substitution {
     }
 
     /**
-     * Returns the glob expression to select the text files to replace the matched strings into.
+     * Returns the regular path or glob expression to select the text files to replace the
+     * matched strings into.
      * 
      * @return the glob expression to select the text files to replace the matched strings into.
      */
@@ -66,7 +69,8 @@ public class Substitution {
     }
 
     /**
-     * Sets the glob expression to select the text files to replace the matched strings into.
+     * Sets the regular path or glob expression to select the text files to replace the
+     * matched strings into.
      * 
      * @param files glob expression to select the text files to replace the matched strings into.
      */

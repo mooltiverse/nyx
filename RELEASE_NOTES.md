@@ -6,15 +6,19 @@ This release is available at [this link](https://github.com/mooltiverse/nyx/rele
 
 ### Upgrade instructions
 
-There are no actions to take for backward compatibility.
+To replace the former [GitHub Action](https://github.com/mooltiverse/nyx-github-action) with the new one replace all occurrences of `mooltiverse/nyx-github-action` in your GitHub workflows with `mooltiverse/nyx`.
+
+The new action is a drop-in replacement and does not require any other change on existing workflows.
 
 ### New features and improvements
 
 This release:
 
+* brings the former [GitHub Action](https://github.com/mooltiverse/nyx-github-action) into the main Nyx project [324](https://github.com/mooltiverse/nyx/issues/324)
 * adds support for Gradle `8.10.2`, `8.11`, `8.11.1`
 * upgraded all libraries
 * replaced the former and deprecated `github.com/xanzy/go-gitlab` Go library with `gitlab.com/gitlab-org/api/client-go`
+* fixes the [338](https://github.com/mooltiverse/nyx/issues/338) bug and allows paths other than globs to specify files to apply substitutions to
 * fixes the [339](https://github.com/mooltiverse/nyx/issues/339) bug which was too restrictive on the commit scope field in Conventional Commits messages
 * fixes the [311](https://github.com/mooltiverse/nyx/issues/311) documentation bug
 
