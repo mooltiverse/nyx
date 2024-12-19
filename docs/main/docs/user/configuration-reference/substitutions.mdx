@@ -14,7 +14,7 @@ Substitutions are used to replace arbitrary text tokens in any text file with st
 
 Substitutions are configured with rules where each rule:
 
-* defines the file paths where replacements must occur; file paths are defined as [globs](https://en.wikipedia.org/wiki/Glob_(programming)) so you can match multiple files with a single rule
+* defines the file paths where replacements must occur; file paths are defined as regular paths or [globs](https://en.wikipedia.org/wiki/Glob_(programming)) so you can match multiple files with a single rule
 * defines the token to be replaced using [regular expressions](https://en.wikipedia.org/wiki/Regular_expression) to give you complete freedom on the selection, which may include dynamic values
 * defines the content to use when replacing the content as a static string or a [template](templates.mdx) so you can use static contents or any dynamic attribute from the internal [State](../state-reference/index.md)
 
@@ -90,7 +90,7 @@ When using multiple [configuration methods](../introduction/configuration-method
 | Configuration File Option | `substitutions/items/<NAME>/files`                                                       |
 | Related state attributes  |                                                                                          |
 
-The `files` is a glob that matches zero, one or multiple files to evaluate for substitutions. When relative paths are used they are interpreted as relative to the current working directory.
+The `files` is a regular file path or glob that matches zero, one or multiple files to evaluate for substitutions. When relative paths are used they are interpreted as relative to the current working directory.
 
 ### Match
 

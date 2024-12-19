@@ -21,7 +21,7 @@ Nyx is the *all in one* tool that gives you integrated support for:
 * *conventional* specifications and best practices like [Conventional Commits](https://www.conventionalcommits.org/), [Keep a Changelog](https://keepachangelog.com/)
 * build tools like [Gradle](https://gradle.org/)
 * Git hosting services like [GitHub](https://github.com/) and [GitLab](https://gitlab.com/) and their extra features like [GitHub Releases](https://docs.github.com/en/github/administering-a-repository/about-releases) and [GitLab Releases](https://docs.gitlab.com/ee/user/project/releases/)
-* CI/CD platforms like [GitHub Actions](https://github.com/mooltiverse/nyx-github-action) and [GitLab CI](https://docs.gitlab.com/ee/ci/)
+* CI/CD platforms like [GitHub Actions](https://github.com/features/actions) and [GitLab CI](https://docs.gitlab.com/ee/ci/)
 * custom or standard workflows (a.k.a. *branching models*) like [GitFlow](https://nvie.com/posts/a-successful-git-branching-model/), [GitHub Flow](https://help.github.com/en/github/collaborating-with-issues-and-pull-requests/github-flow), [GitLab Flow](https://docs.gitlab.com/ee/topics/gitlab_flow.html), [OneFlow](https://www.endoflineblog.com/oneflow-a-git-branching-model-and-workflow)
 * changelog generation
 * any (combination of) configuration means like command line arguments, local or remote files, environment variables and build tools extensions
@@ -66,6 +66,31 @@ From here:
 * try your configuration using the `--dry-run` mode
 * embed Nyx into your build scripts and automation environments
 
+## GitHub Action
+
+### Usage
+
+Use the [GitHub Action](./action.yml) as follows in your workflows (note the `fetch-depth: 0` input to the `actions/checkout` Action):
+
+```yaml
+jobs:
+  infer-version:
+    name: Infer the repository version with Nyx
+    runs-on: ubuntu-latest
+    steps:
+    - name: Git checkout
+      uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+    - name: Nyx infer
+      id: nyx
+      uses: mooltiverse/nyx@main
+    - name: Print version # This step uses the version inferred by Nyx
+      run: echo the inferred version is ${{ steps.nyx.outputs.version }}
+```
+
+Check out [this guide](https://mooltiverse.github.io/nyx/docs/user/quick-start/github-action) to get started quickly, and [this guide](https://mooltiverse.github.io/nyx/docs/user/introduction/usage#using-the-github-action) for a complete reference.
+
 ## Downloads and availability
 
 ### Binaries
@@ -80,7 +105,7 @@ Available for all platforms in the [latest release](https://github.com/mooltiver
 ### Build tools plugin
 
 * [Gradle plug-in](https://plugins.gradle.org/plugin/com.mooltiverse.oss.nyx)
-* [GitHub Action](https://github.com/mooltiverse/nyx-github-action)
+* [GitHub Action](#github-action)
 
 ### Libraries
 

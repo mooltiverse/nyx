@@ -1718,6 +1718,77 @@ func TestMakeRunWithSubstitutionsUsingTextVersionPreset(t *testing.T) {
 	log.SetLevel(logLevel) // restore the original logging level
 }
 
+func TestMakeRunWithSubstitutionsUsingRegularFile(t *testing.T) {
+	logLevel := log.GetLevel()   // save the previous logging level
+	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
+	for _, command := range cmdtpl.CommandInvocationProxies(cmd.MAKE, gittools.INITIAL_COMMIT()) {
+		t.Run((*command).GetContextName(), func(t *testing.T) {
+			// first create the temporary directory and a subdirectory
+			destinationDir := (*command).Script().GetWorkingDirectory()
+			destinationSubDir := filepath.Join(destinationDir, "sub")
+			err := os.MkdirAll(destinationSubDir, os.ModePerm)
+			assert.NoError(t, err)
+			defer os.RemoveAll(destinationSubDir)
+			defer os.RemoveAll(destinationDir)
+
+			configurationLayerMock := cnf.NewSimpleConfigurationLayer()
+			substitutions, err := ent.NewSubstitutionsWith(
+				&[]*string{utl.PointerToString("custom_version_in_destination_dir"), utl.PointerToString("custom_version_in_destination_subdir")},
+				&map[string]*ent.Substitution{
+					"custom_version_in_destination_dir":    ent.NewSubstitutionWith(utl.PointerToString("regular.txt"), utl.PointerToString("(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?"), utl.PointerToString("{{version}}")),
+					"custom_version_in_destination_subdir": ent.NewSubstitutionWith(utl.PointerToString("sub/regular_sub.txt"), utl.PointerToString("(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?"), utl.PointerToString("{{version}}")),
+				},
+			)
+			assert.NoError(t, err)
+			configurationLayerMock.SetSubstitutions(substitutions)
+			var configurationLayer cnf.ConfigurationLayer
+			configurationLayer = configurationLayerMock
+			(*command).State().GetConfiguration().WithRuntimeConfiguration(&configurationLayer)
+
+			regularFileInRootDirectory := filepath.Join(destinationDir, "regular.txt")
+			regularFileInSubDirectory := filepath.Join(destinationSubDir, "regular_sub.txt")
+			otherFileInRootDirectory := filepath.Join(destinationDir, "other.txt")
+			otherFileInSubDirectory := filepath.Join(destinationSubDir, "other.txt")
+			//files := []string{regularFileInRootDirectory, regularFileInSubDirectory, otherFileInRootDirectory, otherFileInSubDirectory}
+
+			writeFile(regularFileInRootDirectory, "91.92.93")
+			writeFile(regularFileInSubDirectory, "91.92.93")
+
+			writeFile(otherFileInRootDirectory, "Some text file not to be touched by the command")
+			writeFile(otherFileInSubDirectory, "Some text file not to be touched by the command")
+
+			_, err = (*command).Run()
+			assert.NoError(t, err)
+
+			// when the command is executed standalone, Infer is not executed so run() will just do nothing as the release scope is undefined
+			if (*command).GetContextName() != cmdtpl.STANDALONE_CONTEXT_NAME {
+				// print the files to standard output for inspection purpose
+				//for _, f := range files {
+				//	fmt.Printf("--------------------- " + f + " ---------------------\n")
+				//	fmt.Printf(readFile(f))
+				//	fmt.Println()
+				//	fmt.Printf("-----------------------------------------\n")
+				//}
+
+				// test the rendered files
+				fileContent := readFile(regularFileInRootDirectory)
+				assert.Equal(t, "0.1.0", fileContent)
+
+				fileContent = readFile(regularFileInSubDirectory)
+				assert.Equal(t, "0.1.0", fileContent)
+
+				fileContent = readFile(otherFileInRootDirectory)
+				assert.Equal(t, "Some text file not to be touched by the command", fileContent)
+
+				fileContent = readFile(otherFileInSubDirectory)
+				assert.Equal(t, "Some text file not to be touched by the command", fileContent)
+			}
+
+		})
+	}
+	log.SetLevel(logLevel) // restore the original logging level
+}
+
 func TestMakeRunWithConventionalCommitsForMergeConventionAndWithoutSections(t *testing.T) {
 	logLevel := log.GetLevel()   // save the previous logging level
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests

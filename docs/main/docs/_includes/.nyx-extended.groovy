@@ -14,11 +14,11 @@ nyx {
     enabled = [ 'conventionalCommits' ]
     items {
       conventionalCommits {
-        expression = '(?m)^(?<type>[a-zA-Z0-9_]+)(\\\\((?<scope>[a-z ]+)\\\\))?(!)?:( (?<title>.+))$(?s).*'
+        expression = '(?m)^(?<type>[a-zA-Z0-9_]+)(\\((?<scope>[a-zA-Z0-9 \\-_]+)\\))?(!)?:( (?<title>.+))$(?s).*'
         bumpExpressions {
-          major = '(?s)(?m)^[a-zA-Z0-9_]+(\\([a-z ]+\\))?(!: .*|.*^(BREAKING( |-)CHANGE: )).*'
-          minor = '(?s)(?m)^feat(!{0})(\\\\([a-z ]+\\\\))?: (?!.*^(BREAKING( |-)CHANGE: )).*'
-          patch = '(?s)(?m)^fix(!{0})(\\\\([a-z ]+\\\\))?: (?!.*^(BREAKING( |-)CHANGE: )).*'
+          major = '(?s)(?m)^[a-zA-Z0-9_]+(\\([a-zA-Z0-9 \\-_]+\\))?(!: .*|.*^(BREAKING( |-)CHANGE: )).*'
+          minor = '(?s)(?m)^feat(!{0})(\\([a-zA-Z0-9 \\-_]+\\))?: (?!.*^(BREAKING( |-)CHANGE: )).*'
+          patch = '(?s)(?m)^fix(!{0})(\\([a-zA-Z0-9 \\-_]+\\))?: (?!.*^(BREAKING( |-)CHANGE: )).*'
         }
       }
     }
@@ -66,7 +66,6 @@ nyx {
         collapseVersions = false
         filterTags = '^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)$'
         gitCommit = 'false'
-        gitCommitMessage = 'Release version {{version}}'
         gitPush = 'true'
         gitPushForce = 'true'
         gitTag = 'true'

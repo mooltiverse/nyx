@@ -25,8 +25,8 @@ import (
 	"os"      // https://pkg.go.dev/os
 	"strings" // https://pkg.go.dev/strings
 
-	log "github.com/sirupsen/logrus" // https://github.com/Sirupsen/logrus, https://pkg.go.dev/github.com/sirupsen/logrus
-	gl "github.com/xanzy/go-gitlab"  // https://pkg.go.dev/github.com/xanzy/go-gitlab
+	log "github.com/sirupsen/logrus"         // https://github.com/Sirupsen/logrus, https://pkg.go.dev/github.com/sirupsen/logrus
+	gl "gitlab.com/gitlab-org/api/client-go" // https://pkg.go.dev/gitlab.com/gitlab-org/api/client-go
 
 	errs "github.com/mooltiverse/nyx/src/go/errors"
 	ent "github.com/mooltiverse/nyx/src/go/nyx/entities"
@@ -333,7 +333,7 @@ func (s GitLab) DeleteGitRepository(name string) error {
 	if err != nil {
 		return err
 	}
-	_, err = s.client.Projects.DeleteProject(user.GetUserName() + "/" + name)
+	_, err = s.client.Projects.DeleteProject(user.GetUserName()+"/"+name, nil, nil)
 	if err != nil {
 		log.Debugf("an error occurred while deleting the GitLab repository '%s': %v", name, err)
 		return errs.TransportError{Message: fmt.Sprintf("could not delete the GitLab repository '%s'", name), Cause: err}

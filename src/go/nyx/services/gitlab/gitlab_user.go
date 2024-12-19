@@ -19,7 +19,7 @@ package gitlab
 import (
 	"strconv" // https://pkg.go.dev/strconv
 
-	gl "github.com/xanzy/go-gitlab" // https://pkg.go.dev/github.com/xanzy/go-gitlab
+	gl "gitlab.com/gitlab-org/api/client-go" // https://pkg.go.dev/gitlab.com/gitlab-org/api/client-go
 )
 
 /*

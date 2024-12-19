@@ -17,7 +17,7 @@
 package gitlab
 
 import (
-	gl "github.com/xanzy/go-gitlab" // https://pkg.go.dev/github.com/xanzy/go-gitlab
+	gl "gitlab.com/gitlab-org/api/client-go" // https://pkg.go.dev/gitlab.com/gitlab-org/api/client-go
 
 	ent "github.com/mooltiverse/nyx/src/go/nyx/entities"
 )

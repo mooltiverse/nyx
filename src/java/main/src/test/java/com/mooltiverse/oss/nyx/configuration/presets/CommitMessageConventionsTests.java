@@ -55,6 +55,7 @@ public class CommitMessageConventionsTests {
             arguments("feat(lang): add polish language", "feat", "lang", "add polish language", "minor"),
             arguments("fix: correct minor typos in code\n\nsee the issue for details\n\non typos fixed.\n\nReviewed-by: Z\nRefs #133", "fix", null, "correct minor typos in code", "patch"),
             arguments("feat(shopping cart): add the amazing button", "feat", "shopping cart", "add the amazing button", "minor"),
+            arguments("feat(shopping cart-with_dash_and_underscore): add the amazing button", "feat", "shopping cart-with_dash_and_underscore", "add the amazing button", "minor"),
             arguments("feat: remove ticket list endpoint\n\nrefers to JIRA-1337\nBREAKING CHANGES: ticket enpoints no longer supports list all entites.", "feat", null, "remove ticket list endpoint", "minor"),
             arguments("fix: add missing parameter to service call\n\nThe error occurred because of <reasons>.", "fix", null, "add missing parameter to service call", "patch"),
             arguments("build: update dependencies", "build", null, "update dependencies", null)
@@ -101,6 +102,7 @@ public class CommitMessageConventionsTests {
                 arguments("Anything\n\nfeat(lang): add polish language", "feat", "lang", "add polish language", "minor"),
                 arguments("Anything\n\nfix: correct minor typos in code\n\nsee the issue for details\n\non typos fixed.\n\nReviewed-by: Z\nRefs #133", "fix", null, "correct minor typos in code", "patch"),
                 arguments("Anything\n\nfeat(shopping cart): add the amazing button", "feat", "shopping cart", "add the amazing button", "minor"),
+                //arguments("Anything\n\nfeat(shopping cart-with_dash_and_underscore): add the amazing button", "feat", "shopping cart-with_dash_and_underscore", "add the amazing button", "minor"),
                 arguments("Anything\n\nfeat: remove ticket list endpoint\n\nrefers to JIRA-1337\nBREAKING CHANGES: ticket enpoints no longer supports list all entites.", "feat", null, "remove ticket list endpoint", "minor"),
                 arguments("Anything\n\nfix: add missing parameter to service call\n\nThe error occurred because of <reasons>.", "fix", null, "add missing parameter to service call", "patch"),
                 arguments("Anything\n\nbuild: update dependencies", "build", null, "update dependencies", null)

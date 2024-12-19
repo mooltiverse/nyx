@@ -779,6 +779,7 @@ subprojects {
       onlyIf { nyxState.newRelease }
 
       // Task dependencies
+      dependsOn importBinaryDependencies
       dependsOn tasks.named("dockerBuilder${flavorSuffix}")
       // The image will be rebuilt anyway, so we can skip this dependency.
       // Skipping will also save disk space on CI/CD environments.
@@ -786,6 +787,7 @@ subprojects {
 
       // Declare inputs and outputs of this task
       inputs.files(dockerfile)
+      inputs.files(importBinaryDependencies.outputs.files)
       outputs.files(dockerStatePushFile(dockerfile))
 
       doLast {
@@ -1328,14 +1330,17 @@ task deepClean(group: 'build', description: 'Clean the reproducible and reusable
   doLast {
     logger.quiet("Pruning the Docker build cache")
     exec {
+      ignoreExitValue true
       commandLine 'docker', 'buildx', 'prune', '--all', '--force'
     }
     logger.info("Pruning unused Docker images")
     exec {
+      ignoreExitValue true
       commandLine 'docker', 'image', 'prune', '--all', '--force'
     }
     logger.info("Pruning unused Docker BuildKit builders")
     exec {
+      ignoreExitValue true
       commandLine 'docker', 'buildx', 'rm', '--all-inactive'
     }
   }
