@@ -26,11 +26,11 @@ public class CommitMessageConventions {
      */
     public static final CommitMessageConvention CONVENTIONAL_COMMITS = new CommitMessageConvention() {
         {
-            setExpression("(?m)^(?<type>[a-zA-Z0-9_]+)(\\((?<scope>[a-z ]+)\\))?(!)?:( (?<title>.+))$(?s).*");
+            setExpression("(?m)^(?<type>[a-zA-Z0-9_]+)(\\((?<scope>[a-zA-Z0-9 \\-_]+)\\))?(!)?:( (?<title>.+))$(?s).*");
 
-            getBumpExpressions().put("major", "(?s)(?m)^[a-zA-Z0-9_]+(\\([a-z ]+\\))?(!: .*|.*^(BREAKING( |-)CHANGE: )).*");
-            getBumpExpressions().put("minor", "(?s)(?m)^feat(!{0})(\\([a-z ]+\\))?: (?!.*^(BREAKING( |-)CHANGE: )).*");
-            getBumpExpressions().put("patch", "(?s)(?m)^fix(!{0})(\\([a-z ]+\\))?: (?!.*^(BREAKING( |-)CHANGE: )).*");
+            getBumpExpressions().put("major", "(?s)(?m)^[a-zA-Z0-9_]+(\\([a-zA-Z0-9 \\-_]+\\))?(!: .*|.*^(BREAKING( |-)CHANGE: )).*");
+            getBumpExpressions().put("minor", "(?s)(?m)^feat(!{0})(\\([a-zA-Z0-9 \\-_]+\\))?: (?!.*^(BREAKING( |-)CHANGE: )).*");
+            getBumpExpressions().put("patch", "(?s)(?m)^fix(!{0})(\\([a-zA-Z0-9 \\-_]+\\))?: (?!.*^(BREAKING( |-)CHANGE: )).*");
         }
     };
 
@@ -44,11 +44,11 @@ public class CommitMessageConventions {
      */
     public static final CommitMessageConvention CONVENTIONAL_COMMITS_FOR_MERGE = new CommitMessageConvention() {
         {
-            setExpression("(?<type>[a-zA-Z0-9_]+)(!)?(\\((?<scope>[a-z ]+)\\))?:( (?<title>.+))");
+            setExpression("(?<type>[a-zA-Z0-9_]+)(!)?(\\((?<scope>[a-zA-Z0-9 \\-_]+)\\))?:( (?<title>.+))");
 
             getBumpExpressions().put("major", "(?s)(?m)[a-zA-Z0-9_]+(!: .*|.*^(BREAKING( |-)CHANGE: )).*");
-            getBumpExpressions().put("minor", "(?s)(?m)feat(!{0})(\\([a-z ]+\\))?: (?!.*^(BREAKING( |-)CHANGE: )).*");
-            getBumpExpressions().put("patch", "(?s)(?m)fix(!{0})(\\([a-z ]+\\))?: (?!.*^(BREAKING( |-)CHANGE: )).*");
+            getBumpExpressions().put("minor", "(?s)(?m)feat(!{0})(\\([a-zA-Z0-9 \\-_]+\\))?: (?!.*^(BREAKING( |-)CHANGE: )).*");
+            getBumpExpressions().put("patch", "(?s)(?m)fix(!{0})(\\([a-zA-Z0-9 \\-_]+\\))?: (?!.*^(BREAKING( |-)CHANGE: )).*");
         }
     };
 

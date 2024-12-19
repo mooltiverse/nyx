@@ -1676,6 +1676,108 @@ public class MakeTestTemplates {
         }
 
         @TestTemplate
+        @DisplayName("Make.run() with substitutions using a regular file")
+        @Baseline(Scenario.INITIAL_COMMIT)
+        void runTestWithSubstitutionsUsingRegularFile(@CommandSelector(Commands.MAKE) CommandProxy command, Script script)
+            throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
+            // first create the temporary directory and a subdirectory
+            File destinationDir = script.getWorkingDirectory();
+            //Files.createTempDirectory("nyx-test-make-test-").toFile();
+            File destinationSubDir = new File(destinationDir, "sub");
+            destinationSubDir.mkdirs();
+            destinationSubDir.deleteOnExit();
+            destinationDir.deleteOnExit();
+
+            SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
+            configurationLayerMock.setSubstitutions(
+                new Substitutions(
+                    List.<String>of("custom_version_in_destination_dir", "custom_version_in_destination_subdir"),
+                    Map.<String,Substitution>of(
+                        "custom_version_in_destination_dir", new Substitution() {
+                            {
+                                // Capture all version.txt files in the project directory in any folder
+                                setFiles("regular.txt");
+                                // Capture anything to replace the whole content
+                                setMatch("(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?");
+                                // Replace with the current version
+                                setReplace("{{version}}");
+                            }
+                        },
+                        "custom_version_in_destination_subdir", new Substitution() {
+                            {
+                                // Capture all version.txt files in the project directory in any folder
+                                setFiles("sub/regular_sub.txt");
+                                // Capture anything to replace the whole content
+                                setMatch("(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?");
+                                // Replace with the current version
+                                setReplace("{{version}}");
+                            }
+                        }
+                    )
+                )
+            );
+            command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
+
+            File regularFileInRootDirectory = new File(destinationDir, "regular.txt");
+            File regularFileInSubDirectory = new File(destinationSubDir, "regular_sub.txt");
+            File otherFileInRootDirectory = new File(destinationDir, "other.txt");
+            File otherFileInSubDirectory = new File(destinationSubDir, "other.txt");
+            List<File> files = List.<File>of(
+                regularFileInRootDirectory,
+                regularFileInSubDirectory,
+                otherFileInRootDirectory,
+                otherFileInSubDirectory
+            );
+
+            FileWriter writer = new FileWriter(regularFileInRootDirectory);
+            writer.write("91.92.93");
+            writer.flush();
+            writer.close();
+
+            writer = new FileWriter(regularFileInSubDirectory);
+            writer.write("91.92.93");
+            writer.flush();
+            writer.close();
+
+            writer = new FileWriter(otherFileInRootDirectory);
+            writer.write("Some text file not to be touched by the command");
+            writer.flush();
+            writer.close();
+
+            writer = new FileWriter(otherFileInSubDirectory);
+            writer.write("Some text file not to be touched by the command");
+            writer.flush();
+            writer.close();
+
+            command.run();
+
+            // when the command is executed standalone, Infer is not executed so run() will just do nothing as the release scope is undefined
+            if (!command.getContextName().equals(StandaloneCommandProxy.CONTEXT_NAME)) {
+                // print the files to standard output for inspection purpose
+                for (File f: files) {
+                    System.out.println("--------------------- "+f.getAbsolutePath()+" ---------------------");
+                    System.out.println(readFile(f));
+                    System.out.println("-----------------------------------------");
+                    System.out.flush();
+                }
+
+                // test the rendered files
+                String fileContent = readFile(regularFileInRootDirectory);
+                assertEquals("0.1.0", fileContent);
+
+                fileContent = readFile(regularFileInSubDirectory);
+                assertEquals("0.1.0", fileContent);
+
+                fileContent = readFile(otherFileInRootDirectory);
+                assertEquals("Some text file not to be touched by the command", fileContent);
+
+                fileContent = readFile(otherFileInSubDirectory);
+                assertEquals("Some text file not to be touched by the command", fileContent);
+            }
+        }
+
+        @TestTemplate
         @DisplayName("Make.run() with conventional commit for merge message convention and without sections > yield to changelog where sections are commit types")
         @Baseline(Scenario.ONE_BRANCH_SHORT_CONVENTIONAL_COMMITS_FOR_MERGE)
         void runTestWithConventionalCommitsForMergeConventionAndWithoutSections(@CommandSelector(Commands.MAKE) CommandProxy command, Script script)

@@ -483,6 +483,203 @@ In this example `dumpSomeDiagnostics` represents some arbitrary task that depend
 
 ## Using the GitHub Action
 
-When using GitHub Actions, the [Nyx Action](https://mooltiverse.github.io/nyx-github-action) is the easiest and most effective way of using Nyx.
+:::tip
+Check out [this section](../quick-start/docker-container.mdx) for a quick introduction on the GitHub Action.
+:::
 
-Please refer to the [action page](https://mooltiverse.github.io/nyx-github-action) for instructions.
+To use the GitHub Ation just configure it as a job in your workflow, like:
+
+```yaml
+jobs:
+  infer-version:
+    name: Infer the repository version with Nyx
+    runs-on: ubuntu-latest
+    steps:
+    - name: Git checkout
+      uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+    // highlight-start
+    - name: Nyx infer
+      id: nyx
+      uses: mooltiverse/nyx@main
+    // highlight-end
+    - name: Print version # This step uses the version inferred by Nyx
+      run: echo the inferred version is ${{ steps.nyx.outputs.version }}
+```
+
+Nyx supports a [variety of configuration means](../introduction/configuration-methods.mdx), including configuration files, command line arguments and environment variables. All configurable options are accessible via any of the supported configuration methods. The [configuration reference](../configuration-reference/index.md) gives you full details on each option.
+
+Using the GitHub Action you can use:
+
+* [configuration files](../introduction/configuration-methods.mdx#supported-file-grammars) (using JSON or YAML grammars, putting them in their default paths or using custom ones)
+* [environment variables](../introduction/configuration-methods.mdx#environment-variables), which is the suggested way for passing [secrets](https://docs.github.com/en/actions/security-guides/encrypted-secrets), using the [`env`](https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#jobsjob_idstepsenv) block in [workflow files](https://docs.github.com/en/actions/using-workflows/about-workflows) (i.e. passing the [`GITHUB_TOKEN`](../configuration-reference/services.mdx#github-configuration-options))
+* action inputs, using the [`with`](https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#jobsjob_idstepswith) block in [workflow files](https://docs.github.com/en/actions/using-workflows/about-workflows)
+
+:::info
+When using the GitHub Action, action inputs replace [command line options](../introduction/configuration-methods.mdx#command-line-options), which are not available with Actions. Action inputs are a subset of all the available command line arguments and this is due to Actions not supporting options with dynamic names. Nonetheless they give you a handy way to set the most common settings. For all those arguments not available as inputs you can still use configuration files or environment variables. Action inputs will be passed to Nyx as [command line arguments](../introduction/configuration-methods.mdx#command-line-options) under the hood so they have priority over all other configuration means.
+:::
+
+See below for a full reference.
+
+### Inputs
+
+| Name                                                      | Notes |
+| --------------------------------------------------------- | ----- |
+| `command` | Selects which [Nyx command](../introduction/how-nyx-works.mdx) to run. Allowed values are: `clean`, `infer` (default), `make`, `mark`, `publish`. When selecting `infer` Nyx will only read the repository and give you back the inferred `version`. `make` will build the changelog, `mark` will apply tags, make commits and push changes to the remote repository. `publish` will publish the release to the configured services |
+| [`bump`](../configuration-reference/global-options.mdx#bump) | Instructs Nyx on which identifier to bump on the past version in order to build the new `version`. This option prevents Nyx to [infer](../introduction/how-nyx-works.mdx#infer) the identifier to bump from the commit history. |
+| [`changelogPath`](../configuration-reference/changelog.mdx#path) | The absolute or relative path to a local file where the changelog is saved when generated. If a file already exists at the given location it is overwritten. Setting this value also enables the changelog creation, which is to say, when this option is not defined no changelog is generated. A common value used for this option is `CHANGELOG.md` |
+| [`changelogTemplate`](../configuration-reference/changelog.mdx#template) | The absolute or relative path to a local file to use as a template instead of the Nyx built-in. The file must contain a valid [Handlebars](https://handlebarsjs.com/) template ([Mustache](https://mustache.github.io/) templates are also supported). Template [functions](../configuration-reference/templates.mdx#functions) can be used in custom templates |
+| [`commitMessageConventionsEnabled`](../configuration-reference/commit-message-conventions.mdx#enabled) | The comma separated list of commit message convention names that are enabled for the project. Here you can enable or disable the various conventions, either custom or default. The list of [available conventions](../configuration-reference/commit-message-conventions.mdx) is defined by the configured `preset` or a [configuration file](../introduction/configuration-methods.mdx#evaluation-order) |
+| [`configurationFile`](../configuration-reference/global-options.mdx#configuration-file) | This option allows you to load a configuration file from a location other than default ones. This can be a relative (to the Action's working directory) path to a local file or an URL to load a remote file. This configuration file can override other options, as per the [evaluation order](../introduction/configuration-methods.mdx#evaluation-order), and can be authored as `.yaml` (or `.yml`) or `.json` (the format is inferred by the file extension or JSON is used by default) just like the default configuration files |
+| [`directory`](../configuration-reference/global-options.mdx#directory) | Sets the working directory for Nyx. The directory is where Nyx searches for the Git repository and is also used as the base path when relative paths to local files or directories. By default Nyx uses the Action's working directory for this. Paths defined here must be relative to the Action's working directory |
+| [`dryRun`](../configuration-reference/global-options.mdx#dry-run) | When this flag is set to `true` no action altering the repository state, either local or remote, is taken. Instead the actions that would be taken if this flag was not set are printed to the log |
+| [`initialVersion`](../configuration-reference/global-options.mdx#initial-version) | The default version to use when no previous version can be [inferred](../introduction/how-nyx-works.mdx#infer) from the commit history (i.e. when the repository has no tagged releases yet) |
+| [`preset`](../configuration-reference/global-options.mdx#preset) | This option allows you to import one [preset configuration](../configuration-presets/index.md) into your configuration to save configuration time and effort |
+| [`releaseLenient`](../configuration-reference/global-options.mdx#release-lenient) | When this option is enabled (it is by default), Nyx will attempt to tolerate prefixes and other unnecessary characters (like leading zeroes) when **reading** Git tags from the commit history. When `true`, tags like `vx.y.x`, `relx.y.x` etc will be detected as release tags (for version `x.y.x`), regardless of the prefix Nyx uses to generate release names |
+| [`releasePrefix`](../configuration-reference/global-options.mdx#release-prefix) | It’s a common practice to add a leading string to version numbers to give releases a name. Common prefixes are v or rel but you might use anything, or no prefix at all |
+| [`releaseTypesEnabled`](../configuration-reference/release-types.mdx#enabled) | The comma separated list of release types that are enabled for the project. Here you can enable or disable the various release types, either custom or default. The list of [available release types](../configuration-reference/release-types.mdx) is defined by the configured `preset` or a [configuration file](../introduction/configuration-methods.mdx#evaluation-order) |
+| [`releaseTypesPublicationServices`](../configuration-reference/release-types.mdx#publication-services) | The comma separated list of service configuration names to be used to publish releases when the matched release type has the [`publish`](../configuration-reference/release-types.mdx#publish) flag enabled. The list of [available services](../configuration-reference/services.mdx) is defined by the configured `preset` or a [configuration file](../introduction/configuration-methods.mdx#evaluation-order) |
+| [`releaseTypesRemoteRepositories`](../configuration-reference/release-types.mdx#remote-repositories) | The comma separated list of remote repository names to be used to push changes to when the matched release type has the [`gitPush`](../configuration-reference/release-types.mdx#git-push) flag enabled. The list of [available remote repositories](../configuration-reference/git.mdx#remotes) is defined by the configured `preset` or a [configuration file](../introduction/configuration-methods.mdx#evaluation-order) |
+| [`resume`](../configuration-reference/global-options.mdx#resume) | When this flag is set to `true` Nyx tries to load an existing [state file](../configuration-reference/global-options.mdx#state-file) and resume operations from where it left when the state file was saved |
+| [`scheme`](../configuration-reference/global-options.mdx#scheme) | Selects the [version scheme](../introduction/version-schemes.mdx) to use. Defaults to [SEMVER](../introduction/version-schemes.mdx#semantic-versioning-semver) |
+| [`sharedConfigurationFile`](../configuration-reference/global-options.mdx#shared-configuration-file) | This option allows you to load a shared configuration file from a location other than [default ones](../introduction/configuration-methods.mdx#evaluation-order) |
+| [`stateFile`](../configuration-reference/global-options.mdx#state-file) | Enables the creation of the [state file](../state-reference/index.md) where Nyx stores its findings and generated values |
+| [`summaryFile`](../configuration-reference/global-options.mdx#summary-file) | Enables the creation of the summary file where Nyx saves a subset of relevant information from the internal state as name value pairs, easy to parse |
+| [`verbosity`](../configuration-reference/global-options.mdx#verbosity) | Controls the amount of output emitted by Nyx, where values are: `FATAL`, `ERROR`, `WARNING`, `INFO`, `DEBUG`, `TRACE` |
+| [`version`](../configuration-reference/global-options.mdx#version) | Overrides the version and prevents Nyx to [infer](../introduction/how-nyx-works.mdx#infer). When overriding this value you take over the tool and go the manual versioning way so Nyx won’t try to read past versions from the commit history nor determine which identifiers to bump |
+
+### Outputs
+
+| Name                                                      | Notes |
+| --------------------------------------------------------- | ----- |
+| [`branch`](../state-reference/global-attributes.mdx) | This string contains the current Git branch name |
+| [`bump`](../state-reference/global-attributes.mdx#bump) | This string contains the name of the identifier that has been bumped to create the new `version`. Version identifiers depend on the selected version `scheme` |
+| [`coreVersion`](../state-reference/global-attributes.mdx#core-version) | This value is `true` when the `version` only uses *core* identifiers (i.e. is not a pre-release) according to the `scheme` |
+| [`latestVersion`](../state-reference/global-attributes.mdx#latest-version) | This value is `true` when the `version` is the latest in the repository, meaning that, according to the `scheme`, there are no other tags in the Git repository representing any version greater than `version` |
+| [`newRelease`](../state-reference/global-attributes.mdx#new-release) | This value is `true` when the `newVersion` is `true` and a new release with the current `version` has to be [issued](../configuration-reference/release-types.mdx#publish) |
+| [`newVersion`](../state-reference/global-attributes.mdx#new-version) | This value is `true` when the `version` is new and is basically a shorthand to testing if `version` is different than the `previousVersion` |
+| [`scheme`](../state-reference/global-attributes.mdx#scheme) | The configured [version `scheme`](../introduction/version-schemes.mdx) |
+| [`timestamp`](../state-reference/global-attributes.mdx#timestamp) | The timestamp in the Unix format (seconds since Jan 01 1970. (UTC). Example: `1591802533` |
+| [`previousVersion`](../state-reference/release-scope.mdx#previous-version) | The version that was released before the one being created |
+| [`primeVersion`](../state-reference/release-scope.mdx#prime-version) | The version that is used as the baseline when bumping version numbers when the release type uses [collapsed versioning](../configuration-reference/release-types.mdx#collapse-versions) (the *pre-release* versioning) |
+| [`version`](../state-reference/global-attributes.mdx#version) | The version that was [inferred](../introduction/how-nyx-works.mdx#infer), unless the [`version`](../configuration-reference/global-options.mdx#version) configuration option was passed to override inference. When the version is not overridden or inferred the [`initialVersion`](../configuration-reference/global-options.mdx#initial-version) is used |
+
+All the above outputs are also contained in the [state file](../state-reference/index.md) (if enabled using the [`stateFile`](../configuration-reference/global-options.mdx#state-file) option) or the summary file (if enabled using the [`summaryFile`](../configuration-reference/global-options.mdx#summary-file) option).
+
+### Limitations
+
+This is a [Docker Action](https://docs.github.com/en/actions/creating-actions/about-custom-actions#types-of-actions) so it's only available for Linux runners.
+
+### Versioning
+
+Although you can use a specific [version](https://github.com/mooltiverse/nyx/tags) for this action you are recommended to always use the latest version from the `main` branch (`uses: mooltiverse/nyx@main`).
+
+This action always uses the latest Nyx version.
+
+### Caveats
+
+#### Git repository checkout action
+
+Your pipelines on GitHub Actions probably start with the [checkout action](https://github.com/actions/checkout), which, by default, only checks out the latest commit as the fetch-depth parameter defaults to 1.
+
+This prevents Nyx from inferring information from the commit history and you likely end up with the inferred version to always be the initial version (i.e. 0.1.0) as further illustrated here.
+
+To work around this you just have to configure the checkout action to always fetch the entire commit history by setting the `fetch-depth` parameter to `0` as in this example:
+
+```yaml
+- uses: actions/checkout@v3
+  with:
+    // highlight-start
+    fetch-depth: 0
+    // highlight-end
+```
+
+#### Combined release process
+
+Just like for other means of using Nyx, in order to [separate Nyx actions and run other jobs or steps in between](../introduction/combined-release-process.mdx), you can run this action multiple times passing different commands (see the `command` parameter). Just make sure you enable the [state file](../state-reference/index.md) (using the [`stateFile`](../configuration-reference/global-options.mdx#state-file) parameter) and the resume flag (using the [`resume`](../configuration-reference/global-options.mdx#resume) parameter).
+
+```yaml
+jobs:
+  job1:
+    name: My job
+    runs-on: ubuntu-latest
+    steps:
+    - name: Git checkout
+      uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+    - name: Run nyx Infer
+      uses: mooltiverse/nyx@main
+      with:
+        command: infer
+        // highlight-start
+        resume: true
+        stateFile: .nyx-state.json
+        // highlight-end
+    # Run other tasks here....
+    - name: Run nyx Publish
+      uses: mooltiverse/nyx@main
+      with:
+        command: publish
+        // highlight-start
+        resume: true
+        stateFile: .nyx-state.json
+        // highlight-end
+```
+
+In case you run Nyx in separate jobs (instead of just separate steps within the same job), you may also wish to bring the state file ahead along with the pipeline progress so you can use the [cache action](https://github.com/actions/cache), like in this example:
+
+```yaml
+jobs:
+  job1:
+    name: My job 1
+    runs-on: ubuntu-latest
+    steps:
+    - name: Git checkout
+      uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+    // highlight-start
+    - name: Set up the cache to store and retrieve the Nyx state
+      uses: actions/cache@v3
+      with:
+        path: |
+          .nyx-state.json
+        key: ${{ github.run_id }}-nyx-state
+        restore-keys: ${{ github.run_id }}-nyx-state
+    // highlight-end
+    - name: Run nyx Infer
+      uses: mooltiverse/nyx@main
+      with:
+        command: infer
+        resume: true
+        stateFile: .nyx-state.json
+
+  job2:
+    name: My job 2
+    needs: job1
+    runs-on: ubuntu-latest
+    steps:
+    - name: Git checkout
+      uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+    // highlight-start
+    - name: Set up the cache to store and retrieve the Nyx state
+      uses: actions/cache@v3
+      with:
+        path: |
+          .nyx-state.json
+        key: ${{ github.run_id }}-nyx-state
+        restore-keys: ${{ github.run_id }}-nyx-state
+    // highlight-end
+    - name: Run nyx Publish
+      uses: mooltiverse/nyx@main
+      with:
+        command: publish
+        resume: true
+        stateFile: .nyx-state.json
+```
+
+Using separate jobs may also come very useful when using [matrix builds](https://docs.github.com/en/actions/using-jobs/using-a-matrix-for-your-jobs).

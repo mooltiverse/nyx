@@ -24,7 +24,8 @@ This structure is JSON and YAML aware so all objects are properly managed for ma
 as all internal fields must be exported (have the first capital letter in their names) or they can't be marshalled.
 */
 type Substitution struct {
-	// The glob expression to select the text files to replace the matched strings into.
+	// The regular path or glob expression to select the text files to replace the
+	// matched strings into.
 	Files *string `json:"files,omitempty" yaml:"files,omitempty"`
 
 	// The regular expression used to match the text to be replaced replace in files.
@@ -46,7 +47,8 @@ Standard constructor.
 
 Arguments are as follows:
 
-  - files the glob expression to select the text files to replace the matched strings into.
+  - files the regular path or glob expression to select the text files to replace the
+    matched strings into.
   - match the regular expression used to match the text to be replaced replace in files.
   - replace the template expression defining the text to use when replacing all matched tokens.
 */
@@ -61,14 +63,16 @@ func NewSubstitutionWith(files *string, match *string, replace *string) *Substit
 }
 
 /*
-Returns the glob expression to select the text files to replace the matched strings into.
+Returns the regular path or glob expression to select the text files to replace the
+matched strings into.
 */
 func (s *Substitution) GetFiles() *string {
 	return s.Files
 }
 
 /*
-Sets the glob expression to select the text files to replace the matched strings into.
+Sets the regular path or glob expression to select the text files to replace the
+matched strings into.
 */
 func (s *Substitution) SetFiles(files *string) {
 	s.Files = files

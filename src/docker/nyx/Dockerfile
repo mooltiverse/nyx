@@ -22,7 +22,11 @@ WORKDIR /project
 VOLUME /project
 
 # Put the binary into the image
-COPY --from=dependencies binaries/go/nyx/nyx-linux-amd64 /usr/bin/nyx
+COPY --from=dependencies --chmod=755 binaries/go/nyx/nyx-linux-amd64 /usr/bin/nyx
+
+# Add the script used as an entrypoint by the GitHub Action
+COPY action-entrypoint.sh /action-entrypoint.sh
+RUN chmod ugo+x /action-entrypoint.sh
 
 # Also install Git, as it's required by the libraries used in Go
 RUN apk update && \

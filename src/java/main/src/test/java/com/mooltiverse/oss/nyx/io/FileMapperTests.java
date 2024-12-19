@@ -30,20 +30,24 @@ public class FileMapperTests {
     @DisplayName("Load from URL")
     public static class LoadFromURL {
         /**
-         * A dummy class used to test the output from the <a href="https://www.jsontest.com/">JSON Test</a> service.
+         * A dummy class used to test the output from the <a href="https://jsonplaceholder.typicode.com/todos/1">JSON Placeholder</a> service.
          */
-        public static class JSONTestIPOutput {
+        public static class Todo {
+            // For the type of data returned see:
+	        // - https://jsonplaceholder.typicode.com/todos/1
+            public String   id = null;
+            public String   usedId = null;
+            public String   title = null;
+            public Boolean  completed = null;
 
-            public String ip = null;
-
-            public JSONTestIPOutput() {
+            public Todo() {
                 super();
             }
         }
 
         /**
          * In this test we just try to load a JSON file from the internet.
-         * For this we use the <a href="https://www.jsontest.com/">JSON Test</a> service, which just returns a value like:
+         * For this we use the <a href="https://jsonplaceholder.typicode.com/todos/1">JSON Placeholder</a> service, which just returns a value like:
          * <pre>
          *      {"ip": "8.8.8.8"}
          * </pre>
@@ -54,15 +58,9 @@ public class FileMapperTests {
         @DisplayName("FileMapper.load(URL, ?)")
         void loadFromURLTest()
             throws Exception {
-            URL url = new URI("http://ip.jsontest.com/").toURL();
-
-            try {
-                JSONTestIPOutput testOutput = FileMapper.load(url, JSONTestIPOutput.class);
-                assertNotNull(testOutput.ip);
-            }
-            catch (DataAccessException dae) {
-                // do nothing, just skip the test as sometimes http://ip.jsontest.com/ is unavailable and the call yields to a 500 server error
-            }
+            URL url = new URI("https://jsonplaceholder.typicode.com/todos/1").toURL();
+            Todo testOutput = FileMapper.load(url, Todo.class);
+            assertNotNull(testOutput.id);
         }
     }
 }

@@ -430,15 +430,45 @@ public class Make extends AbstractCommand {
                 throw new IllegalPropertyException(String.format("Substitution rule '%s' is enabled but not all of its required attributes have been set", ruleName));
             
             try {
-                // find files matching the glob
-                List<File> matches = new ArrayList<File>();
                 String globPattern = state().getConfiguration().getSubstitutions().getItems().get(ruleName).getFiles();
 
                 String rootDirectory = System.getProperty("user.dir");
                 if (!Objects.isNull(state().getConfiguration().getDirectory())) {
                     rootDirectory = state().getConfiguration().getDirectory();
                 }
-                
+
+                List<File> matches = new ArrayList<File>();
+
+                // First try to match a single file both as absolute or relative path
+                // unless the path contains a glob character
+                if (!globPattern.contains("*") && !globPattern.contains("?")) {
+                    try {
+                        File regularFile = Paths.get(globPattern).toFile();
+                        if (regularFile.exists()) {
+                            // If the regular file exists add it to the list of matches
+                            logger.debug(COMMAND, "Expression '{}' matches a local absolute file path that is added to the substitution targets", globPattern);
+                            matches.add(regularFile);
+                        } else {
+                            logger.debug(COMMAND, "Expression '{}' doesn't match a local absolute file path", globPattern);
+                        }
+                    } catch (InvalidPathException ipe) {
+                        logger.debug(COMMAND, "Expression '{}' is not a valid absolute file path for a local file", globPattern);
+                    }
+                    try {
+                        File regularFile = Paths.get(rootDirectory, globPattern).toFile();
+                        if (regularFile.exists()) {
+                            // If the regular file exists add it to the list of matches
+                            logger.debug(COMMAND, "Expression '{}' matches a local relative file path that is added to the substitution targets", globPattern);
+                            matches.add(regularFile);
+                        } else {
+                            logger.debug(COMMAND, "Expression '{}' doesn't match a local relative file path", globPattern);
+                        }
+                    } catch (InvalidPathException ipe) {
+                        logger.debug(COMMAND, "Expression '{}' is not a valid relative file path for a local file", globPattern);
+                    }
+                }
+
+                // Then try to find files matching the glob
                 // A FileVisitor to walk the directory and select only the files whose names match the glob pattern
                 FileVisitor<Path> matcherVisitor = new SimpleFileVisitor<Path>() {
                     @Override
@@ -455,7 +485,7 @@ public class Make extends AbstractCommand {
                 Files.walkFileTree(Paths.get(rootDirectory), matcherVisitor);
 
                 if (matches.isEmpty()) {
-                    logger.debug(COMMAND, "Glob pattern '{}' doesn't match any file in directory '{}'", state().getConfiguration().getSubstitutions().getItems().get(ruleName).getFiles(), rootDirectory);
+                    logger.debug(COMMAND, "Expression '{}' doesn't match any file in directory '{}'", state().getConfiguration().getSubstitutions().getItems().get(ruleName).getFiles(), rootDirectory);
                 }
                 else {
                     for (File file: matches) {

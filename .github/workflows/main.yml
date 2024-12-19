@@ -139,14 +139,7 @@ jobs:
     # to the Gradle compatibility matrix. See CONTRIBUTING.md in the root directory or the Gradle functional test suites for more.
     strategy:
       matrix:
-        # TODO: SHORTEN TESTS: uncomment the following line after the whole
-        # pipeline has been verified.
-        # Some tests have been suspended to make the pipeline quicker while
-        # testing some downstream jobs that are still failing.
-        # Meanwhile, all source code has already been fully tested by previous
-        # commits.
-        #java: [ '17', '20' ]
-        java: [ '17' ]
+        java: [ '17', '20' ]
     uses: mooltiverse/nyx/.github/workflows/java-test-sequence.yml@main
     with:
       verbosity: info
@@ -157,15 +150,9 @@ jobs:
       nyx-cache-name-restore-suffix: ${{ needs.initialize.outputs.nyx-cache-name-suffix }}
       gradle-cache-name-restore-suffix: ${{ needs.java-build.outputs.gradle-cache-name-suffix }}
       java-cache-name-restore-suffix: ${{ needs.java-build.outputs.java-cache-name-suffix }}
-      # TODO: SHORTEN TESTS: remove the following lines after the whole
-      # pipeline has been verified.
-      # Always run unit tests instead of integration and functional tests
-      # to make the pipeline quicker while testing some downstream jobs
-      # that are still failing.
-      # Meanwhile, all source code has already been fully tested by previous
-      # commits.
-      gradle-integration-test-tasks: src:java:unitTest
-      gradle-functional-test-tasks: src:java:unitTest
+      # When running in non-main branches reduce the number of test cases to speed up the build.
+      # Use the 'quickTests' for this purpose, which is a property parsed by the Gradle scripts
+      gradle-arguments: --build-cache --stacktrace ${{ github.ref == 'refs/heads/main' && '-PquickTests=false' || '-PquickTests=true' }}
     secrets:
       # Pass extra properties used by the Gradle scripts to run tests.
       # See the top level
@@ -192,7 +179,7 @@ jobs:
     - test
     - java-build
     - java-test
-    if: needs.initialize.outputs.javaChanged == 'true' || needs.initialize.outputs.release == 'true'
+    if: needs.initialize.outputs.release == 'true'
     uses: mooltiverse/nyx/.github/workflows/java-publish.yml@main
     with:
       verbosity: info
@@ -228,7 +215,7 @@ jobs:
     name: Go Build
     needs:
     - initialize
-    if: needs.initialize.outputs.goChanged == 'true' || needs.initialize.outputs.release == 'true'
+    if: needs.initialize.outputs.goChanged == 'true' || needs.initialize.outputs.dockerChanged == 'true' || needs.initialize.outputs.release == 'true'
     uses: mooltiverse/nyx/.github/workflows/go-build.yml@main
     with:
       verbosity: info
@@ -260,14 +247,7 @@ jobs:
     #  cancel-in-progress: false
     strategy:
       matrix:
-        # TODO: SHORTEN TESTS: uncomment the following line after the whole
-        # pipeline has been verified.
-        # Some tests have been suspended to make the pipeline quicker while
-        # testing some downstream jobs that are still failing.
-        # Meanwhile, all source code has already been fully tested by previous
-        # commits.
-        #os: [ubuntu-latest, macos-latest, windows-latest]
-        os: [ubuntu-latest]
+        os: [ubuntu-latest, macos-latest, windows-latest]
     uses: mooltiverse/nyx/.github/workflows/go-test-sequence.yml@main
     with:
       verbosity: info
@@ -281,15 +261,9 @@ jobs:
       nyx-cache-name-restore-suffix: ${{ needs.initialize.outputs.nyx-cache-name-suffix }}
       gradle-cache-name-restore-suffix: ${{ needs.go-build.outputs.gradle-cache-name-suffix }}
       go-cache-name-restore-suffix: ${{ needs.go-build.outputs.go-cache-name-suffix }}
-      # TODO: SHORTEN TESTS: remove the following lines after the whole
-      # pipeline has been verified.
-      # Always run unit tests instead of integration and functional tests
-      # to make the pipeline quicker while testing some downstream jobs
-      # that are still failing.
-      # Meanwhile, all source code has already been fully tested by previous
-      # commits.
-      gradle-integration-test-tasks: src:go:unitTest
-      gradle-functional-test-tasks: src:go:unitTest
+      # When running in non-main branches reduce the number of test cases to speed up the build.
+      # Use the 'quickTests' for this purpose, which is a property parsed by the Gradle scripts
+      gradle-arguments: --build-cache --stacktrace ${{ github.ref == 'refs/heads/main' && '-PquickTests=false' || '-PquickTests=true' }}
     secrets:
       # Pass extra properties used by the Gradle scripts to run tests.
       # See the top level
@@ -316,7 +290,7 @@ jobs:
     - test
     - go-build
     - go-test
-    if: needs.initialize.outputs.goChanged == 'true' || needs.initialize.outputs.release == 'true'
+    if: needs.initialize.outputs.release == 'true'
     uses: mooltiverse/nyx/.github/workflows/go-publish.yml@main
     with:
       verbosity: info
@@ -392,7 +366,7 @@ jobs:
     - go-build
     - docker-build
     - docker-test
-    if: needs.initialize.outputs.dockerChanged == 'true' || needs.initialize.outputs.goChanged == 'true' || needs.initialize.outputs.release == 'true'
+    if: needs.initialize.outputs.release == 'true'
     uses: mooltiverse/nyx/.github/workflows/docker-publish.yml@main
     with:
       verbosity: info
@@ -432,7 +406,7 @@ jobs:
     - initialize
     - test
     - docusaurus-build
-    if: needs.initialize.outputs.docusaurusChanged == 'true' || needs.initialize.outputs.release == 'true'
+    if: needs.initialize.outputs.release == 'true'
     uses: mooltiverse/nyx/.github/workflows/docusaurus-publish.yml@main
     with:
       verbosity: info

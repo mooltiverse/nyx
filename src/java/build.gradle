@@ -90,6 +90,10 @@ description = 'Java binaries'
   This is the configuration for this project and all sub-projects
 ------------------------------------------------------------------------------*/
 allprojects {
+  // All sub projects must belong to the same group as the root project.
+  // This also affects the metadata in published jars, their POMs etc.
+  group = rootProject.group
+
   /*------------------------------------------------------------------------------
     Plugins DSL block
     https://docs.gradle.org/current/userguide/plugins.html#sec:plugins_block
@@ -149,7 +153,7 @@ allprojects {
   jacocoTestReport {
     reports {
       xml.required = true
-      xml.outputLocation = new File(buildDir, "test/reports/xml")
+      xml.outputLocation = new File(buildDir, "test/reports/xml/report.xml")
       html.required = true
       html.outputLocation = new File(buildDir, "test/reports/html")
     }
@@ -199,7 +203,6 @@ allprojects {
     destinationDir = new File(buildDir, "api/docs")
     options {
       // Link generated javadocs to external docs
-      links 'https://download.eclipse.org/jgit/site/6.4.0.202211300538-r/apidocs/' // TODO: Update this link to https://download.eclipse.org/jgit/site/6.8.0.202311291450-r/apidocs/ when available (as of this writing it's not)
       links 'https://www.slf4j.org/apidocs/'
       links 'https://docs.gradle.org/current/javadoc/'
       links 'https://junit.org/junit5/docs/current/api/'
@@ -289,12 +292,12 @@ subprojects {
         testType = TestSuiteType.UNIT_TEST
         dependencies {
           // plug the Logback SLF4J implementation when testing so we can get log messages logged to the standard output
-          runtimeOnly    'ch.qos.logback:logback-core:1.4.7'
-          runtimeOnly    'ch.qos.logback:logback-classic:1.4.7'
+          runtimeOnly    'ch.qos.logback:logback-core:1.5.12'
+          runtimeOnly    'ch.qos.logback:logback-classic:1.5.12'
 
           // The SLF4J framework that prints all test output to System err
           // See http://www.slf4j.org/apidocs/org/slf4j/impl/SimpleLogger.html for the system properties available to change verbosity levels
-          runtimeOnly    'org.slf4j:slf4j-simple:2.0.12'
+          runtimeOnly    'org.slf4j:slf4j-simple:2.0.16'
         }
         targets {
           all { 
@@ -438,7 +441,7 @@ allprojects.each {prj ->
         pom {
           name = prj.name
           // prj.description fails to evaluate because it's not yet available when publications are defined
-          description = "$prj.group:$prj.name:$rootProject.version $prj.description"
+          description = "$prj.group:$prj.name:$rootProject.version"
           url = projectURL
           licenses {
             license {
@@ -693,16 +696,16 @@ tasks.test.dependsOn subprojects*.test
 // provided by the 'io.codearte.nexus-staging' plugin.
 // When the browser has an authenticated session to Sonatype Nexus the Id is
 // also available at https://oss.sonatype.org/service/local/staging/profiles
-//tasks.publishToSonatype.dependsOn tasks.getStagingProfile
+tasks.publishToSonatype.dependsOn tasks.getStagingProfile
 // After the artifacts are published to the Sonatype staging repository,
 // trigger the transition to the official Maven Central repository using the
 // closeAndReleaseRepository task from the 'io.codearte.nexus-staging' plugin.
 // This may take ~10-20 minutes and so many retries.
-//tasks.publishToSonatype.finalizedBy tasks.closeAndReleaseRepository
+tasks.publishToSonatype.finalizedBy tasks.closeAndReleaseRepository
 // Make the overall publish task depend on the global publishToSonatype
 // task, which in turn has dependencies to the other tasks that are functional
 // to the publication.
-//tasks.publish.dependsOn tasks.publishToSonatype
+tasks.publish.dependsOn tasks.publishToSonatype
 
 afterEvaluate {
   // Only perform publishing if the Nyx release type enables publishing.
