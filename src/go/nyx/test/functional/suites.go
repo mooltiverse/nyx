@@ -202,13 +202,32 @@ scheme: SEMVER
 	"substitutions":{
 		"enabled":[
 			"node_version",
-			"text_version"
-		]
+			"text_version",
+			"custom_version"
+		],
+		"items": {
+			"node_version": {
+				"files": "**/package.json",
+				"match": "\"version\"(\\s)*:(\\s)*\"(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?\"",
+				"replace": "\"version\": \"{{version}}\""
+			},
+			"text_version": {
+				"files": "**/version.txt",
+				"match": "(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?",
+				"replace": "{{version}}"
+			},
+			"custom_version": {
+				"files": "custom_version.txt",
+				"match": "(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?",
+				"replace": "{{version}}"
+			}
+		}
 	}
 }				  
 `,
 				// the version.txt file, used to test for substitutions, initialized with a fake version number to be replaced by Make
-				"version.txt": `91.92.93`,
+				"version.txt":        `91.92.93`,
+				"custom_version.txt": `91.92.93`,
 			},
 			RemoteRepoName:     nil,
 			HostingRepoService: nil,
@@ -245,6 +264,9 @@ scheme: SEMVER
 					"\\* \\[[a-z0-9]{5}\\] fix: Untagged commit \\[#1\\]\\(https:\\/\\/example\\.com\\/issues\\/1\\)",
 				},
 				"version.txt": []string{
+					"v0.1.0",
+				},
+				"custom_version.txt": []string{
 					"v0.1.0",
 				},
 			},
@@ -328,13 +350,32 @@ scheme: SEMVER
 	"substitutions":{
 		"enabled":[
 			"node_version",
-			"text_version"
-		]
+			"text_version",
+			"custom_version"
+		],
+		"items": {
+			"node_version": {
+				"files": "**/package.json",
+				"match": "\"version\"(\\s)*:(\\s)*\"(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?\"",
+				"replace": "\"version\": \"{{version}}\""
+			},
+			"text_version": {
+				"files": "**/version.txt",
+				"match": "(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?",
+				"replace": "{{version}}"
+			},
+			"custom_version": {
+				"files": "custom_version.txt",
+				"match": "(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?",
+				"replace": "{{version}}"
+			}
+		}
 	}
 }				  
 `,
 				// the version.txt file, used to test for substitutions, initialized with a fake version number to be replaced by Make
-				"version.txt": `91.92.93`,
+				"version.txt":        `91.92.93`,
+				"custom_version.txt": `91.92.93`,
 			},
 			RemoteRepoName:     utl.PointerToString("replica"),
 			HostingRepoService: nil,
@@ -371,6 +412,9 @@ scheme: SEMVER
 					"\\* \\[[a-z0-9]{5}\\] fix: Untagged commit \\[#1\\]\\(https:\\/\\/example\\.com\\/issues\\/1\\)",
 				},
 				"version.txt": []string{
+					"v0.1.0",
+				},
+				"custom_version.txt": []string{
 					"v0.1.0",
 				},
 			},
@@ -453,13 +497,32 @@ commitMessageConventions:
 	"substitutions":{
 		"enabled":[
 			"node_version",
-			"text_version"
-		]
+			"text_version",
+			"custom_version"
+		],
+		"items": {
+			"node_version": {
+				"files": "**/package.json",
+				"match": "\"version\"(\\s)*:(\\s)*\"(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?\"",
+				"replace": "\"version\": \"{{version}}\""
+			},
+			"text_version": {
+				"files": "**/version.txt",
+				"match": "(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?",
+				"replace": "{{version}}"
+			},
+			"custom_version": {
+				"files": "custom_version.txt",
+				"match": "(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?",
+				"replace": "{{version}}"
+			}
+		}
 	}
 }				  
 `,
 				// the version.txt file, used to test for substitutions, initialized with a fake version number to be replaced by Make
-				"version.txt": `91.92.93`,
+				"version.txt":        `91.92.93`,
+				"custom_version.txt": `91.92.93`,
 			},
 			RemoteRepoName:     utl.PointerToString("replica"),
 			HostingRepoService: nil,
@@ -492,6 +555,9 @@ commitMessageConventions:
 					"No changes.",
 				},
 				"version.txt": []string{
+					"0.0.6",
+				},
+				"custom_version.txt": []string{
 					"0.0.6",
 				},
 			},
@@ -587,13 +653,32 @@ scheme: SEMVER
 	"substitutions":{
 		"enabled":[
 			"node_version",
-			"text_version"
-		]
+			"text_version",
+			"custom_version"
+		],
+		"items": {
+			"node_version": {
+				"files": "**/package.json",
+				"match": "\"version\"(\\s)*:(\\s)*\"(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?\"",
+				"replace": "\"version\": \"{{version}}\""
+			},
+			"text_version": {
+				"files": "**/version.txt",
+				"match": "(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?",
+				"replace": "{{version}}"
+			},
+			"custom_version": {
+				"files": "custom_version.txt",
+				"match": "(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?",
+				"replace": "{{version}}"
+			}
+		}
 	}
 }				  
 `,
 				// the version.txt file, used to test for substitutions, initialized with a fake version number to be replaced by Make
-				"version.txt": `91.92.93`,
+				"version.txt":        `91.92.93`,
+				"custom_version.txt": `91.92.93`,
 			},
 			RemoteRepoName:     nil, //utl.PointerToString("origin"), // use 'origin', from the cloned repository from the hosting service
 			HostingRepoService: utl.PointerToString("github"),
@@ -630,6 +715,9 @@ scheme: SEMVER
 					"\\* \\[[a-z0-9]{5}\\] fix: Untagged commit \\[#1\\]\\(https:\\/\\/example\\.com\\/issues\\/1\\)",
 				},
 				"version.txt": []string{
+					"v0.1.0",
+				},
+				"custom_version.txt": []string{
 					"v0.1.0",
 				},
 			},
@@ -724,13 +812,33 @@ scheme: SEMVER
 	},
 	"substitutions":{
 		"enabled":[
-			"node_version","text_version"
-		]
+			"node_version",
+			"text_version",
+			"custom_version"
+		],
+		"items": {
+			"node_version": {
+				"files": "**/package.json",
+				"match": "\"version\"(\\s)*:(\\s)*\"(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?\"",
+				"replace": "\"version\": \"{{version}}\""
+			},
+			"text_version": {
+				"files": "**/version.txt",
+				"match": "(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?",
+				"replace": "{{version}}"
+			},
+			"custom_version": {
+				"files": "custom_version.txt",
+				"match": "(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?",
+				"replace": "{{version}}"
+			}
+		}
 	}
 }				  
 `,
 				// the version.txt file, used to test for substitutions, initialized with a fake version number to be replaced by Make
-				"version.txt": `91.92.93`,
+				"version.txt":        `91.92.93`,
+				"custom_version.txt": `91.92.93`,
 			},
 			RemoteRepoName:     nil, //utl.PointerToString("origin"), // use 'origin', from the cloned repository from the hosting service
 			HostingRepoService: utl.PointerToString("gitlab"),
@@ -767,6 +875,9 @@ scheme: SEMVER
 					"\\* \\[[a-z0-9]{5}\\] fix: Untagged commit \\[#1\\]\\(https:\\/\\/example\\.com\\/issues\\/1\\)",
 				},
 				"version.txt": []string{
+					"v0.1.0",
+				},
+				"custom_version.txt": []string{
 					"v0.1.0",
 				},
 			},

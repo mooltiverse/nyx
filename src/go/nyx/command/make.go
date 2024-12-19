@@ -485,7 +485,6 @@ func (c *Make) applySubstitutions() error {
 				return &errs.IllegalPropertyError{Message: fmt.Sprintf("substitution rule '%s' is enabled but not all of its required attributes have been set", *ruleName)}
 			}
 
-			// find files matching the glob
 			rootDirectory, err := os.Getwd()
 			if err != nil {
 				return &errs.DataAccessError{Message: fmt.Sprintf("unable to retrieve the current working directory"), Cause: err}
@@ -497,10 +496,34 @@ func (c *Make) applySubstitutions() error {
 			if configurationRootDirectory != nil {
 				rootDirectory = *configurationRootDirectory
 			}
+
+			matches := []string{}
+			// First try to match a single file both as absolute or relative path
+			// unless the path contains a glob character
+			if !strings.ContainsAny(*substitution.GetFiles(), "*?") {
+				if filepath.IsAbs(*substitution.GetFiles()) {
+					_, err = os.Stat(*substitution.GetFiles())
+					if err == nil {
+						log.Debugf("expression '%s' matches a local absolute file path that is added to the substitution targets", *substitution.GetFiles())
+						matches = append(matches, *substitution.GetFiles())
+					} else {
+						log.Debugf("expression '%s' doesn't match a local absolute file path", *substitution.GetFiles())
+					}
+				} else {
+					_, err = os.Stat(filepath.Join(rootDirectory, *substitution.GetFiles()))
+					if err == nil {
+						log.Debugf("expression '%s' matches a local relative file path that is added to the substitution targets", *substitution.GetFiles())
+						matches = append(matches, filepath.Join(rootDirectory, *substitution.GetFiles()))
+					} else {
+						log.Debugf("expression '%s' doesn't match a local relative file path", *substitution.GetFiles())
+					}
+				}
+			}
+
+			// Then try to find files matching the glob
 			// filepath has a bug that doesn't support double stars ("**") as per this issue: https://github.com/golang/go/issues/11862
 			// so we use https://github.com/bmatcuk/doublestar as a drop-in replacement
 			//matches, err := filepath.Glob(rootDirectory + "/" + *substitution.GetFiles())
-			matches := []string{}
 			err = filepath.Walk(rootDirectory, func(path string, f os.FileInfo, err error) error {
 				//matched, err := filepath.Match(*substitution.GetFiles(), path)
 				matched, err := doublestar.Match(filepath.ToSlash(*substitution.GetFiles()), filepath.ToSlash(path))
@@ -517,7 +540,7 @@ func (c *Make) applySubstitutions() error {
 			}
 
 			if len(matches) == 0 {
-				log.Debugf("glob pattern '%s' doesn't match any file in directory '%s'", *substitution.GetFiles(), rootDirectory)
+				log.Debugf("expression '%s' doesn't match any file in directory '%s'", *substitution.GetFiles(), rootDirectory)
 			} else {
 				for _, file := range matches {
 					// if the file path is relative make it relative to the configured directory

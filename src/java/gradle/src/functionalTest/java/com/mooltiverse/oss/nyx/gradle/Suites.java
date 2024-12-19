@@ -1261,11 +1261,29 @@ public class Suites {
                         .concat("        }").concat(newLine)
                         .concat("    },").concat(newLine)
                         .concat("    \"substitutions\":{").concat(newLine)
-                        .concat("        \"enabled\":[ \"node_version\", \"text_version\" ]").concat(newLine)
+                        .concat("        \"enabled\":[ \"node_version\", \"text_version\", \"custom_version\" ],").concat(newLine)
+                        .concat("        \"items\": {").concat(newLine)
+                        .concat("            \"node_version\": {").concat(newLine)
+                        .concat("                \"files\":\"**/package.json\",").concat(newLine)
+                        .concat("                \"match\":\"\\\"version\\\"(\\\\s)*:(\\\\s)*\\\"(0|[1-9]\\\\d*)\\\\.(0|[1-9]\\\\d*)\\\\.(0|[1-9]\\\\d*)(?:-((?:0|[1-9]\\\\d*|\\\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\\\.(?:0|[1-9]\\\\d*|\\\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\\\+([0-9a-zA-Z-]+(?:\\\\.[0-9a-zA-Z-]+)*))?\\\"\",").concat(newLine)
+                        .concat("                \"replace\":\"\\\"version\\\": \\\"{{version}}\\\"\"").concat(newLine)
+                        .concat("            },").concat(newLine)
+                        .concat("            \"text_version\": {").concat(newLine)
+                        .concat("                \"files\":\"**/version.txt\",").concat(newLine)
+                        .concat("                \"match\":\"(0|[1-9]\\\\d*)\\\\.(0|[1-9]\\\\d*)\\\\.(0|[1-9]\\\\d*)(?:-((?:0|[1-9]\\\\d*|\\\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\\\.(?:0|[1-9]\\\\d*|\\\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\\\+([0-9a-zA-Z-]+(?:\\\\.[0-9a-zA-Z-]+)*))?\",").concat(newLine)
+                        .concat("                \"replace\":\"{{version}}\"").concat(newLine)
+                        .concat("            },").concat(newLine)
+                        .concat("            \"custom_version\": {").concat(newLine)
+                        .concat("                \"files\":\"custom_version.txt\",").concat(newLine)
+                        .concat("                \"match\":\"(0|[1-9]\\\\d*)\\\\.(0|[1-9]\\\\d*)\\\\.(0|[1-9]\\\\d*)(?:-((?:0|[1-9]\\\\d*|\\\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\\\.(?:0|[1-9]\\\\d*|\\\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\\\+([0-9a-zA-Z-]+(?:\\\\.[0-9a-zA-Z-]+)*))?\",").concat(newLine)
+                        .concat("                \"replace\":\"{{version}}\"").concat(newLine)
+                        .concat("            }").concat(newLine)
+                        .concat("        }").concat(newLine)
                         .concat("    }").concat(newLine)
                         .concat("}"),
                     // the version.txt file, used to test for substitutions, initialized with a fake version number to be replaced by Make
-                    "version.txt", "91.92.93"
+                    "version.txt", "91.92.93",
+                    "custom_version.txt", "91.92.93"
                 );
                 remoteRepoName  = null;
                 hostingRepoService = null;
@@ -1302,6 +1320,9 @@ public class Suites {
                         "\\* \\[[a-z0-9]{5}\\] fix: Untagged commit \\[#1\\]\\(https:\\/\\/example\\.com\\/issues\\/1\\)"
                     ),
                     "version.txt", Set.<String>of(
+                        "v0.1.0"
+                    ),
+                    "custom_version.txt", Set.<String>of(
                         "v0.1.0"
                     )
                 );
@@ -1392,11 +1413,29 @@ public class Suites {
                         .concat("        }").concat(newLine)
                         .concat("    },").concat(newLine)
                         .concat("    \"substitutions\":{").concat(newLine)
-                        .concat("        \"enabled\":[ \"node_version\", \"text_version\" ]").concat(newLine)
+                        .concat("        \"enabled\":[ \"node_version\", \"text_version\", \"custom_version\" ],").concat(newLine)
+                        .concat("        \"items\": {").concat(newLine)
+                        .concat("            \"node_version\": {").concat(newLine)
+                        .concat("                \"files\":\"**/package.json\",").concat(newLine)
+                        .concat("                \"match\":\"\\\"version\\\"(\\\\s)*:(\\\\s)*\\\"(0|[1-9]\\\\d*)\\\\.(0|[1-9]\\\\d*)\\\\.(0|[1-9]\\\\d*)(?:-((?:0|[1-9]\\\\d*|\\\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\\\.(?:0|[1-9]\\\\d*|\\\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\\\+([0-9a-zA-Z-]+(?:\\\\.[0-9a-zA-Z-]+)*))?\\\"\",").concat(newLine)
+                        .concat("                \"replace\":\"\\\"version\\\": \\\"{{version}}\\\"\"").concat(newLine)
+                        .concat("            },").concat(newLine)
+                        .concat("            \"text_version\": {").concat(newLine)
+                        .concat("                \"files\":\"**/version.txt\",").concat(newLine)
+                        .concat("                \"match\":\"(0|[1-9]\\\\d*)\\\\.(0|[1-9]\\\\d*)\\\\.(0|[1-9]\\\\d*)(?:-((?:0|[1-9]\\\\d*|\\\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\\\.(?:0|[1-9]\\\\d*|\\\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\\\+([0-9a-zA-Z-]+(?:\\\\.[0-9a-zA-Z-]+)*))?\",").concat(newLine)
+                        .concat("                \"replace\":\"{{version}}\"").concat(newLine)
+                        .concat("            },").concat(newLine)
+                        .concat("            \"custom_version\": {").concat(newLine)
+                        .concat("                \"files\":\"custom_version.txt\",").concat(newLine)
+                        .concat("                \"match\":\"(0|[1-9]\\\\d*)\\\\.(0|[1-9]\\\\d*)\\\\.(0|[1-9]\\\\d*)(?:-((?:0|[1-9]\\\\d*|\\\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\\\.(?:0|[1-9]\\\\d*|\\\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\\\+([0-9a-zA-Z-]+(?:\\\\.[0-9a-zA-Z-]+)*))?\",").concat(newLine)
+                        .concat("                \"replace\":\"{{version}}\"").concat(newLine)
+                        .concat("            }").concat(newLine)
+                        .concat("        }").concat(newLine)
                         .concat("    }").concat(newLine)
                         .concat("}"),
                     // the version.txt file, used to test for substitutions, initialized with a fake version number to be replaced by Make
-                    "version.txt", "91.92.93"
+                    "version.txt", "91.92.93",
+                    "custom_version.txt", "91.92.93"
                 );
                 remoteRepoName  = null;
                 hostingRepoService = null;
@@ -1433,6 +1472,9 @@ public class Suites {
                         "\\* \\[[a-z0-9]{5}\\] fix: Untagged commit \\[#1\\]\\(https:\\/\\/example\\.com\\/issues\\/1\\)"
                     ),
                     "version.txt", Set.<String>of(
+                        "v0.1.0"
+                    ),
+                    "custom_version.txt", Set.<String>of(
                         "v0.1.0"
                     )
                 );
@@ -1522,11 +1564,29 @@ public class Suites {
                         .concat("        }").concat(newLine)
                         .concat("    },").concat(newLine)
                         .concat("    \"substitutions\":{").concat(newLine)
-                        .concat("        \"enabled\":[ \"node_version\", \"text_version\" ]").concat(newLine)
+                        .concat("        \"enabled\":[ \"node_version\", \"text_version\", \"custom_version\" ],").concat(newLine)
+                        .concat("        \"items\": {").concat(newLine)
+                        .concat("            \"node_version\": {").concat(newLine)
+                        .concat("                \"files\":\"**/package.json\",").concat(newLine)
+                        .concat("                \"match\":\"\\\"version\\\"(\\\\s)*:(\\\\s)*\\\"(0|[1-9]\\\\d*)\\\\.(0|[1-9]\\\\d*)\\\\.(0|[1-9]\\\\d*)(?:-((?:0|[1-9]\\\\d*|\\\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\\\.(?:0|[1-9]\\\\d*|\\\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\\\+([0-9a-zA-Z-]+(?:\\\\.[0-9a-zA-Z-]+)*))?\\\"\",").concat(newLine)
+                        .concat("                \"replace\":\"\\\"version\\\": \\\"{{version}}\\\"\"").concat(newLine)
+                        .concat("            },").concat(newLine)
+                        .concat("            \"text_version\": {").concat(newLine)
+                        .concat("                \"files\":\"**/version.txt\",").concat(newLine)
+                        .concat("                \"match\":\"(0|[1-9]\\\\d*)\\\\.(0|[1-9]\\\\d*)\\\\.(0|[1-9]\\\\d*)(?:-((?:0|[1-9]\\\\d*|\\\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\\\.(?:0|[1-9]\\\\d*|\\\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\\\+([0-9a-zA-Z-]+(?:\\\\.[0-9a-zA-Z-]+)*))?\",").concat(newLine)
+                        .concat("                \"replace\":\"{{version}}\"").concat(newLine)
+                        .concat("            },").concat(newLine)
+                        .concat("            \"custom_version\": {").concat(newLine)
+                        .concat("                \"files\":\"custom_version.txt\",").concat(newLine)
+                        .concat("                \"match\":\"(0|[1-9]\\\\d*)\\\\.(0|[1-9]\\\\d*)\\\\.(0|[1-9]\\\\d*)(?:-((?:0|[1-9]\\\\d*|\\\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\\\.(?:0|[1-9]\\\\d*|\\\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\\\+([0-9a-zA-Z-]+(?:\\\\.[0-9a-zA-Z-]+)*))?\",").concat(newLine)
+                        .concat("                \"replace\":\"{{version}}\"").concat(newLine)
+                        .concat("            }").concat(newLine)
+                        .concat("        }").concat(newLine)
                         .concat("    }").concat(newLine)
                         .concat("}"),
                     // the version.txt file, used to test for substitutions, initialized with a fake version number to be replaced by Make
-                    "version.txt", "91.92.93"
+                    "version.txt", "91.92.93",
+                    "custom_version.txt", "91.92.93"
                 );
                 remoteRepoName  = "replica";
                 hostingRepoService = null;
@@ -1563,6 +1623,9 @@ public class Suites {
                         "\\* \\[[a-z0-9]{5}\\] fix: Untagged commit \\[#1\\]\\(https:\\/\\/example\\.com\\/issues\\/1\\)"
                     ),
                     "version.txt", Set.<String>of(
+                        "v0.1.0"
+                    ),
+                    "custom_version.txt", Set.<String>of(
                         "v0.1.0"
                     )
                 );
@@ -1655,11 +1718,29 @@ public class Suites {
                         .concat("        }").concat(newLine)
                         .concat("    },").concat(newLine)
                         .concat("    \"substitutions\":{").concat(newLine)
-                        .concat("        \"enabled\":[ \"node_version\", \"text_version\" ]").concat(newLine)
+                        .concat("        \"enabled\":[ \"node_version\", \"text_version\", \"custom_version\" ],").concat(newLine)
+                        .concat("        \"items\": {").concat(newLine)
+                        .concat("            \"node_version\": {").concat(newLine)
+                        .concat("                \"files\":\"**/package.json\",").concat(newLine)
+                        .concat("                \"match\":\"\\\"version\\\"(\\\\s)*:(\\\\s)*\\\"(0|[1-9]\\\\d*)\\\\.(0|[1-9]\\\\d*)\\\\.(0|[1-9]\\\\d*)(?:-((?:0|[1-9]\\\\d*|\\\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\\\.(?:0|[1-9]\\\\d*|\\\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\\\+([0-9a-zA-Z-]+(?:\\\\.[0-9a-zA-Z-]+)*))?\\\"\",").concat(newLine)
+                        .concat("                \"replace\":\"\\\"version\\\": \\\"{{version}}\\\"\"").concat(newLine)
+                        .concat("            },").concat(newLine)
+                        .concat("            \"text_version\": {").concat(newLine)
+                        .concat("                \"files\":\"**/version.txt\",").concat(newLine)
+                        .concat("                \"match\":\"(0|[1-9]\\\\d*)\\\\.(0|[1-9]\\\\d*)\\\\.(0|[1-9]\\\\d*)(?:-((?:0|[1-9]\\\\d*|\\\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\\\.(?:0|[1-9]\\\\d*|\\\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\\\+([0-9a-zA-Z-]+(?:\\\\.[0-9a-zA-Z-]+)*))?\",").concat(newLine)
+                        .concat("                \"replace\":\"{{version}}\"").concat(newLine)
+                        .concat("            },").concat(newLine)
+                        .concat("            \"custom_version\": {").concat(newLine)
+                        .concat("                \"files\":\"custom_version.txt\",").concat(newLine)
+                        .concat("                \"match\":\"(0|[1-9]\\\\d*)\\\\.(0|[1-9]\\\\d*)\\\\.(0|[1-9]\\\\d*)(?:-((?:0|[1-9]\\\\d*|\\\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\\\.(?:0|[1-9]\\\\d*|\\\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\\\+([0-9a-zA-Z-]+(?:\\\\.[0-9a-zA-Z-]+)*))?\",").concat(newLine)
+                        .concat("                \"replace\":\"{{version}}\"").concat(newLine)
+                        .concat("            }").concat(newLine)
+                        .concat("        }").concat(newLine)
                         .concat("    }").concat(newLine)
                         .concat("}"),
                     // the version.txt file, used to test for substitutions, initialized with a fake version number to be replaced by Make
-                    "version.txt", "91.92.93"
+                    "version.txt", "91.92.93",
+                    "custom_version.txt", "91.92.93"
                 );
                 remoteRepoName  = "replica";
                 hostingRepoService = null;
@@ -1696,6 +1777,9 @@ public class Suites {
                         "\\* \\[[a-z0-9]{5}\\] fix: Untagged commit \\[#1\\]\\(https:\\/\\/example\\.com\\/issues\\/1\\)"
                     ),
                     "version.txt", Set.<String>of(
+                        "v0.1.0"
+                    ),
+                    "custom_version.txt", Set.<String>of(
                         "v0.1.0"
                     )
                 );
@@ -1780,11 +1864,29 @@ public class Suites {
                         .concat("        }").concat(newLine)
                         .concat("    },").concat(newLine)
                         .concat("    \"substitutions\":{").concat(newLine)
-                        .concat("        \"enabled\":[ \"node_version\", \"text_version\" ]").concat(newLine)
+                        .concat("        \"enabled\":[ \"node_version\", \"text_version\", \"custom_version\" ],").concat(newLine)
+                        .concat("        \"items\": {").concat(newLine)
+                        .concat("            \"node_version\": {").concat(newLine)
+                        .concat("                \"files\":\"**/package.json\",").concat(newLine)
+                        .concat("                \"match\":\"\\\"version\\\"(\\\\s)*:(\\\\s)*\\\"(0|[1-9]\\\\d*)\\\\.(0|[1-9]\\\\d*)\\\\.(0|[1-9]\\\\d*)(?:-((?:0|[1-9]\\\\d*|\\\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\\\.(?:0|[1-9]\\\\d*|\\\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\\\+([0-9a-zA-Z-]+(?:\\\\.[0-9a-zA-Z-]+)*))?\\\"\",").concat(newLine)
+                        .concat("                \"replace\":\"\\\"version\\\": \\\"{{version}}\\\"\"").concat(newLine)
+                        .concat("            },").concat(newLine)
+                        .concat("            \"text_version\": {").concat(newLine)
+                        .concat("                \"files\":\"**/version.txt\",").concat(newLine)
+                        .concat("                \"match\":\"(0|[1-9]\\\\d*)\\\\.(0|[1-9]\\\\d*)\\\\.(0|[1-9]\\\\d*)(?:-((?:0|[1-9]\\\\d*|\\\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\\\.(?:0|[1-9]\\\\d*|\\\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\\\+([0-9a-zA-Z-]+(?:\\\\.[0-9a-zA-Z-]+)*))?\",").concat(newLine)
+                        .concat("                \"replace\":\"{{version}}\"").concat(newLine)
+                        .concat("            },").concat(newLine)
+                        .concat("            \"custom_version\": {").concat(newLine)
+                        .concat("                \"files\":\"custom_version.txt\",").concat(newLine)
+                        .concat("                \"match\":\"(0|[1-9]\\\\d*)\\\\.(0|[1-9]\\\\d*)\\\\.(0|[1-9]\\\\d*)(?:-((?:0|[1-9]\\\\d*|\\\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\\\.(?:0|[1-9]\\\\d*|\\\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\\\+([0-9a-zA-Z-]+(?:\\\\.[0-9a-zA-Z-]+)*))?\",").concat(newLine)
+                        .concat("                \"replace\":\"{{version}}\"").concat(newLine)
+                        .concat("            }").concat(newLine)
+                        .concat("        }").concat(newLine)
                         .concat("    }").concat(newLine)
                         .concat("}"),
                     // the version.txt file, used to test for substitutions, initialized with a fake version number to be replaced by Make
-                    "version.txt", "91.92.93"
+                    "version.txt", "91.92.93",
+                    "custom_version.txt", "91.92.93"
                 );
                 remoteRepoName  = "replica";
                 hostingRepoService = null;
@@ -1817,6 +1919,9 @@ public class Suites {
 					    "No changes."
                     ),
                     "version.txt", Set.<String>of(
+                        "0.0.6"
+                    ),
+                    "custom_version.txt", Set.<String>of(
                         "0.0.6"
                     )
                 );
@@ -1902,11 +2007,29 @@ public class Suites {
                         .concat("        }").concat(newLine)
                         .concat("    },").concat(newLine)
                         .concat("    \"substitutions\":{").concat(newLine)
-                        .concat("        \"enabled\":[ \"node_version\", \"text_version\" ]").concat(newLine)
+                        .concat("        \"enabled\":[ \"node_version\", \"text_version\", \"custom_version\" ],").concat(newLine)
+                        .concat("        \"items\": {").concat(newLine)
+                        .concat("            \"node_version\": {").concat(newLine)
+                        .concat("                \"files\":\"**/package.json\",").concat(newLine)
+                        .concat("                \"match\":\"\\\"version\\\"(\\\\s)*:(\\\\s)*\\\"(0|[1-9]\\\\d*)\\\\.(0|[1-9]\\\\d*)\\\\.(0|[1-9]\\\\d*)(?:-((?:0|[1-9]\\\\d*|\\\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\\\.(?:0|[1-9]\\\\d*|\\\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\\\+([0-9a-zA-Z-]+(?:\\\\.[0-9a-zA-Z-]+)*))?\\\"\",").concat(newLine)
+                        .concat("                \"replace\":\"\\\"version\\\": \\\"{{version}}\\\"\"").concat(newLine)
+                        .concat("            },").concat(newLine)
+                        .concat("            \"text_version\": {").concat(newLine)
+                        .concat("                \"files\":\"**/version.txt\",").concat(newLine)
+                        .concat("                \"match\":\"(0|[1-9]\\\\d*)\\\\.(0|[1-9]\\\\d*)\\\\.(0|[1-9]\\\\d*)(?:-((?:0|[1-9]\\\\d*|\\\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\\\.(?:0|[1-9]\\\\d*|\\\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\\\+([0-9a-zA-Z-]+(?:\\\\.[0-9a-zA-Z-]+)*))?\",").concat(newLine)
+                        .concat("                \"replace\":\"{{version}}\"").concat(newLine)
+                        .concat("            },").concat(newLine)
+                        .concat("            \"custom_version\": {").concat(newLine)
+                        .concat("                \"files\":\"custom_version.txt\",").concat(newLine)
+                        .concat("                \"match\":\"(0|[1-9]\\\\d*)\\\\.(0|[1-9]\\\\d*)\\\\.(0|[1-9]\\\\d*)(?:-((?:0|[1-9]\\\\d*|\\\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\\\.(?:0|[1-9]\\\\d*|\\\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\\\+([0-9a-zA-Z-]+(?:\\\\.[0-9a-zA-Z-]+)*))?\",").concat(newLine)
+                        .concat("                \"replace\":\"{{version}}\"").concat(newLine)
+                        .concat("            }").concat(newLine)
+                        .concat("        }").concat(newLine)
                         .concat("    }").concat(newLine)
                         .concat("}"),
                     // the version.txt file, used to test for substitutions, initialized with a fake version number to be replaced by Make
-                    "version.txt", "91.92.93"
+                    "version.txt", "91.92.93",
+                    "custom_version.txt", "91.92.93"
                 );
                 remoteRepoName  = "replica";
                 hostingRepoService = null;
@@ -1939,6 +2062,9 @@ public class Suites {
 					    "No changes."
                     ),
                     "version.txt", Set.<String>of(
+                        "0.0.6"
+                    ),
+                    "custom_version.txt", Set.<String>of(
                         "0.0.6"
                     )
                 );
@@ -2040,11 +2166,29 @@ public class Suites {
                         .concat("        }").concat(newLine)
                         .concat("    },").concat(newLine)
                         .concat("    \"substitutions\":{").concat(newLine)
-                        .concat("        \"enabled\":[ \"node_version\", \"text_version\" ]").concat(newLine)
+                        .concat("        \"enabled\":[ \"node_version\", \"text_version\", \"custom_version\" ],").concat(newLine)
+                        .concat("        \"items\": {").concat(newLine)
+                        .concat("            \"node_version\": {").concat(newLine)
+                        .concat("                \"files\":\"**/package.json\",").concat(newLine)
+                        .concat("                \"match\":\"\\\"version\\\"(\\\\s)*:(\\\\s)*\\\"(0|[1-9]\\\\d*)\\\\.(0|[1-9]\\\\d*)\\\\.(0|[1-9]\\\\d*)(?:-((?:0|[1-9]\\\\d*|\\\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\\\.(?:0|[1-9]\\\\d*|\\\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\\\+([0-9a-zA-Z-]+(?:\\\\.[0-9a-zA-Z-]+)*))?\\\"\",").concat(newLine)
+                        .concat("                \"replace\":\"\\\"version\\\": \\\"{{version}}\\\"\"").concat(newLine)
+                        .concat("            },").concat(newLine)
+                        .concat("            \"text_version\": {").concat(newLine)
+                        .concat("                \"files\":\"**/version.txt\",").concat(newLine)
+                        .concat("                \"match\":\"(0|[1-9]\\\\d*)\\\\.(0|[1-9]\\\\d*)\\\\.(0|[1-9]\\\\d*)(?:-((?:0|[1-9]\\\\d*|\\\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\\\.(?:0|[1-9]\\\\d*|\\\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\\\+([0-9a-zA-Z-]+(?:\\\\.[0-9a-zA-Z-]+)*))?\",").concat(newLine)
+                        .concat("                \"replace\":\"{{version}}\"").concat(newLine)
+                        .concat("            },").concat(newLine)
+                        .concat("            \"custom_version\": {").concat(newLine)
+                        .concat("                \"files\":\"custom_version.txt\",").concat(newLine)
+                        .concat("                \"match\":\"(0|[1-9]\\\\d*)\\\\.(0|[1-9]\\\\d*)\\\\.(0|[1-9]\\\\d*)(?:-((?:0|[1-9]\\\\d*|\\\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\\\.(?:0|[1-9]\\\\d*|\\\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\\\+([0-9a-zA-Z-]+(?:\\\\.[0-9a-zA-Z-]+)*))?\",").concat(newLine)
+                        .concat("                \"replace\":\"{{version}}\"").concat(newLine)
+                        .concat("            }").concat(newLine)
+                        .concat("        }").concat(newLine)
                         .concat("    }").concat(newLine)
                         .concat("}"),
                     // the version.txt file, used to test for substitutions, initialized with a fake version number to be replaced by Make
-                    "version.txt", "91.92.93"
+                    "version.txt", "91.92.93",
+                    "custom_version.txt", "91.92.93"
                 );
                 remoteRepoName  = null; // use 'origin', from the cloned repository from the hosting service
                 hostingRepoService = "github";
@@ -2081,6 +2225,9 @@ public class Suites {
                         "\\* \\[[a-z0-9]{5}\\] fix: Untagged commit \\[#1\\]\\(https:\\/\\/example\\.com\\/issues\\/1\\)"
                     ),
                     "version.txt", Set.<String>of(
+                        "v0.1.0"
+                    ),
+                    "custom_version.txt", Set.<String>of(
                         "v0.1.0"
                     )
                 );
@@ -2185,11 +2332,29 @@ public class Suites {
                         .concat("        }").concat(newLine)
                         .concat("    },").concat(newLine)
                         .concat("    \"substitutions\":{").concat(newLine)
-                        .concat("        \"enabled\":[ \"node_version\", \"text_version\" ]").concat(newLine)
+                        .concat("        \"enabled\":[ \"node_version\", \"text_version\", \"custom_version\" ],").concat(newLine)
+                        .concat("        \"items\": {").concat(newLine)
+                        .concat("            \"node_version\": {").concat(newLine)
+                        .concat("                \"files\":\"**/package.json\",").concat(newLine)
+                        .concat("                \"match\":\"\\\"version\\\"(\\\\s)*:(\\\\s)*\\\"(0|[1-9]\\\\d*)\\\\.(0|[1-9]\\\\d*)\\\\.(0|[1-9]\\\\d*)(?:-((?:0|[1-9]\\\\d*|\\\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\\\.(?:0|[1-9]\\\\d*|\\\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\\\+([0-9a-zA-Z-]+(?:\\\\.[0-9a-zA-Z-]+)*))?\\\"\",").concat(newLine)
+                        .concat("                \"replace\":\"\\\"version\\\": \\\"{{version}}\\\"\"").concat(newLine)
+                        .concat("            },").concat(newLine)
+                        .concat("            \"text_version\": {").concat(newLine)
+                        .concat("                \"files\":\"**/version.txt\",").concat(newLine)
+                        .concat("                \"match\":\"(0|[1-9]\\\\d*)\\\\.(0|[1-9]\\\\d*)\\\\.(0|[1-9]\\\\d*)(?:-((?:0|[1-9]\\\\d*|\\\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\\\.(?:0|[1-9]\\\\d*|\\\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\\\+([0-9a-zA-Z-]+(?:\\\\.[0-9a-zA-Z-]+)*))?\",").concat(newLine)
+                        .concat("                \"replace\":\"{{version}}\"").concat(newLine)
+                        .concat("            },").concat(newLine)
+                        .concat("            \"custom_version\": {").concat(newLine)
+                        .concat("                \"files\":\"custom_version.txt\",").concat(newLine)
+                        .concat("                \"match\":\"(0|[1-9]\\\\d*)\\\\.(0|[1-9]\\\\d*)\\\\.(0|[1-9]\\\\d*)(?:-((?:0|[1-9]\\\\d*|\\\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\\\.(?:0|[1-9]\\\\d*|\\\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\\\+([0-9a-zA-Z-]+(?:\\\\.[0-9a-zA-Z-]+)*))?\",").concat(newLine)
+                        .concat("                \"replace\":\"{{version}}\"").concat(newLine)
+                        .concat("            }").concat(newLine)
+                        .concat("        }").concat(newLine)
                         .concat("    }").concat(newLine)
                         .concat("}"),
                     // the version.txt file, used to test for substitutions, initialized with a fake version number to be replaced by Make
-                    "version.txt", "91.92.93"
+                    "version.txt", "91.92.93",
+                    "custom_version.txt", "91.92.93"
                 );
                 remoteRepoName  = null; // use 'origin', from the cloned repository from the hosting service
                 hostingRepoService = "github";
@@ -2226,6 +2391,9 @@ public class Suites {
                         "\\* \\[[a-z0-9]{5}\\] fix: Untagged commit \\[#1\\]\\(https:\\/\\/example\\.com\\/issues\\/1\\)"
                     ),
                     "version.txt", Set.<String>of(
+                        "v0.1.0"
+                    ),
+                    "custom_version.txt", Set.<String>of(
                         "v0.1.0"
                     )
                 );
@@ -2327,11 +2495,29 @@ public class Suites {
                         .concat("        }").concat(newLine)
                         .concat("    },").concat(newLine)
                         .concat("    \"substitutions\":{").concat(newLine)
-                        .concat("        \"enabled\":[ \"node_version\", \"text_version\" ]").concat(newLine)
+                        .concat("        \"enabled\":[ \"node_version\", \"text_version\", \"custom_version\" ],").concat(newLine)
+                        .concat("        \"items\": {").concat(newLine)
+                        .concat("            \"node_version\": {").concat(newLine)
+                        .concat("                \"files\":\"**/package.json\",").concat(newLine)
+                        .concat("                \"match\":\"\\\"version\\\"(\\\\s)*:(\\\\s)*\\\"(0|[1-9]\\\\d*)\\\\.(0|[1-9]\\\\d*)\\\\.(0|[1-9]\\\\d*)(?:-((?:0|[1-9]\\\\d*|\\\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\\\.(?:0|[1-9]\\\\d*|\\\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\\\+([0-9a-zA-Z-]+(?:\\\\.[0-9a-zA-Z-]+)*))?\\\"\",").concat(newLine)
+                        .concat("                \"replace\":\"\\\"version\\\": \\\"{{version}}\\\"\"").concat(newLine)
+                        .concat("            },").concat(newLine)
+                        .concat("            \"text_version\": {").concat(newLine)
+                        .concat("                \"files\":\"**/version.txt\",").concat(newLine)
+                        .concat("                \"match\":\"(0|[1-9]\\\\d*)\\\\.(0|[1-9]\\\\d*)\\\\.(0|[1-9]\\\\d*)(?:-((?:0|[1-9]\\\\d*|\\\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\\\.(?:0|[1-9]\\\\d*|\\\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\\\+([0-9a-zA-Z-]+(?:\\\\.[0-9a-zA-Z-]+)*))?\",").concat(newLine)
+                        .concat("                \"replace\":\"{{version}}\"").concat(newLine)
+                        .concat("            },").concat(newLine)
+                        .concat("            \"custom_version\": {").concat(newLine)
+                        .concat("                \"files\":\"custom_version.txt\",").concat(newLine)
+                        .concat("                \"match\":\"(0|[1-9]\\\\d*)\\\\.(0|[1-9]\\\\d*)\\\\.(0|[1-9]\\\\d*)(?:-((?:0|[1-9]\\\\d*|\\\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\\\.(?:0|[1-9]\\\\d*|\\\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\\\+([0-9a-zA-Z-]+(?:\\\\.[0-9a-zA-Z-]+)*))?\",").concat(newLine)
+                        .concat("                \"replace\":\"{{version}}\"").concat(newLine)
+                        .concat("            }").concat(newLine)
+                        .concat("        }").concat(newLine)
                         .concat("    }").concat(newLine)
                         .concat("}"),
                     // the version.txt file, used to test for substitutions, initialized with a fake version number to be replaced by Make
-                    "version.txt", "91.92.93"
+                    "version.txt", "91.92.93",
+                    "custom_version.txt", "91.92.93"
                 );
                 remoteRepoName  = null; // use 'origin', from the cloned repository from the hosting service
                 hostingRepoService = "gitlab";
@@ -2368,6 +2554,9 @@ public class Suites {
                         "\\* \\[[a-z0-9]{5}\\] fix: Untagged commit \\[#1\\]\\(https:\\/\\/example\\.com\\/issues\\/1\\)"
                     ),
                     "version.txt", Set.<String>of(
+                        "v0.1.0"
+                    ),
+                    "custom_version.txt", Set.<String>of(
                         "v0.1.0"
                     )
                 );
@@ -2472,11 +2661,29 @@ public class Suites {
                         .concat("        }").concat(newLine)
                         .concat("    },").concat(newLine)
                         .concat("    \"substitutions\":{").concat(newLine)
-                        .concat("        \"enabled\":[ \"node_version\", \"text_version\" ]").concat(newLine)
+                        .concat("        \"enabled\":[ \"node_version\", \"text_version\", \"custom_version\" ],").concat(newLine)
+                        .concat("        \"items\": {").concat(newLine)
+                        .concat("            \"node_version\": {").concat(newLine)
+                        .concat("                \"files\":\"**/package.json\",").concat(newLine)
+                        .concat("                \"match\":\"\\\"version\\\"(\\\\s)*:(\\\\s)*\\\"(0|[1-9]\\\\d*)\\\\.(0|[1-9]\\\\d*)\\\\.(0|[1-9]\\\\d*)(?:-((?:0|[1-9]\\\\d*|\\\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\\\.(?:0|[1-9]\\\\d*|\\\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\\\+([0-9a-zA-Z-]+(?:\\\\.[0-9a-zA-Z-]+)*))?\\\"\",").concat(newLine)
+                        .concat("                \"replace\":\"\\\"version\\\": \\\"{{version}}\\\"\"").concat(newLine)
+                        .concat("            },").concat(newLine)
+                        .concat("            \"text_version\": {").concat(newLine)
+                        .concat("                \"files\":\"**/version.txt\",").concat(newLine)
+                        .concat("                \"match\":\"(0|[1-9]\\\\d*)\\\\.(0|[1-9]\\\\d*)\\\\.(0|[1-9]\\\\d*)(?:-((?:0|[1-9]\\\\d*|\\\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\\\.(?:0|[1-9]\\\\d*|\\\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\\\+([0-9a-zA-Z-]+(?:\\\\.[0-9a-zA-Z-]+)*))?\",").concat(newLine)
+                        .concat("                \"replace\":\"{{version}}\"").concat(newLine)
+                        .concat("            },").concat(newLine)
+                        .concat("            \"custom_version\": {").concat(newLine)
+                        .concat("                \"files\":\"custom_version.txt\",").concat(newLine)
+                        .concat("                \"match\":\"(0|[1-9]\\\\d*)\\\\.(0|[1-9]\\\\d*)\\\\.(0|[1-9]\\\\d*)(?:-((?:0|[1-9]\\\\d*|\\\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\\\.(?:0|[1-9]\\\\d*|\\\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\\\+([0-9a-zA-Z-]+(?:\\\\.[0-9a-zA-Z-]+)*))?\",").concat(newLine)
+                        .concat("                \"replace\":\"{{version}}\"").concat(newLine)
+                        .concat("            }").concat(newLine)
+                        .concat("        }").concat(newLine)
                         .concat("    }").concat(newLine)
                         .concat("}"),
                     // the version.txt file, used to test for substitutions, initialized with a fake version number to be replaced by Make
-                    "version.txt", "91.92.93"
+                    "version.txt", "91.92.93",
+                    "custom_version.txt", "91.92.93"
                 );
                 remoteRepoName  = null; // use 'origin', from the cloned repository from the hosting service
                 hostingRepoService = "gitlab";
@@ -2513,6 +2720,9 @@ public class Suites {
                         "\\* \\[[a-z0-9]{5}\\] fix: Untagged commit \\[#1\\]\\(https:\\/\\/example\\.com\\/issues\\/1\\)"
                     ),
                     "version.txt", Set.<String>of(
+                        "v0.1.0"
+                    ),
+                    "custom_version.txt", Set.<String>of(
                         "v0.1.0"
                     )
                 );
