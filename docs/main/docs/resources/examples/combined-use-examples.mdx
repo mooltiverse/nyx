@@ -89,7 +89,7 @@ jobs:
     # Here we use the Nyx GitHub Action just to read the data from its state file (generated in the above step)
     - name: Load Nyx data
       id: nyx
-      uses: mooltiverse/nyx@main
+      uses: mooltiverse/nyx-github-action@main
       # The following parameters are here just to show but 'infer' is the default command while the other options are set in the configuration file
       #with:
       #  command: infer
@@ -145,7 +145,7 @@ jobs:
     # Here we use the Nyx GitHub Action just to read the data from its state file (generated in the above step)
     - name: Load Nyx data
       id: nyx
-      uses: mooltiverse/nyx@main
+      uses: mooltiverse/nyx-github-action@main
       # The following parameters are here just to show but 'infer' is the default command while the other options are set in the configuration file
       #with:
       #  command: infer

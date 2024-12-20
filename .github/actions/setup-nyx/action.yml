@@ -196,7 +196,7 @@ runs:
     # by the previous step into the build/.nyx-state.json and export it to outputs.
     id: nyx
     if: ${{ inputs.enable-action == 'true' }}
-    uses: mooltiverse/nyx@main
+    uses: mooltiverse/nyx-github-action@main
   - name: Publish the job artifacts with the Nyx state and summary
     uses: actions/upload-artifact@v4
     if: ${{ inputs.enable-artifacts == 'true' }}

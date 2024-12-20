@@ -243,6 +243,10 @@ export default {
               to: 'https://plugins.gradle.org/plugin/com.mooltiverse.oss.nyx',
             },
             {
+              label: 'GitHub Action',
+              to: 'https://github.com/mooltiverse/nyx-github-action',
+            },
+            {
               label: 'Go Docs',
               to: 'https://godocs.io/github.com/mooltiverse/nyx/src/go/nyx',
             },
