@@ -88,7 +88,9 @@ public class Suites {
             extensiveTestVersions.add("8.6");
             extensiveTestVersions.add("8.5");
             extensiveTestVersions.add("8.4");
-            extensiveTestVersions.add("8.3");
+            // These tests are suspended due to the 'GRADLE MULTI-RELEASE JARS ERROR'
+            // commented below.
+            //extensiveTestVersions.add("8.3");
         }
         if (javaVersion <= 19) {
             // GRADLE MULTI-RELEASE JARS ERROR
