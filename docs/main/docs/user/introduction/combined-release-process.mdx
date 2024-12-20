@@ -74,14 +74,14 @@ jobs:
       with:
         fetch-depth: 0
     - name: Run nyx Infer
-      uses: mooltiverse/nyx-github-action@main
+      uses: mooltiverse/nyx@main
       with:
         command: infer
         resume: true
         stateFile: .nyx-state.json
     # Run other tasks here....
     - name: Run nyx Publish
-      uses: mooltiverse/nyx-github-action@main
+      uses: mooltiverse/nyx@main
       with:
         command: publish
         resume: true
@@ -108,7 +108,7 @@ jobs:
         key: ${{ github.run_id }}-nyx-state
         restore-keys: ${{ github.run_id }}-nyx-state
     - name: Run nyx Infer
-      uses: mooltiverse/nyx-github-action@main
+      uses: mooltiverse/nyx@main
       with:
         command: infer
         resume: true
@@ -131,14 +131,12 @@ jobs:
         key: ${{ github.run_id }}-nyx-state
         restore-keys: ${{ github.run_id }}-nyx-state
     - name: Run nyx Publish
-      uses: mooltiverse/nyx-github-action@main
+      uses: mooltiverse/nyx@main
       with:
         command: publish
         resume: true
         stateFile: .nyx-state.json
 ```
-
-Please refer to the [Nyx GitHub Action](https://github.com/mooltiverse/nyx-github-action?tab=readme-ov-file#combined-release-process) for more.
 
 ## Using a combination of Nyx flavors
 

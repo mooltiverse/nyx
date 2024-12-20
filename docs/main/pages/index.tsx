@@ -36,11 +36,6 @@ const RESOURCES: ResourceItem[] = [
         "title": "Releases",
         "url": "https://github.com/mooltiverse/nyx/releases/latest",
         "logo": ''
-      },
-      {
-        "title": "Action",
-        "url": "https://github.com/mooltiverse/nyx-github-action",
-        "logo": ''
       }
     ]
   },
@@ -242,7 +237,7 @@ const FEATURES: FeatureItem[] = [
     },
     description: (
       <>
-        <a href='https://github.com/mooltiverse/nyx-github-action' target='_blank'>GitHub Action</a> available.
+        <a href='https://mooltiverse.github.io/nyx/docs/user/quick-start/github-action' target='_blank'>GitHub Action</a> available.
       </>
     ),
   },
