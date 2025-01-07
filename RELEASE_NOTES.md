@@ -1,5 +1,20 @@
 # Nyx Release Notes
 
+## 3.1.1
+
+This release is available at [this link](https://github.com/mooltiverse/nyx/releases/tag/3.1.1).
+
+### Upgrade instructions
+
+There are no actions to take for backward compatibility.
+
+### New features and improvements
+
+This release:
+
+* fixes a [vulnerability issue](https://github.com/advisories/GHSA-r9px-m959-cxf4) in the go-git library
+* upgrades Go to version 1.23.4
+
 ## 3.1.0
 
 This release is available at [this link](https://github.com/mooltiverse/nyx/releases/tag/3.1.0).
