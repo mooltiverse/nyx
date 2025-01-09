@@ -150,6 +150,7 @@ subprojects {
     doLast {
       logger.quiet("Installing Docusaurus")
       exec {
+        workingDir projectDir
         commandLine 'npm', 'install'
       }
     }
@@ -171,6 +172,7 @@ subprojects {
     doLast {
       logger.quiet("Building the Docusaurus site")
       exec {
+        workingDir projectDir
         commandLine 'npm', 'run', 'build'
       }
     }
