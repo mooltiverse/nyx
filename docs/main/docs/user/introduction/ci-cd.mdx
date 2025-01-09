@@ -12,9 +12,9 @@ Nyx is perfectly suited for use in CI/CD platforms and leverage [automation](../
 
 ## [GitHub Actions](https://docs.github.com/en/actions)
 
-### Using the official Nyx GitHub Action
-
-Please refer to the [GitHub Action home page](https://mooltiverse.github.io/nyx-github-action).
+:::tip
+Check out [this section](./usage.mdx#using-the-github-action) for a full reference on the GitHub Action.
+:::
 
 ### Check out the entire repository when running jobs
 
@@ -25,7 +25,7 @@ This prevents Nyx from inferring information from the commit history and you lik
 To work around this you just have to configure the checkout action to always fetch the entire commit history by setting the `fetch-depth` parameter to `0` as documented [here](https://github.com/actions/checkout#Fetch-all-history-for-all-tags-and-branches):
 
 ```yaml
-- uses: actions/checkout@v3
+- uses: actions/checkout@v4
   with:
     fetch-depth: 0
 ```
@@ -38,7 +38,7 @@ When running GitHub Actions pipelines you can take advantage of the [automatic t
 
 As an example, to read the token and set it as the `GH_TOKEN` environment variable you can define your GitHub Actions job like in the following snippets.
 
-Running Nyx using the [GitHub Action](https://mooltiverse.github.io/nyx-github-action#usage):
+Running Nyx using the [GitHub Action](./usage.mdx#using-the-github-action):
 
 ```yaml
 release:
@@ -64,7 +64,7 @@ release:
 
 ## [GitLab CI](https://docs.gitlab.com/ee/ci/)
 
-When running pipelines on GitLab CI you need to override some defaults to make Nyx work correctly. In particular you need to set the values for the [`GIT_STRATEGY`](https://docs.gitlab.com/ee/ci/runners/configure_runners.html#git-strategy) and [`GIT_DEPTH`](https://docs.gitlab.com/ee/ci/runners/configure_runners.html#shallow-cloning) variables to `clone` and `0` respectively,  so that the entire repository is checked out, like:
+When running pipelines on GitLab CI you need to override some defaults to make Nyx work correctly. In particular you need to set the values for the [`GIT_STRATEGY`](https://docs.gitlab.com/ee/ci/runners/configure_runners.html#git-strategy) and [`GIT_DEPTH`](https://docs.gitlab.com/ee/ci/runners/configure_runners.html#shallow-cloning) variables to `clone` and `0` respectively, so that the entire repository is checked out, like:
 
 ```yaml
 variables:

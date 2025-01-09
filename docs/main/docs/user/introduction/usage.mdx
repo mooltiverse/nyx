@@ -496,7 +496,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Git checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         fetch-depth: 0
     // highlight-start
@@ -588,7 +588,7 @@ This prevents Nyx from inferring information from the commit history and you lik
 To work around this you just have to configure the checkout action to always fetch the entire commit history by setting the `fetch-depth` parameter to `0` as in this example:
 
 ```yaml
-- uses: actions/checkout@v3
+- uses: actions/checkout@v4
   with:
     // highlight-start
     fetch-depth: 0
@@ -606,7 +606,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Git checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         fetch-depth: 0
     - name: Run nyx Infer
@@ -637,12 +637,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Git checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         fetch-depth: 0
     // highlight-start
     - name: Set up the cache to store and retrieve the Nyx state
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: |
           .nyx-state.json
@@ -662,12 +662,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Git checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         fetch-depth: 0
     // highlight-start
     - name: Set up the cache to store and retrieve the Nyx state
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: |
           .nyx-state.json

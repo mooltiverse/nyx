@@ -70,7 +70,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Git checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         fetch-depth: 0
     - name: Run nyx Infer
@@ -97,11 +97,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Git checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         fetch-depth: 0
     - name: Set up the cache to store and retrieve the Nyx state
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: |
           .nyx-state.json
@@ -120,11 +120,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Git checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         fetch-depth: 0
     - name: Set up the cache to store and retrieve the Nyx state
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: |
           .nyx-state.json
@@ -138,7 +138,7 @@ jobs:
         stateFile: .nyx-state.json
 ```
 
-Please refer to the [Nyx GitHub Action](https://github.com/mooltiverse/nyx-github-action?tab=readme-ov-file#combined-release-process) for more.
+Please refer to the [Nyx GitHub Action](./usage.mdx#using-the-github-action) for more.
 
 ## Using a combination of Nyx flavors
 
