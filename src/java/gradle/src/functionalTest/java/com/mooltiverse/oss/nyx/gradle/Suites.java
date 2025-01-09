@@ -77,7 +77,8 @@ public class Suites {
         // Gradle versions from 7.0 on are recommended
         if (javaVersion <= 20) {
             // the latest version is always among the 'quick' tests
-            quickTestVersions.add("8.11.1");
+            quickTestVersions.add("8.12");
+            extensiveTestVersions.add("8.11.1");
             extensiveTestVersions.add("8.11");
             extensiveTestVersions.add("8.10.2");
             extensiveTestVersions.add("8.10.1");
