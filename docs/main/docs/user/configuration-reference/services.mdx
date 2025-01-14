@@ -25,7 +25,7 @@ Each service configuration has the following attributes:
 | Name                                                                                       | Type    | Command Line Option                                                   | Environment Variable                                                    | Default                                              |
 | ------------------------------------------------------------------------------------------ | ------- | --------------------------------------------------------------------- | ----------------------------------------------------------------------- | ---------------------------------------------------- |
 | [`services/<NAME>/name`](#name)                                                            | string  | `--services-<NAME>-name=<NAME>`                                       | `NYX_SERVICES_<NAME>_NAME=<NAME>`                                       | N/A                                                  |
-| [`services/<NAME>/options`](#options)                                                      | [map](../introduction/configuration-methods.mdx#collections-of-objects)   `--services-<NAME>-options-<OPTION>=<VALUE>` | `NYX_SERVICES_<NAME>_OPTIONS-<OPTION>=<VALUE>` | Empty                                  |
+| [`services/<NAME>/options`](#options)                                                      | [map](../introduction/configuration-methods.mdx#collections-of-objects)   `--services-<NAME>-options-<OPTION>=<VALUE>` | `NYX_SERVICES_<NAME>_OPTIONS_<OPTION>=<VALUE>` | Empty                                  |
 | [`services/<NAME>/type`](#type)                                                            | string  | `--services-<NAME>-type=<TYPE>`                                       | `NYX_SERVICES_<NAME>_TYPE=<TYPE>`                                       | N/A                                                  |
 
 :::warning
@@ -56,7 +56,7 @@ This option is **mandatory**.
 | Type                      | [map](../introduction/configuration-methods.mdx#collections-of-objects)                  |
 | Default                   | Empty                                                                                    |
 | Command Line Option       | `--services-<NAME>-options-<OPTION>=<VALUE>`                                             |
-| Environment Variable      | `NYX_SERVICES_<NAME>_OPTIONS-<OPTION>=<VALUE>`                                           |
+| Environment Variable      | `NYX_SERVICES_<NAME>_OPTIONS_<OPTION>=<VALUE>`                                           |
 | Configuration File Option | `services/<NAME>/options`                                                                |
 | Related state attributes  |                                                                                          |
 
