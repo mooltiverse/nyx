@@ -74,6 +74,14 @@ Configuring remotes gives Nyx information about:
 * the authentication method to use for remote repositories
 * the credentials to use when performing operations to and from remote repositories
 
+:::warning
+`<name>` is the name of the remote to configure. It is case sensitive, even for environment variable. 
+Example: 
+- Remote name: `origin`
+- Command Line Option: `--git-remotes-origin-authenticationMethod=<METHOD>`
+- Environment Variable: `NYX_GIT_REMOTES_origin_AUTHENTICATION_METHOD=<METHOD>`
+:::
+
 Each remote has the following attributes:
 
 | Name                                                                | Type    | Command Line Option                                  | Environment Variable                                    | Default |
