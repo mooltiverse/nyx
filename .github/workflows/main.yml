@@ -404,9 +404,9 @@ jobs:
     name: Docusaurus Publish
     needs:
     - initialize
-    - test
+    #- test
     - docusaurus-build
-    if: needs.initialize.outputs.release == 'true'
+    if: needs.initialize.outputs.docusaurusChanged == 'true' || needs.initialize.outputs.release == 'true'
     uses: mooltiverse/nyx/.github/workflows/docusaurus-publish.yml@main
     with:
       verbosity: info
