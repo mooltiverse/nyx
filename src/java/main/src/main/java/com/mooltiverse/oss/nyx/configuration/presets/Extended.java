@@ -51,7 +51,7 @@ public class Extended extends SimpleConfigurationLayer {
                 Map.<String,CommitMessageConvention>of("conventionalCommits", com.mooltiverse.oss.nyx.configuration.presets.CommitMessageConventions.CONVENTIONAL_COMMITS, "conventionalCommitsForMerge", com.mooltiverse.oss.nyx.configuration.presets.CommitMessageConventions.CONVENTIONAL_COMMITS_FOR_MERGE, "gitmoji", com.mooltiverse.oss.nyx.configuration.presets.CommitMessageConventions.GITMOJI))
         );
 
-        // add the 'mainline' and 'internal' release types
+        // add all release types
         setReleaseTypes(
             new ReleaseTypes(
                 List.<String>of("mainline", "integration", "maturity", "feature", "fix", "hotfix", "release", "maintenance", "internal"),

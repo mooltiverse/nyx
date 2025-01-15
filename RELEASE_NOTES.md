@@ -1,5 +1,20 @@
 # Nyx Release Notes
 
+## 3.1.3
+
+This release is available at [this link](https://github.com/mooltiverse/nyx/releases/tag/3.1.3).
+
+### Upgrade instructions
+
+There are no actions to take for backward compatibility.
+
+### New features and improvements
+
+This release:
+
+* adds the GitHub and GitLab services to the extended preset ([352](https://github.com/mooltiverse/nyx/issues/352))
+* upgrades all the Go libraries to fix the latest security alerts
+
 ## 3.1.2
 
 This release is available at [this link](https://github.com/mooltiverse/nyx/releases/tag/3.1.2).
