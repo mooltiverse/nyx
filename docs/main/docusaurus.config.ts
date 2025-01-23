@@ -30,6 +30,18 @@ export default {
     locales: ['en'],
   },
 
+  // Markdown configuration.
+  // For more see:
+  // - https://docusaurus.io/docs/api/docusaurus-config#markdown
+  markdown: {
+    // Make Docusaurus select the markdown parser to use based on each file
+    // extension instead of using the default 'mdx' for all files.
+    // This is required to avoid errors (i.e. not parsing square bracket links
+    // correctly in plain .md files).
+    format: 'detect',
+    mermaid: true,
+  },
+
   // Non Docusaurus fields
   customFields: {
     // When the GOOGLE_CLIENT_ID environment variable is set authentication
