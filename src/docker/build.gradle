@@ -464,6 +464,23 @@ subprojects {
       argsList.addAll('--annotation', "org.opencontainers.image.licenses=${project.getProperty("licenses")}")
     }
     argsList.addAll('--annotation', "org.opencontainers.image.ref.name=${nyxState.branch}")
+    if (project.hasProperty("dockerBuildArgs") && !project.getProperty("dockerBuildArgs").trim().isBlank()) {
+      project.getProperty("dockerBuildArgs").split(',').each { v -> 
+        def setName = v.split('=')[0]
+        def setValue = v.split('=')[1]
+        logger.debug("Adding the extra argument '${setName}'")
+        if (setValue.startsWith('$')) {
+          logger.debug("Resolving the value for the '${setName}' argument from the environment variable '${setValue}'")
+          if (System.getenv(setValue.substring(1)) == null) {
+            logger.warn("The value for the '${setName}' argument is supposed to be read by the '${setValue}' environment variable but no '${setValue}' has been found. Set the '${setValue}' environment variable if you consider this a mistake.")
+            setValue = ""
+          } else {
+            setValue = System.getenv(setValue.substring(1))
+          }
+        }
+        argsList.addAll('--build-arg', "${setName}=${setValue}")
+      }
+    }
 
     return argsList
   }
