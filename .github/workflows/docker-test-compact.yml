@@ -139,6 +139,36 @@ on:
         type: string
         required: false
         default: 'wrapper'
+      install-node:
+        description: |-
+          Whether to install Node or not.
+          For more see: https://github.com/actions/setup-node.
+          Please note that the tools come preinstalled in many hosted GitHub
+          runner images and re-installing would just slow down the setup process.
+          Consider installing only when the runners don't have it preinstalled or
+          when you need a specific version.
+          To check out if it's already installed see:
+          - https://docs.github.com/en/actions/using-github-hosted-runners/using-github-hosted-runners/about-github-hosted-runners#preinstalled-software
+          Default: false
+        type: boolean
+        required: false
+        default: false
+      install-node-version:
+        description: |-
+          The Node SDK version to setup if 'install-node' is 'true'.
+          For available versions see: https://github.com/actions/setup-node.
+          Default: latest
+        type: string
+        required: false
+        default: 'latest'
+      install-newman:
+        description: |-
+          Whether to install Newman or not.
+          For more see: https://learning.postman.com/docs/collections/using-newman-cli/installing-running-newman/.
+          Default: false
+        type: boolean
+        required: false
+        default: false
       delete-android:
         description: |-
           When true the jobs will first delete some preinstalled contents from
@@ -570,6 +600,16 @@ jobs:
         aws-container-registry: ${{ inputs.aws-container-registry }}
         aws-access-key-id: ${{ inputs.aws-access-key-id }}
         aws-secret-access-key: ${{ secrets.aws-secret-access-key }}
+    - id: node
+      if: inputs.node-cache-name-restore-suffix != ''
+      uses: mooltiverse/toolbox/.github/actions/setup-node@main
+      with:
+        verbosity: ${{ inputs.verbosity }}
+        install-node: ${{ inputs.install-node }}
+        install-node-version: ${{ inputs.install-node-version }}
+        install-newman: ${{ inputs.install-newman }}
+        # Restore the cache from the previous job to 'chain' the two caches
+        cache-name-restore-suffix: ${{ inputs.node-cache-name-restore-suffix }}
     - id: gradle
       uses: mooltiverse/nyx/.github/actions/setup-gradle@main
       with:

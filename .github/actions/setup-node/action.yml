@@ -145,6 +145,13 @@ inputs:
       Default: latest
     required: false
     default: 'latest'
+  install-newman:
+    description: |-
+      Whether to install Newman or not.
+      For more see: https://learning.postman.com/docs/collections/using-newman-cli/installing-running-newman/.
+      Default: false
+    required: false
+    default: 'false'
 outputs:
   probed:
     description: "Returns 'true' if this action has probed the files for this feature."
@@ -221,3 +228,8 @@ runs:
     if: ${{ inputs.install-node == 'true' }}
     with:
       node-version: ${{ inputs.install-node-version }}
+  - name: Install Newman
+    if: ${{ inputs.install-newman == 'true' }}
+    shell: bash
+    run: npm install -g newman
+

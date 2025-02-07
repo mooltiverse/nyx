@@ -233,3 +233,6 @@ runs:
       enable-cache: false
       enable-changed-files-detection: false
       node-version: ${{ inputs.install-node-version }}
+  - name: Install Docusaurus
+    shell: bash
+    run: npm install -g docusaurus

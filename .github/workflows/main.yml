@@ -150,6 +150,8 @@ jobs:
       nyx-cache-name-restore-suffix: ${{ needs.initialize.outputs.nyx-cache-name-suffix }}
       gradle-cache-name-restore-suffix: ${{ needs.java-build.outputs.gradle-cache-name-suffix }}
       java-cache-name-restore-suffix: ${{ needs.java-build.outputs.java-cache-name-suffix }}
+      install-node: false
+      install-newman: false
       # When running in non-main branches reduce the number of test cases to speed up the build.
       # Use the 'quickTests' for this purpose, which is a property parsed by the Gradle scripts
       gradle-arguments: --build-cache --stacktrace ${{ github.ref == 'refs/heads/main' && '-PquickTests=false' || '-PquickTests=true' }}
@@ -261,6 +263,8 @@ jobs:
       nyx-cache-name-restore-suffix: ${{ needs.initialize.outputs.nyx-cache-name-suffix }}
       gradle-cache-name-restore-suffix: ${{ needs.go-build.outputs.gradle-cache-name-suffix }}
       go-cache-name-restore-suffix: ${{ needs.go-build.outputs.go-cache-name-suffix }}
+      install-node: false
+      install-newman: false
       # When running in non-main branches reduce the number of test cases to speed up the build.
       # Use the 'quickTests' for this purpose, which is a property parsed by the Gradle scripts
       gradle-arguments: --build-cache --stacktrace ${{ github.ref == 'refs/heads/main' && '-PquickTests=false' || '-PquickTests=true' }}
@@ -339,6 +343,8 @@ jobs:
       go-cache-name-restore-suffix: ${{ needs.go-build.outputs.go-cache-name-suffix }}
       gradle-cache-name-restore-suffix: ${{ needs.docker-build.outputs.gradle-cache-name-suffix }}
       docker-cache-name-restore-suffix: ${{ needs.docker-build.outputs.docker-cache-name-suffix }}
+      install-node: false
+      install-newman: false
     secrets:
       # Pass extra properties used by the Gradle scripts to run tests.
       # See the top level
