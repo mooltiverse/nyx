@@ -481,6 +481,14 @@ subprojects {
         argsList.addAll('--build-arg', "${setName}=${setValue}")
       }
     }
+    if (project.hasProperty("dockerBuildSecrets") && !project.getProperty("dockerBuildSecrets").trim().isBlank()) {
+      // Note here a semicolon is used as a separator because commas are also used
+      // for secret values. See https://docs.docker.com/build/building/secrets/
+      project.getProperty("dockerBuildSecrets").split(';').each { v -> 
+        logger.debug("Adding the extra secret '${v}'")
+        argsList.addAll('--secret', "${v}")
+      }
+    }
 
     return argsList
   }
