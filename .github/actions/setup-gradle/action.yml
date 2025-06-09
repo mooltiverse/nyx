@@ -266,7 +266,7 @@ runs:
     # hardcoded for non 'main' branches.
     # As a result, we only use this cache for the 'main' branch, where it's very
     # effective, otherwise we use the custom one above.
-    uses: burrunan/gradle-cache-action@v2
+    uses: burrunan/gradle-cache-action@v3
     if: ${{ inputs.enable-cache == 'true' && github.ref == 'refs/heads/main' }}
     with:
       gradle-version: ${{ inputs.install-gradle-version }}
