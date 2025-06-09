@@ -602,7 +602,7 @@ jobs:
         aws-secret-access-key: ${{ secrets.aws-secret-access-key }}
     - id: node
       if: inputs.node-cache-name-restore-suffix != ''
-      uses: mooltiverse/toolbox/.github/actions/setup-node@main
+      uses: mooltiverse/nyx/.github/actions/setup-node@main
       with:
         verbosity: ${{ inputs.verbosity }}
         install-node: ${{ inputs.install-node }}
