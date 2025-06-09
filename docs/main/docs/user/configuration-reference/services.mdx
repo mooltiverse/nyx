@@ -131,7 +131,7 @@ This service type supports the following [options](#options):
 | `REPOSITORY_NAME`                              | string  | `--services-<NAME>-options-REPOSITORY_NAME=<TOKEN>`        | `NYX_SERVICES_<NAME>_OPTIONS_REPOSITORY_NAME=<TOKEN>`      | `services/<NAME>/options/REPOSITORY_NAME`        | N/A                                        |
 | `REPOSITORY_OWNER`                             | string  | `--services-<NAME>-options-REPOSITORY_OWNER=<TOKEN>`       | `NYX_SERVICES_<NAME>_OPTIONS_REPOSITORY_OWNER=<TOKEN>`     | `services/<NAME>/options/REPOSITORY_OWNER`       | N/A                                        |
 
-`BASE_URI` is meant to be used if you're using GitHub on a self hosted environment. If that's your case just pass the URI to your REST API endpoint here otherwise, if you're using the public service, do not pass any value.
+`BASE_URI` is meant to be used if you're using GitHub on a self hosted environment. If that's your case just pass the URI to your REST API endpoint here (i.e. `https://github.example.com/api/v3/`) otherwise, if you're using the public service, do not pass any value.
 
 `AUTHENTICATION_TOKEN` is a [OAuth or Personal Access Token](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token) that is used to authenticate and perform access controlled operations. This option is **mandatory** for the service in order to work. Generally speaking here you can use a [template](templates.mdx#environmentvariable) that reads the [conventionally used](https://cli.github.com/manual/gh_help_environment) `GITHUB_TOKEN` or `GH_TOKEN` environment variable so you don't have to configure anything else, otherwise just paste a PAT here.
 
@@ -154,6 +154,10 @@ The service of `GITLAB` [type](#type) giving you access to [GitLab](https://gitl
 #### Release support
 
 This service type supports all release publication features with no limitations. See below for release assets.
+
+:::warning
+The release type [description](release-types.mdx#description) must be set in order to publish releases to GitLab.
+:::
 
 #### Release assets support
 

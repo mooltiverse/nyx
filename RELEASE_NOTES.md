@@ -1,5 +1,20 @@
 # Nyx Release Notes
 
+## 3.1.4
+
+This release is available at [this link](https://github.com/mooltiverse/nyx/releases/tag/3.1.4).
+
+### Upgrade instructions
+
+There are no actions to take for backward compatibility.
+
+### New features and improvements
+
+This release:
+
+* upgrades all the Go libraries to fix the latest security alerts
+* updates the docs according to [359](https://github.com/mooltiverse/nyx/issues/359) and [368](https://github.com/mooltiverse/nyx/issues/368)
+
 ## 3.1.3
 
 This release is available at [this link](https://github.com/mooltiverse/nyx/releases/tag/3.1.3).
