@@ -218,14 +218,16 @@ func (c *Mark) tag() error {
 				log.Tracef("tag template '%s' renders to '%s'", *tagTemplate, *tag)
 				log.Debugf("tag force flag is '%t'", forceFlag)
 				log.Debugf("tagging latest commit '%s' with tag '%s'", latestCommit, *tag)
+				if tagMessage != nil && "" == strings.TrimSpace(*tagMessage) {
+					tagMessage = nil
+				}
 				// Here we can also specify the Tagger Identity as per https://github.com/mooltiverse/nyx/issues/65
-				if tagMessage == nil || "" == strings.TrimSpace(*tagMessage) {
-					(*c.Repository()).TagWithMessageAndForce(tag, nil, forceFlag)
-				} else {
-					(*c.Repository()).TagWithMessageAndForce(tag, tagMessage, forceFlag)
+				gitTag, err := (*c.Repository()).TagWithMessageAndForce(tag, tagMessage, forceFlag)
+				if err != nil {
+					return err
 				}
 
-				log.Debugf("tag '%s' applied to commit '%s'", *tag, latestCommit)
+				log.Debugf("tag '%s' applied to commit '%s'", gitTag.Name, latestCommit)
 			}
 		}
 	}
