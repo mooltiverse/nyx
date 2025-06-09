@@ -26,7 +26,7 @@ const RESOURCES: ResourceItem[] = [
   {
     name: 'GitHub',
     environment: '',
-    url: 'https://github.com/mooltiverse/toolbox',
+    url: 'https://github.com/mooltiverse/nyx',
     description: (
       <></>
     ),
