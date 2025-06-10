@@ -12,7 +12,7 @@ There are no actions to take for backward compatibility.
 
 This release:
 
-* upgrades all the Go libraries to fix the latest security alerts
+* upgrades all the Go and Java libraries to fix the latest security alerts
 * updates the docs according to [359](https://github.com/mooltiverse/nyx/issues/359) and [368](https://github.com/mooltiverse/nyx/issues/368)
 
 ## 3.1.3
