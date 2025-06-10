@@ -190,9 +190,7 @@ public class GitHub implements GitHostingService, ReleaseService, UserService {
     public GitHubRepository createGitRepository(String name, String description, boolean restricted, boolean initialize)
         throws SecurityException, TransportException {
         try {
-            GHRepository ghRepository = client.createRepository(name).description(description).autoInit(initialize).visibility(restricted ? GHRepository.Visibility.PRIVATE : GHRepository.Visibility.PUBLIC).create();
-            // it looks like setting the visibility above against the builder doesn't work, so let's repeat it here
-            ghRepository.setVisibility(restricted ? GHRepository.Visibility.PRIVATE : GHRepository.Visibility.PUBLIC);
+            GHRepository ghRepository = client.createRepository(name).description(description).visibility(restricted ? GHRepository.Visibility.PRIVATE : GHRepository.Visibility.PUBLIC).autoInit(initialize).create();
             return new GitHubRepository(ghRepository);
         }
         catch (IOException ioe) {
