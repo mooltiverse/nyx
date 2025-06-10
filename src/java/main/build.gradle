@@ -30,15 +30,15 @@ configurations {
 dependencies {
   // Import dependencies from other modules of this project
   api                   project(':src:java:version')
-  implementation        'org.slf4j:slf4j-api:2.0.16'                                               // SLF4J API (http://www.slf4j.org/)
-  implementation        'org.eclipse.jgit:org.eclipse.jgit:7.0.0.202409031743-r'                   // JGit (https://www.eclipse.org/jgit/)
-  implementation        'org.eclipse.jgit:org.eclipse.jgit.ssh.jsch:7.0.0.202409031743-r'          // JGit JSch extension (https://www.eclipse.org/jgit/)
-  implementation        'com.github.mwiede:jsch:0.2.21'                                            // JSch SSH2 Java library (https://github.com/mwiede/jsch)
+  implementation        'org.slf4j:slf4j-api:2.0.17'                                               // SLF4J API (http://www.slf4j.org/)
+  implementation        'org.eclipse.jgit:org.eclipse.jgit:7.3.0.202506031305-r'                   // JGit (https://www.eclipse.org/jgit/)
+  implementation        'org.eclipse.jgit:org.eclipse.jgit.ssh.jsch:7.3.0.202506031305-r'          // JGit JSch extension (https://www.eclipse.org/jgit/)
+  implementation        'com.github.mwiede:jsch:0.2.26'                                            // JSch SSH2 Java library (https://github.com/mwiede/jsch)
   implementation        'com.fasterxml.jackson.core:jackson-databind:2.18.1'                       // Jackson JSON library (https://github.com/FasterXML/jackson)
   implementation        'com.fasterxml.jackson.core:jackson-annotations:2.18.1'                    // Jackson JSON library (https://github.com/FasterXML/jackson)
   implementation        'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.18.1'          // Jackson YAML library (https://github.com/FasterXML/jackson-dataformats-text/tree/master/yaml)
   implementation        'com.github.jknack:handlebars:4.4.0'                                       // Handlebars library (https://github.com/jknack/handlebars.java)
-  implementation        'org.kohsuke:github-api:1.326'                                             // GitHub API client Java library (https://github-api.kohsuke.org/)
+  implementation        'org.kohsuke:github-api:1.327'                                             // GitHub API client Java library (https://github-api.kohsuke.org/)
   // Bouncycastle is used by JSch to provide support for certain key types when running on older JVMs (see: https://github.com/mwiede/jsch#faq).
   // JVMs from 15 on don't need Bouncycastle.
   runtimeOnly           'org.bouncycastle:bcprov-jdk18on:1.79'                                     // Bouncycastle (https://www.bouncycastle.org/), (https://repo1.maven.org/maven2/org/bouncycastle/bcprov-jdk18on/)
