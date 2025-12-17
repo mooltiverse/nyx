@@ -156,6 +156,37 @@ subprojects {
     }
   }
 
+  task docusaurusUpgrade(group: 'build setup', description: 'Upgrades Docusaurus and the libraries used by the microsite') {
+    dependsOn docusaurusInstall
+    // Declare inputs and outputs of this task
+    // Run this task if there's any change in Docusaurus' configuration
+    inputs.files('docusaurus.config.ts')
+
+    doLast {
+      logger.quiet("Checking for packages requiring upgrade")
+      exec {
+        workingDir projectDir
+        commandLine 'npm', 'outdated'
+      }
+
+      logger.quiet("Upgrading packages")
+      exec {
+        workingDir projectDir
+        commandLine 'npx', 'npm-check-updates', '-u' 
+      }
+      exec {
+        workingDir projectDir
+        commandLine 'npm', 'install' 
+      }
+
+      logger.quiet("Cleaning up the cache")
+      exec {
+        workingDir projectDir
+        commandLine 'npm', 'run', 'clear' 
+      }
+    }
+  }
+
   task docusaurusBuild(group: 'build', description: 'Renders the documentation site with Docusaurus') {
     dependsOn rootProject.tasks.nyxMake
     dependsOn docusaurusInstall
