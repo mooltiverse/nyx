@@ -1,3 +1,12 @@
+/* Add support to inject the ExecOperations object in order to run exec commands.
+ * See: https://docs.gradle.org/current/userguide/service_injection.html#execoperations
+ */
+import org.gradle.process.ExecOperations
+import javax.inject.Inject
+interface InjectedExec {
+  @Inject ExecOperations getExecOps()
+}
+
 /*------------------------------------------------------------------------------
   Plugins DSL block
   https://docs.gradle.org/current/userguide/plugins.html#sec:plugins_block
@@ -657,6 +666,8 @@ subprojects {
       // files are up to date.
       outputs.upToDateWhen { dockerBuilderPresent }
 
+      // Inject the ExecOperations service to run exec commands (see imports on top of the file)
+      def injectedExecOps = project.objects.newInstance(InjectedExec)
       doLast {
         if (dockerBuilderPresent) {
           logger.quiet("The Docker Buildkit builder named ${dockerBuilderName(flavor)} for the Docker image ${dockerfile} already exists")
@@ -674,14 +685,14 @@ subprojects {
           argsList.addAll('--name', dockerBuilderName(flavor))
 
           // Eventually run the build command
-          exec {
+          injectedExecOps.execOps.exec {
             workingDir projectDir
             executable 'docker'
             args argsList
           }
 
           logger.info("Printing information for builder ${dockerBuilderName(flavor)} used for image ${dockerfile}")
-          exec {
+          injectedExecOps.execOps.exec {
             // Print to the INFO level
             logging.captureStandardOutput LogLevel.INFO
             logging.captureStandardError  LogLevel.ERROR
@@ -706,6 +717,8 @@ subprojects {
       outputs.files(dockerImageOCIFile(dockerfile, flavor))
       outputs.files(dockerStateIIDFile(dockerfile))
 
+      // Inject the ExecOperations service to run exec commands (see imports on top of the file)
+      def injectedExecOps = project.objects.newInstance(InjectedExec)
       doLast {
         logger.quiet("Building the Docker image ${dockerfile} using the Docker Buildkit builder named ${dockerStateBuilderFile(dockerfile).text} and storing the image to ${dockerImageOCIFile(dockerfile, flavor)}")
         // Prepare the dynamic list of command line arguments, start from common arguments
@@ -730,7 +743,7 @@ subprojects {
         argsList.addAll('--file', dockerfile, '.')
 
         // Eventually run the build command
-        exec {
+        injectedExecOps.execOps.exec {
           workingDir projectDir
           executable 'docker'
           args argsList
@@ -763,12 +776,14 @@ subprojects {
       // files are up to date.
       outputs.upToDateWhen { dockerImagePresent }
       
+      // Inject the ExecOperations service to run exec commands (see imports on top of the file)
+      def injectedExecOps = project.objects.newInstance(InjectedExec)
       doLast {
         if (dockerImagePresent) {
           logger.quiet("The Docker Image with SHA ${dockerStateIIDFile(dockerfile).text} for the Docker image ${dockerfile} already exists in the local image store")
         } else {
           logger.quiet("Loading the Docker image ${dockerfile} from ${dockerImageOCIFile(dockerfile, flavor)} to the local Docker image store")
-          exec {
+          injectedExecOps.execOps.exec {
             commandLine 'docker', 'load', '--input', dockerImageOCIFile(dockerfile, flavor)
           }
           // Save the SHA of the image to the output file.
@@ -815,6 +830,8 @@ subprojects {
       inputs.files(importBinaryDependencies.outputs.files)
       outputs.files(dockerStatePushFile(dockerfile))
 
+      // Inject the ExecOperations service to run exec commands (see imports on top of the file)
+      def injectedExecOps = project.objects.newInstance(InjectedExec)
       doLast {
         if (resolvedTags(flavor, true)) {
           // Due to the Docker BuildKit limitation we can't reuse nor import images that
@@ -845,7 +862,7 @@ subprojects {
           argsList.addAll('--file', dockerfile, '.')
 
           // Eventually run the build command
-          exec {
+          injectedExecOps.execOps.exec {
             workingDir projectDir
             executable 'docker'
             args argsList
@@ -861,6 +878,8 @@ subprojects {
     // Create one 'dockerCleanImage-<FLAVOR>' task for each flavor or the
     // 'dockerCleanImage' for the plain Dockerfile (which has no flavors).
     tasks.create(group: 'build', name: "dockerCleanImage${flavorSuffix}", description: "Deletes the local Docker images built from the ${dockerfile}") {
+      // Inject the ExecOperations service to run exec commands (see imports on top of the file)
+      def injectedExecOps = project.objects.newInstance(InjectedExec)
       doLast {
         if (resolvedTags(flavor, false)) {
           // Prepare the dynamic list of command line arguments
@@ -872,7 +891,7 @@ subprojects {
           argsList.addAll(tagsList)
 
           logger.quiet("Deleting the local Docker image ${dockerfile} with tags ${String.join(', ', tagsList)}")
-          exec {
+          injectedExecOps.execOps.exec {
             ignoreExitValue true
             executable 'docker'
             args argsList
@@ -880,11 +899,11 @@ subprojects {
         }
         if (dockerStateBuilderFile(dockerfile) != null && dockerStateBuilderFile(dockerfile).exists()) {
           logger.quiet("Stopping and deleting the Docker BuildKit builder ${dockerStateBuilderFile(dockerfile).text}")
-          exec {
+          injectedExecOps.execOps.exec {
             ignoreExitValue true
             commandLine 'docker', 'buildx', 'stop', dockerStateBuilderFile(dockerfile).text
           }
-          exec {
+          injectedExecOps.execOps.exec {
             ignoreExitValue true
             commandLine 'docker', 'buildx', 'rm', dockerStateBuilderFile(dockerfile).text
           }
@@ -915,9 +934,11 @@ subprojects {
       // Declare inputs and outputs of this task
       inputs.files(composeFile)
 
+      // Inject the ExecOperations service to run exec commands (see imports on top of the file)
+      def injectedExecOps = project.objects.newInstance(InjectedExec)
       doLast {
         logger.quiet("Bringing up the Docker Compose environment for '${composeFile}'")
-        exec {
+        injectedExecOps.execOps.exec {
           workingDir projectDir
           commandLine 'docker', 'compose', '--file', composeFile, 'up', '--detach'
         }
@@ -933,14 +954,16 @@ subprojects {
       // Declare inputs and outputs of this task
       inputs.files(composeFile)
 
+      // Inject the ExecOperations service to run exec commands (see imports on top of the file)
+      def injectedExecOps = project.objects.newInstance(InjectedExec)
       doLast {
         logger.quiet("Tearing down the Docker Compose environment for '${composeFile}'")
-        exec {
+        injectedExecOps.execOps.exec {
           workingDir projectDir
           commandLine 'docker', 'compose', '--file', composeFile, 'down', '--remove-orphans', '--rmi', 'local', '--volumes'
         }
         logger.quiet("Cleaning up the Docker Compose environment for '${composeFile}'")
-        exec {
+        injectedExecOps.execOps.exec {
           workingDir projectDir
           commandLine 'docker', 'compose', '--file', composeFile, 'rm', '--force', '--stop', '--volumes'
         }
@@ -995,14 +1018,16 @@ subprojects {
               inputs.files(testEnvironmentStateStatusFile(group, suite.name))
               outputs.files(testEnvironmentStateStatusFile(group, suite.name))
 
+              // Inject the ExecOperations service to run exec commands (see imports on top of the file)
+              def injectedExecOps = project.objects.newInstance(InjectedExec)
               doLast {
                 logger.quiet("Tearing down the Docker Compose environment for the ${suite.name} test suite using the '${suiteEnvironmentComposeFile}' file")
-                exec {
+                injectedExecOps.execOps.exec {
                   workingDir testDirectory
                   commandLine 'docker', 'compose', '--file', suiteEnvironmentComposeFile, 'down', '--remove-orphans', '--rmi', 'local', '--volumes'
                 }
                 logger.quiet("Cleaning up the Docker Compose environment for the ${suite.name} test suite using the '${suiteEnvironmentComposeFile}' file")
-                exec {
+                injectedExecOps.execOps.exec {
                   workingDir testDirectory
                   commandLine 'docker', 'compose', '--file', suiteEnvironmentComposeFile, 'rm', '--force', '--stop', '--volumes'
                 }
@@ -1044,11 +1069,13 @@ subprojects {
               inputs.dir(testDirectory)
               outputs.files(testEnvironmentStateStatusFile(group, suite.name))
 
+              // Inject the ExecOperations service to run exec commands (see imports on top of the file)
+              def injectedExecOps = project.objects.newInstance(InjectedExec)
               doLast {
                 mkdir(dockerComposeLogFile(group, suite.name).parent)
 
                 logger.quiet("Bringing up the Docker Compose environment for the ${suite.name} test suite using the '${suiteEnvironmentComposeFile}' file")
-                exec {
+                injectedExecOps.execOps.exec {
                   workingDir testDirectory
                   commandLine 'docker', 'compose', '--file', suiteEnvironmentComposeFile, 'up', '--wait', '--build'
                 }
@@ -1352,19 +1379,21 @@ task deepClean(group: 'build', description: 'Clean the reproducible and reusable
   dependsOn clean
   dependsOn subprojects*.clean
 
+  // Inject the ExecOperations service to run exec commands (see imports on top of the file)
+  def injectedExecOps = project.objects.newInstance(InjectedExec)
   doLast {
     logger.quiet("Pruning the Docker build cache")
-    exec {
+    injectedExecOps.execOps.exec {
       ignoreExitValue true
       commandLine 'docker', 'buildx', 'prune', '--all', '--force'
     }
     logger.info("Pruning unused Docker images")
-    exec {
+    injectedExecOps.execOps.exec {
       ignoreExitValue true
       commandLine 'docker', 'image', 'prune', '--all', '--force'
     }
     logger.info("Pruning unused Docker BuildKit builders")
-    exec {
+    injectedExecOps.execOps.exec {
       ignoreExitValue true
       commandLine 'docker', 'buildx', 'rm', '--all-inactive'
     }

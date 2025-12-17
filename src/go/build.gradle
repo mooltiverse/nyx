@@ -1,3 +1,12 @@
+/* Add support to inject the ExecOperations object in order to run exec commands.
+ * See: https://docs.gradle.org/current/userguide/service_injection.html#execoperations
+ */
+import org.gradle.process.ExecOperations
+import javax.inject.Inject
+interface InjectedExec {
+  @Inject ExecOperations getExecOps()
+}
+
 /*------------------------------------------------------------------------------
   Plugins DSL block
   https://docs.gradle.org/current/userguide/plugins.html#sec:plugins_block
@@ -154,9 +163,11 @@ subprojects {
     inputs.dir(projectDir)
     outputs.dir(projectDir)
 
+    // Inject the ExecOperations service to run exec commands (see imports on top of the file)
+    def injectedExecOps = project.objects.newInstance(InjectedExec)
     doLast {
       logger.quiet('Cleaning up Go artifacts')
-      exec {
+      injectedExecOps.execOps.exec {
         logging.captureStandardOutput LogLevel.QUIET
         logging.captureStandardError  LogLevel.ERROR
         workingDir projectDir
@@ -180,9 +191,11 @@ subprojects {
     })
     outputs.file(modFile)
 
+    // Inject the ExecOperations service to run exec commands (see imports on top of the file)
+    def injectedExecOps = project.objects.newInstance(InjectedExec)
     doLast {
       logger.quiet("Initializing the Go module '${modulePath}' file: '${modFile.path}'")
-      exec {
+      injectedExecOps.execOps.exec {
         logging.captureStandardOutput LogLevel.QUIET
         logging.captureStandardError  LogLevel.ERROR
         workingDir projectDir
@@ -201,9 +214,11 @@ subprojects {
     })
     outputs.file(modFile)
 
+    // Inject the ExecOperations service to run exec commands (see imports on top of the file)
+    def injectedExecOps = project.objects.newInstance(InjectedExec)
     doLast {
       logger.quiet("Updating the Go module '${modulePath}' file: '${modFile.path}'")
-      exec {
+      injectedExecOps.execOps.exec {
         logging.captureStandardOutput LogLevel.QUIET
         logging.captureStandardError  LogLevel.ERROR
         workingDir projectDir
@@ -222,9 +237,11 @@ subprojects {
     })
     outputs.file(modFile)
 
+    // Inject the ExecOperations service to run exec commands (see imports on top of the file)
+    def injectedExecOps = project.objects.newInstance(InjectedExec)
     doLast {
       logger.quiet("Upgrading dependencies in Go module '${modulePath}' file: '${modFile.path}'")
-      exec {
+      injectedExecOps.execOps.exec {
         logging.captureStandardOutput LogLevel.QUIET
         logging.captureStandardError  LogLevel.ERROR
         workingDir projectDir
@@ -237,9 +254,11 @@ subprojects {
     // Declare inputs and outputs of this task
     outputs.file(goDocExecutable)
 
+    // Inject the ExecOperations service to run exec commands (see imports on top of the file)
+    def injectedExecOps = project.objects.newInstance(InjectedExec)
     doLast {
       logger.quiet('Installing the Godoc module')
-      exec {
+      injectedExecOps.execOps.exec {
         logging.captureStandardOutput LogLevel.QUIET
         logging.captureStandardError  LogLevel.ERROR
         environment 'GOBIN', goDocBin.path
@@ -253,9 +272,11 @@ subprojects {
     // Declare inputs and outputs of this task
     outputs.file(goDocDownExecutable)
 
+    // Inject the ExecOperations service to run exec commands (see imports on top of the file)
+    def injectedExecOps = project.objects.newInstance(InjectedExec)
     doLast {
       logger.quiet('Installing the Godocdown module')
-      exec {
+      injectedExecOps.execOps.exec {
         logging.captureStandardOutput LogLevel.QUIET
         logging.captureStandardError  LogLevel.ERROR
         environment 'GOBIN', goDocBin.path
@@ -278,9 +299,11 @@ subprojects {
       f.name.endsWith(".go") || f.name.endsWith(".mod") || f.name.endsWith(".sum")
     })
 
+    // Inject the ExecOperations service to run exec commands (see imports on top of the file)
+    def injectedExecOps = project.objects.newInstance(InjectedExec)
     doLast {
       logger.quiet('Running Godoc, listening on port 6060')
-      exec {
+      injectedExecOps.execOps.exec {
         logging.captureStandardOutput LogLevel.QUIET
         logging.captureStandardError  LogLevel.ERROR
         environment 'GOBIN', goDocBin.path
@@ -306,9 +329,11 @@ subprojects {
     })
     outputs.file(outputFile)
 
+    // Inject the ExecOperations service to run exec commands (see imports on top of the file)
+    def injectedExecOps = project.objects.newInstance(InjectedExec)
     doLast {
       logger.quiet('Running Godocdown')
-      exec {
+      injectedExecOps.execOps.exec {
         logging.captureStandardOutput LogLevel.QUIET
         logging.captureStandardError  LogLevel.ERROR
         environment 'GOBIN', goDocBin.path
@@ -338,10 +363,12 @@ subprojects {
       })
       outputs.file(binaryFile)
 
+      // Inject the ExecOperations service to run exec commands (see imports on top of the file)
+      def injectedExecOps = project.objects.newInstance(InjectedExec)
       // See https://golang.org/doc/install/source#environment for variables determining the build platform ans OS
       doLast {
         logger.quiet("Building the Go binary '${binaryName}' for the '${targetPlatform}' platform")
-        exec {
+        injectedExecOps.execOps.exec {
             logging.captureStandardOutput LogLevel.QUIET
             logging.captureStandardError  LogLevel.ERROR
             environment 'GOOS', os
@@ -383,6 +410,8 @@ subprojects {
       outputs.file(coverageProfileFile)
       outputs.file(coverageReportFile)
 
+      // Inject the ExecOperations service to run exec commands (see imports on top of the file)
+      def injectedExecOps = project.objects.newInstance(InjectedExec)
       doLast {
         def testEnvironmentVariables = [:]
         // Add the path to the binaries as the 'binDir' environment variable
@@ -420,7 +449,7 @@ subprojects {
         // CUSTOMIZATIONS ON THE STANDARD BUILD SCRIPT - END
 
         logger.quiet("Running ${group} tests for Go module '${modulePath}'")
-        exec {
+        injectedExecOps.execOps.exec {
           logging.captureStandardOutput LogLevel.QUIET
           logging.captureStandardError  LogLevel.ERROR
           environment += testEnvironmentVariables
@@ -430,7 +459,7 @@ subprojects {
         }
 
         logger.quiet("Rendering ${group} test coverage report for Go module '${modulePath}'")
-        exec {
+        injectedExecOps.execOps.exec {
           logging.captureStandardOutput LogLevel.QUIET
           logging.captureStandardError  LogLevel.ERROR
           workingDir = projectDir
@@ -448,12 +477,14 @@ subprojects {
     onlyIf { rootProject.nyxState.newRelease }
     onlyIf { project.hasProperty("publishToGoPkg") && Boolean.parseBoolean(project.getProperty("publishToGoPkg")) }
 
+    // Inject the ExecOperations service to run exec commands (see imports on top of the file)
+    def injectedExecOps = project.objects.newInstance(InjectedExec)
     // See https://go.dev/doc/src/publishing
     doLast {
       def moduleReference = modulePath+'@'+project.version
 
       logger.quiet("Listing Go module '${moduleReference}' to https://pkg.go.dev/")
-      exec {
+      injectedExecOps.execOps.exec {
         ignoreExitValue = true // sometimes response is too slow to come and results in a timeout error
         environment 'GOPROXY', 'proxy.golang.org'
         workingDir = projectDir

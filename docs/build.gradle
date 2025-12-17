@@ -1,3 +1,12 @@
+/* Add support to inject the ExecOperations object in order to run exec commands.
+ * See: https://docs.gradle.org/current/userguide/service_injection.html#execoperations
+ */
+import org.gradle.process.ExecOperations
+import javax.inject.Inject
+interface InjectedExec {
+  @Inject ExecOperations getExecOps()
+}
+
 /*------------------------------------------------------------------------------
   Plugins DSL block
   https://docs.gradle.org/current/userguide/plugins.html#sec:plugins_block
@@ -147,9 +156,11 @@ subprojects {
     outputs.dir('.docusaurus')
     outputs.dir('node_modules')
 
+    // Inject the ExecOperations service to run exec commands (see imports on top of the file)
+    def injectedExecOps = project.objects.newInstance(InjectedExec)
     doLast {
       logger.quiet("Installing Docusaurus")
-      exec {
+      injectedExecOps.execOps.exec {
         workingDir projectDir
         commandLine 'npm', 'install'
       }
@@ -162,25 +173,27 @@ subprojects {
     // Run this task if there's any change in Docusaurus' configuration
     inputs.files('docusaurus.config.ts')
 
+    // Inject the ExecOperations service to run exec commands (see imports on top of the file)
+    def injectedExecOps = project.objects.newInstance(InjectedExec)
     doLast {
       logger.quiet("Checking for packages requiring upgrade")
-      exec {
+      injectedExecOps.execOps.exec {
         workingDir projectDir
         commandLine 'npm', 'outdated'
       }
 
       logger.quiet("Upgrading packages")
-      exec {
+      injectedExecOps.execOps.exec {
         workingDir projectDir
         commandLine 'npx', 'npm-check-updates', '-u' 
       }
-      exec {
+      injectedExecOps.execOps.exec {
         workingDir projectDir
         commandLine 'npm', 'install' 
       }
 
       logger.quiet("Cleaning up the cache")
-      exec {
+      injectedExecOps.execOps.exec {
         workingDir projectDir
         commandLine 'npm', 'run', 'clear' 
       }
@@ -188,7 +201,6 @@ subprojects {
   }
 
   task docusaurusBuild(group: 'build', description: 'Renders the documentation site with Docusaurus') {
-    dependsOn rootProject.tasks.nyxMake
     dependsOn docusaurusInstall
     dependsOn importAPIDocumentationDependencies
 
@@ -200,9 +212,11 @@ subprojects {
     // Output of this task is the 'build' subdirectory
     outputs.dir(buildDir)
 
+    // Inject the ExecOperations service to run exec commands (see imports on top of the file)
+    def injectedExecOps = project.objects.newInstance(InjectedExec)
     doLast {
       logger.quiet("Building the Docusaurus site")
-      exec {
+      injectedExecOps.execOps.exec {
         workingDir projectDir
         commandLine 'npm', 'run', 'build'
       }
