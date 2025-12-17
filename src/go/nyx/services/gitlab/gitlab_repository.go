@@ -62,7 +62,7 @@ func newGitLabRepository(repository gl.Project) *GitLabRepository {
 	res.fullName = repository.Name
 	res.httpURL = repository.HTTPURLToRepo
 	res.sshURL = repository.SSHURLToRepo
-	res.id = strconv.Itoa(repository.ID)
+	res.id = strconv.FormatInt(repository.ID, 10)
 	res.name = repository.Path
 	return res
 }
