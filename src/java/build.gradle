@@ -139,13 +139,6 @@ allprojects {
   reporting {
     reports {
       testCodeCoverageReport(JacocoCoverageReport) { 
-        // It looks there is no way to select all test types here,
-        // only one value is allowed and when empty the UNIT_TEST is assumed by default
-        /*
-        testType = TestSuiteType.UNIT_TEST
-        testType = TestSuiteType.INTEGRATION_TEST
-        testType = TestSuiteType.FUNCTIONAL_TEST
-        */
       }
     }
   }
@@ -289,7 +282,6 @@ subprojects {
       }
       // This is the built-in suite
       test {
-        testType = TestSuiteType.UNIT_TEST
         dependencies {
           // Plug the Logback SLF4J implementation when testing so we can get log messages logged to the standard output
           // See https://logback.qos.ch/download.html for the latest version
@@ -321,7 +313,6 @@ subprojects {
 
       // Integration tests can be implemented in the directory src/integrationTest/[java|groovy]
       integrationTest(JvmTestSuite) {
-        testType = TestSuiteType.INTEGRATION_TEST
         dependencies {
           // allow production code to be added to the test dependencies
           implementation project()
@@ -363,7 +354,6 @@ subprojects {
 
       // Functional tests can be implemented in the directory src/functionalTest/[java|groovy]
       functionalTest(JvmTestSuite) {
-        testType = TestSuiteType.FUNCTIONAL_TEST
         dependencies {
           // allow production code to be added to the test dependencies
           implementation project()
