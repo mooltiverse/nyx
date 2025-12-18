@@ -124,13 +124,8 @@ const RESOURCES: ResourceItem[] = [
     links: [
       {
         "title": "GitHub",
-        "url": "https://repo.maven.apache.org/maven2/com/mooltiverse/oss/nyx/",
+        "url": "https://github.com/orgs/mooltiverse/packages?repo_name=nyx",
         "logo": '/nyx/img/github.svg'
-      },
-      {
-        "title": "Maven",
-        "url": "https://repo.maven.apache.org/maven2/com/mooltiverse/oss/nyx/",
-        "logo": '/nyx/img/maven.svg'
       },
       {
         "title": "Javadoc",
