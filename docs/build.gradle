@@ -191,6 +191,10 @@ subprojects {
         workingDir projectDir
         commandLine 'npm', 'install' 
       }
+      injectedExecOps.execOps.exec {
+        workingDir projectDir
+        commandLine 'npm', 'audit', 'fix'
+      }
 
       logger.quiet("Cleaning up the cache")
       injectedExecOps.execOps.exec {
