@@ -168,12 +168,6 @@ subprojects {
     Configurations
   ------------------------------------------------------------------------------*/
   configurations {
-    // make integrations tests configuration extend others
-    integrationTestImplementation.extendsFrom testImplementation
-    integrationTestRuntime.extendsFrom testRuntime
-    // make functional tests configuration extend others
-    functionalTestImplementation.extendsFrom testImplementation
-    functionalTestRuntime.extendsFrom testRuntime
   }
 
   /*------------------------------------------------------------------------------
@@ -225,10 +219,10 @@ subprojects {
               binaryResultsDirectory = new File(buildDir, "test/unit/results/binary")
               reports {
                 html {
-                  destination = new File(buildDir, "test/unit/results/html")
+                  outputLocation = new File(buildDir, "test/unit/results/html")
                 }
                 junitXml {
-                  destination = new File(buildDir, "test/unit/results/xml")
+                  outputLocation = new File(buildDir, "test/unit/results/xml")
                 }
               }
             }
@@ -249,10 +243,10 @@ subprojects {
               binaryResultsDirectory = new File(buildDir, "test/integration/results/binary")
               reports {
                 html {
-                  destination = new File(buildDir, "test/integration/results/html")
+                  outputLocation = new File(buildDir, "test/integration/results/html")
                 }
                 junitXml {
-                  destination = new File(buildDir, "test/integration/results/xml")
+                  outputLocation = new File(buildDir, "test/integration/results/xml")
                 }
               }
 
@@ -290,10 +284,10 @@ subprojects {
               binaryResultsDirectory = new File(buildDir, "test/functional/results/binary")
               reports {
                 html {
-                  destination = new File(buildDir, "test/functional/results/html")
+                  outputLocation = new File(buildDir, "test/functional/results/html")
                 }
                 junitXml {
-                  destination = new File(buildDir, "test/functional/results/xml")
+                  outputLocation = new File(buildDir, "test/functional/results/xml")
                 }
               }
 
@@ -438,24 +432,11 @@ task functionalTest(group: 'verification', description: 'Runs the functional tes
   mustRunAfter integrationTest
 }
 
-// Aggregate all JUnit reports from sub projects into one
-task testReport(type: TestReport, group: 'verification', description: 'Aggregates all JUnit test reports into one') {
-  // The output directory for test reports
-  destinationDir = new File(buildDir, "test/aggregated/reports")
-
-  // Include the results from the "test" task in all subprojects
-  // Be careful as including report sets implicitly makes the task dependent on the tasks producing those reports
-  reportOn subprojects*.test, subprojects*.integrationTest, subprojects*.functionalTest
-}
-
 /*------------------------------------------------------------------------------
   Additional task dependencies
 ------------------------------------------------------------------------------*/
 // Make this overall assemble task dependent on subprojects assemble tasks
 tasks.assemble.dependsOn subprojects*.assemble
-
-// Make the aggregated check task also depend on the aggregated test reports
-tasks.check.dependsOn tasks.testReport
 
 // Make this overall Java unit test task dependent on subprojects unit test tasks
 // so that we can run all Java unit tests with one task
