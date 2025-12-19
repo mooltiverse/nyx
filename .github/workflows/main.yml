@@ -202,6 +202,8 @@ jobs:
       gradle-secret-arguments: >-
         -Dorg.gradle.project.gitHubUser=GITHUB
         -Dorg.gradle.project.gitHubToken=${{ secrets.GITHUB_TOKEN }}
+        -Dorg.gradle.project.signingKeyBase64="${{ secrets.GPG_PRIVATE_KEY_BASE64 }}"
+        -Dorg.gradle.project.signingPassword="${{ secrets.GPG_PASSPHRASE }}"
         -Dorg.gradle.project.gradlePublishKey="${{ secrets.GRADLE_PLUGIN_PUBLISH_KEY }}"
         -Dorg.gradle.project.gradlePublishSecret="${{ secrets.GRADLE_PLUGIN_PUBLISH_SECRET }}"
 

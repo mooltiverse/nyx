@@ -3,6 +3,7 @@
   https://docs.gradle.org/current/userguide/plugins.html#sec:plugins_block
 ------------------------------------------------------------------------------*/
 plugins {
+  id 'signing'       // See: https://docs.gradle.org/current/userguide/signing_plugin.html
   id 'maven-publish' // See: https://docs.gradle.org/current/userguide/publishing_maven.html
 }
 
@@ -407,6 +408,91 @@ publishing {
       }
     }
   }
+}
+
+// PGP artifacts signing before publishing
+// See: https://docs.gradle.org/current/userguide/signing_plugin.html
+// In order to generate the keypair:
+// 1. install gpg (see https://gnupg.org/). Note that while there is a version for Windows, these instructions apply
+//    to the Linux version, and the two have a few differences.
+// 2. define a strong passphrase
+// 3. generate a key pair using the passphrase you have chosen and a valid id and email. In our case the name is
+//    'Mooltiverse Nyx Project and the email 'nyx.project@mooltiverse.com'.
+//    For other values just use the defaults (RSA 2048):
+//      $ gpg --gen-key
+//      gpg: checking the trustdb
+//      gpg: 3 marginal(s) needed, 1 complete(s) needed, PGP trust model
+//      gpg: depth: 0  valid:   1  signed:   0  trust: 0-, 0q, 0n, 0m, 0f, 1u
+//      pub   2048R/AA42BF82 2020-02-28
+//      Key fingerprint = F93C B38B 5F19 BE68 11CB  B16C 4FC3 053A AA42 BF82
+//      uid                  Mooltiverse Nyx Project <nyx.project@mooltiverse.com>
+//      sub   2048R/7EE0E228 2020-02-28
+// 4. double check to see the generated keys:
+//      $ gpg --list-keys
+//      /home/user/.gnupg/pubring.gpg
+//      -----------------------------
+//      pub   2048R/AA42BF82 2020-02-28
+//      uid                  Mooltiverse Nyx Project <nyx.project@mooltiverse.com>
+//      sub   2048R/7EE0E228 2020-02-28
+//
+//    Take note of the Key ID. In this case it's AA42BF82.
+// 5. publish the public key to public servers (note you need the Key ID above):
+//      $ gpg --keyserver hkp://pool.sks-keyservers.net --send-keys AA42BF82
+// 6. make sure the key is available on the public servers:
+//      $ gpg --keyserver hkp://pool.sks-keyservers.net --search-keys AA42BF82
+// 7. export the secret keys as ASCII armor (keep it safe, even if it's protected by the passphrase). The exported key
+//    will be used, along with the passphrase (and Key ID), to set a property or an environment variable when
+//    signing the artifacts to publish. If using it from a text file the command would be:
+//      $ gpg --armor --export-secret-key AA42BF82 > ~/.gnupg/seckey.asc
+//    however we need to use the key from a property or an environment variable and this requires some escaping or
+//    encoding to preserve the newline. The simplest method is to just replace newlines with the '\n' sequence. In
+//    this case just use the command:
+//      $ gpg --armor --export-secret-key AA42BF82 | awk 'NR == 1 { print "" } 1' ORS='\\n' > ~/.gnupg/seckey.asc
+//    The content of the seckey.asc file, in this case, works well when passed as a property but not as an
+//    environment variable as many platforms will try to decode themselves the '\n' sequence.
+//    So the third option, the safest, is to use base64 encoding using the command:
+//      $ gpg --armor --export-secret-key AA42BF82 | base64 -w 0 > ~/.gnupg/seckey.asc
+//    This way the content of the seckey.asc is safe (note the -w 0 option to disable line wrapping). The only
+//    downside is that before using the value we need to decode it from base64.
+//    Since it's the safest (and more portable), we are using this method.
+// 9. take the entire content of the 'seckey.asc' file to set the 'ORG_GRADLE_PROJECT_signingKeyBase64' environment
+//    variable. See below about the usage of such variable.
+//
+// For more see:
+// - https://central.sonatype.org/pages/working-with-pgp-signatures.html
+// - https://maven.apache.org/repository/guide-central-repository-upload.html
+// - https://stackoverflow.com/questions/1251999/how-can-i-replace-a-newline-n-using-sed/14853319#14853319
+signing {
+  // With the keypair created as per the instructions above we can sign the artifacts to publish.
+  // However we don't want the passphrase or the private key (even if it's protected by the passphrase) stored
+  // in cleartext files or publicly available on the Git repo so we use variables in the CI/CD environments to
+  // store them.
+  // By using the 'findProperty' we can fetch those values from environment variables named:
+  // - ORG_GRADLE_PROJECT_signingKeyBase64: we use this base 64 encoded version instead of the plain
+  //   ORG_GRADLE_PROJECT_signingKey to make it safer and more portable, avoiding escaping and transcoding issues
+  //   about newlines (see comments above about this).
+  // - ORG_GRADLE_PROJECT_signingPassword
+  //
+  // For more see:
+  // - https://docs.gradle.org/current/userguide/signing_plugin.html#sec:in-memory-keys
+
+  // The signingKey is set by base64 decoding the value of signingKeyBase64 (i.e. from the environment variable
+  // ORG_GRADLE_PROJECT_signingKeyBase64)
+  // It's available only on CI/CD configurations allowed to sign and publish, otherwise it's null
+  def signingKeyBase64 = findProperty("signingKeyBase64")
+  def signingKey = signingKeyBase64 == null ? "" : new String(signingKeyBase64.decodeBase64())
+  // The signingPassword is taken from a property or the environment variable ORG_GRADLE_PROJECT_signingPassword
+  def signingPassword = findProperty("signingPassword")
+
+  def signingCredentialsAvailable = (signingKey != null) && (signingPassword != null)
+
+  useInMemoryPgpKeys(signingKey, signingPassword)
+
+  // Sign only for release and prerelease versions
+  required { signingCredentialsAvailable && gradle.taskGraph.hasTask("publish") }
+
+  //sign publishing.publications.mavenJava
+  sign publishing.publications
 }
 
 /*----------------------------------------------------------------------------
