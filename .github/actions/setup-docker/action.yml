@@ -287,7 +287,7 @@ runs:
         echo "$file"
       done
   - name: Enable the containerd image store
-    uses: crazy-max/ghaction-setup-docker@v3
+    uses: docker/setup-docker-action@v4
     if: ${{ inputs.enable-containerd-image-store == 'true' }}
     with:
       daemon-config: |-

@@ -45,7 +45,7 @@ Arguments are as follows:
 */
 func newGitLabUser(user gl.User) *GitLabUser {
 	res := &GitLabUser{}
-	res.id = strconv.Itoa(user.ID)
+	res.id = strconv.FormatInt(user.ID, 10)
 	res.userName = user.Username
 	res.fullName = user.Name
 	return res
