@@ -165,12 +165,6 @@ subprojects {
   apply plugin: 'jvm-test-suite'                      // See: https://docs.gradle.org/current/userguide/jvm_test_suite_plugin.html
 
   /*------------------------------------------------------------------------------
-    Configurations
-  ------------------------------------------------------------------------------*/
-  configurations {
-  }
-
-  /*------------------------------------------------------------------------------
     Dependencies
     https://docs.gradle.org/current/userguide/dependency_management_for_java_projects.html
   ------------------------------------------------------------------------------*/
@@ -192,6 +186,10 @@ subprojects {
           all { 
             testTask.configure {
               maxHeapSize = '1024m' 
+              options {
+                // This prevents Gradle from failing if a subproject has no tests 
+                failOnNoDiscoveredTests = false
+              }
               testLogging {
                 events "passed", "skipped", "failed"
               }
@@ -312,6 +310,18 @@ subprojects {
         }
       }
     }
+  }
+
+  /*------------------------------------------------------------------------------
+    Configurations
+  ------------------------------------------------------------------------------*/
+  configurations {
+    // make integrations tests configuration extend others
+    integrationTestImplementation.extendsFrom testImplementation
+    integrationTestRuntime.extendsFrom testRuntime
+    // make functional tests configuration extend others
+    functionalTestImplementation.extendsFrom testImplementation
+    functionalTestRuntime.extendsFrom testRuntime
   }
 
   /*------------------------------------------------------------------------------
