@@ -77,6 +77,21 @@ gradlePlugin {
   }
 }
 
+/*------------------------------------------------------------------------------
+  Publications
+------------------------------------------------------------------------------*/
+// Override the default publication created by the parent project for proper
+// publication of the Gradle plugin.
+publishing {
+  publications {
+    maven(MavenPublication) {
+      // This forces the artifact ID to be 'nyx' instead of 'main' or 'gradle'
+      artifactId = rootProject.name
+      from components.java
+    }
+  }
+}
+
 // See https://github.com/gradle/gradle/issues/1246
 task setupPublishPluginCredentials() {
   group = 'Publishing'

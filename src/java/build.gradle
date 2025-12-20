@@ -347,7 +347,7 @@ sourcesJar.from(subprojects.collect { it.sourceSets.main.allJava })
 /*------------------------------------------------------------------------------
   Publications
 ------------------------------------------------------------------------------*/
-// Maven publications are configured here for all java projects to grant more consistency when dealing with Sonatype Nexus.
+// Maven publications are configured here for all java projects to grant more consistency.
 // Here we create one Maven publication for each project.
 allprojects.each {prj ->
   publishing {
