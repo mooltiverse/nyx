@@ -56,13 +56,6 @@ jobs:
     name: Initialize
     uses: mooltiverse/nyx/.github/workflows/initialize.yml@main
   
-  build:
-    name: Waypoint
-    needs:
-    - initialize
-    - java-build
-    uses: mooltiverse/nyx/.github/workflows/build.yml@main
-  
   release:
     name: Release
     needs:

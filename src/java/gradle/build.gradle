@@ -89,6 +89,32 @@ publishing {
       artifactId = rootProject.name
       from components.java
     }
+
+    pom {
+      name = prj.name
+      description = "$rootProject.group:$rootProject.name:$rootProject.version"
+      url = projectURL
+      licenses {
+        license {
+          name = projectLicenseName
+          url = projectLicenseURL
+        }
+      }
+      developers {
+        developer {
+          id = projectID
+          name = projectTeamName
+          email = projectTeamEmail
+          organization = projectOrganizationName
+          organizationUrl = projectOrganizationURL
+        }
+      }
+      scm {
+        connection = projectGitURL
+        developerConnection = projectGitURL
+        url = projectURL
+      }
+    }
   }
 }
 
