@@ -84,7 +84,7 @@ gradlePlugin {
 // publication of the Gradle plugin.
 publishing {
   publications {
-    maven(MavenPublication) {
+    pluginMaven(MavenPublication) {
       // This forces the artifact ID to be 'nyx' instead of 'main' or 'gradle'
       artifactId = rootProject.name
       from components.java
