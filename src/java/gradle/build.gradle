@@ -90,7 +90,7 @@ publishing {
       from components.java
 
       pom {
-        name = prj.name
+        name = rootProject.name
         description = "$rootProject.group:$rootProject.name:$rootProject.version"
         url = projectURL
         licenses {
