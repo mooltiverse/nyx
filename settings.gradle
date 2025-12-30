@@ -5,6 +5,7 @@
 plugins {
   // use our own plugin
   id "com.mooltiverse.oss.nyx" version "3.1.3"
+  //id "com.mooltiverse.oss.nyx" version "3.1.7-alpha.5"
 
   // Gradle Enterprise plugin (former 'com.gradle.enterprise', used for build scans)
   id "com.gradle.develocity" version "4.3"
@@ -41,7 +42,7 @@ develocity {
 
     if (System.getenv("CI")) { // when running on a CI server
       // always publish 
-      publishAlways()
+      //publishAlways()
 
       // apply these tags when running on CI servers
       tag "CI"
