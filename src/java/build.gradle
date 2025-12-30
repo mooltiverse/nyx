@@ -391,7 +391,7 @@ allprojects.each {prj ->
 publishing {
   repositories {
     // The GitHub Packages repository, visible at https://github.com/mooltiverse/nyx/packages
-    /*maven {
+    maven {
       name = "GitHubPackages"
       url = uri("https://maven.pkg.github.com/"+projectOrganizationID+"/"+projectID)
       credentials {
@@ -401,7 +401,7 @@ publishing {
         username = findProperty("gitHubUser")
         password = findProperty("gitHubToken")
       }
-    }*/
+    }
     maven {
       name = "localDir"
       // This repository is useful to check artifacts and their layout before they are published

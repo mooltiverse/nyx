@@ -149,6 +149,6 @@ tasks.test.dependsOn project(':src:java:main').tasks.test
 
 afterEvaluate {
   // The tasks listed here are those not caught in the section above
-//  tasks.publish.onlyIf { rootProject.nyxState.newRelease }                    // this actually belongs to the 'publishing' group but doesn't get captured by the above section for some reason
-//  tasks.publishPlugins.onlyIf { rootProject.nyxState.newRelease }             // from the 'plugin portal' group
+  tasks.publish.onlyIf { rootProject.nyxState.newRelease }                    // this actually belongs to the 'publishing' group but doesn't get captured by the above section for some reason
+  tasks.publishPlugins.onlyIf { rootProject.nyxState.newRelease }             // from the 'plugin portal' group
 }
