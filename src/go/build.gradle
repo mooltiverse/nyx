@@ -584,6 +584,7 @@ subprojects {
   /*----------------------------------------------------------------------------
     Additional task dependencies
     ----------------------------------------------------------------------------*/
+  tasks.assemble.dependsOn goBuild
   tasks.build.dependsOn documentation
   tasks.check.dependsOn test
   tasks.clean.dependsOn goClean
