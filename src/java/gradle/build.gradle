@@ -4,7 +4,6 @@
 ------------------------------------------------------------------------------*/
 plugins {
   id 'java-gradle-plugin'                             // See: https://docs.gradle.org/current/userguide/java_gradle_plugin.html
-  id 'maven-publish'                                  // See: https://docs.gradle.org/current/userguide/publishing_maven.html
   id 'com.gradle.plugin-publish' version '2.0.0'      // See: https://guides.gradle.org/publishing-plugins-to-gradle-plugin-portal/ and https://plugins.gradle.org/docs/publish-plugin
 }
 
@@ -150,6 +149,6 @@ tasks.test.dependsOn project(':src:java:main').tasks.test
 
 afterEvaluate {
   // The tasks listed here are those not caught in the section above
-  tasks.publish.onlyIf { rootProject.nyxState.newRelease }                    // this actually belongs to the 'publishing' group but doesn't get captured by the above section for some reason
-  tasks.publishPlugins.onlyIf { rootProject.nyxState.newRelease }             // from the 'plugin portal' group
+//  tasks.publish.onlyIf { rootProject.nyxState.newRelease }                    // this actually belongs to the 'publishing' group but doesn't get captured by the above section for some reason
+//  tasks.publishPlugins.onlyIf { rootProject.nyxState.newRelease }             // from the 'plugin portal' group
 }
