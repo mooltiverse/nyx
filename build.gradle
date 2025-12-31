@@ -185,6 +185,9 @@ task deepClean() {
 /*------------------------------------------------------------------------------
   Additional task dependencies
 ------------------------------------------------------------------------------*/
+// Make sure all artifacts are assembled before publishing.
+tasks.nyxPublish.dependsOn assemble
+
 // Only perform publishing if the Nyx release type enables publishing.
 tasks.nyxMark.onlyIf { rootProject.nyxState.newRelease }
 tasks.nyxPublish.onlyIf { rootProject.nyxState.newRelease }
