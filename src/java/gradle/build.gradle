@@ -19,10 +19,6 @@ description = 'The Nyx Gradle plugin'
 configurations {
   // this shouldn't be required but without this the plugin metadata is not available in the functional test classpath
   functionalTestRuntimeOnly.extendsFrom testRuntimeClasspath
-
-  // Include the 'shadow' configuration in the 'compileOnly' (see the dependencies for more).
-  // ***CHECK***
-  //compileOnly.extendsFrom(shadow)
 }
 
 shadowJar {
@@ -30,7 +26,6 @@ shadowJar {
   // including all dependencies required to run the plugin.
   archiveClassifier.set('')
   // This replaces the default jar with the fat jar
-  // ***CHECK***
   //configurations = [project.configurations.shadow]
   // Merge service files (common in plugins)
   mergeServiceFiles()
@@ -43,19 +38,6 @@ shadowJar {
 dependencies {
   // Import dependencies from other modules of this project
   implementation project(':src:java:main')
-
-  // Import dependencies from other modules of this project. Using the "shadow" configuration
-  // they will be included in the final plugin JAR produced by this subproject but they
-  // won't be listed as transitive dependencies to the POM file.
-  // This configuration is used to create a "fat" (also called "uber") JAR including all
-  // dependencies required to run the plugin so we don't have to mess with external maven
-  // repositories, making the plugin jar self-contained.
-  // ***CHECK***
-  /*shadow project(':src:java:main')
-  shadow project(':src:java:version')
-
-  compileOnly project(':src:java:main')
-  compileOnly project(':src:java:version')*/
 
   // Add this dependency to use the Git scripts from the main subproject into this project tests
   integrationTestImplementation project(path: ':src:java:main', configuration: 'integrationTestExport')
@@ -115,9 +97,8 @@ publishing {
     maven(MavenPublication) {
       // This forces the artifact ID to be 'nyx' instead of 'main' or 'gradle'
       artifactId = rootProject.name
-      // ***CHECK***
-      //from components.java
       // Use the "shadow" plugin artifact which is a "fat" JAR including all dependencies
+      //from components.java
       from components.shadow
 
       pom {
@@ -145,23 +126,6 @@ publishing {
           url = projectURL
         }
       }
-      // ***CHECK***
-      /*pom.withXml {
-        // This finds the 'dependencies' node and removes it
-        asNode().children().removeIf { it.name().toString().endsWith('dependencies') }
-      }*/
-      /*pom.withXml {
-        // Make sure to remove internal project dependencies from the generated POM file,
-        // provided that all dependencies from other modules are bundled into the final JAR
-        // thanks to the "shadow" plugin.
-        def dependenciesNode = asNode().getAt('dependencies')[0]
-        if (dependenciesNode) {
-          dependenciesNode.children().removeIf { node ->
-            // Remove specific internal projects by their artifactId or groupId
-            node.artifactId.text() == 'main' || node.artifactId.text() == 'version' || node.groupId.text() == rootProject.group
-          }
-        }
-      }*/
     }
   }
 }
@@ -188,9 +152,6 @@ task setupPublishPluginCredentials() {
 /*------------------------------------------------------------------------------
   Additional task dependencies
 ------------------------------------------------------------------------------*/
-// Disables the standard jar task to avoid confusion with the "shadow" plugin tasks
-// ***CHECK***
-//tasks.jar.enabled = false
 tasks.assemble.dependsOn(shadowJar)
 
 tasks.publishPlugins.dependsOn tasks.setupPublishPluginCredentials
