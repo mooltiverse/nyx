@@ -46,7 +46,7 @@ on:
           Default: nyxMark nyxPublish
         type: string
         required: false
-        default: "nyxMark nyxPublish"
+        default: "assemble nyxMark nyxPublish"
       install-jdk:
         description: |-
           Whether to install the JDK or not.
