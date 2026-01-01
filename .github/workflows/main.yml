@@ -167,10 +167,6 @@ jobs:
       # When running in non-main branches reduce the number of test cases to speed up the build.
       # Use the 'quickTests' for this purpose, which is a property parsed by the Gradle scripts
       gradle-arguments: --build-cache --stacktrace ${{ github.ref == 'refs/heads/main' && '-PquickTests=false' || '-PquickTests=true' }}
-      # TODO: delete the following lines, used just to make the test steps lighter during the build process
-      gradle-unit-test-tasks: src:java:assemble
-      gradle-integration-test-tasks: src:java:assemble
-      gradle-functional-test-tasks: src:java:assemble
     secrets:
       # Pass extra properties used by the Gradle scripts to run tests.
       # See the top level
@@ -280,10 +276,6 @@ jobs:
       # When running in non-main branches reduce the number of test cases to speed up the build.
       # Use the 'quickTests' for this purpose, which is a property parsed by the Gradle scripts
       gradle-arguments: --build-cache --stacktrace ${{ github.ref == 'refs/heads/main' && '-PquickTests=false' || '-PquickTests=true' }}
-      # TODO: delete the following lines, used just to make the test steps lighter during the build process
-      gradle-unit-test-tasks: src:go:assemble
-      gradle-integration-test-tasks: src:go:assemble
-      gradle-functional-test-tasks: src:go:assemble
     secrets:
       # Pass extra properties used by the Gradle scripts to run tests.
       # See the top level
@@ -361,10 +353,6 @@ jobs:
       docker-cache-name-restore-suffix: ${{ needs.docker-build.outputs.docker-cache-name-suffix }}
       install-node: false
       install-newman: false
-      # TODO: delete the following lines, used just to make the test steps lighter during the build process
-      gradle-unit-test-tasks: src:docker:assemble
-      gradle-integration-test-tasks: src:docker:assemble
-      gradle-functional-test-tasks: src:docker:assemble
     secrets:
       # Pass extra properties used by the Gradle scripts to run tests.
       # See the top level
