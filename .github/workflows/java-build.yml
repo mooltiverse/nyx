@@ -106,6 +106,14 @@ on:
         type: string
         required: false
         default: 'wrapper'
+      cache-mode:
+        description: |-
+          Whether to enable the cache and, if enabled, how to use it.
+          Allowed values are: 'read-write', 'read-only', 'write-only', 'disabled'.
+          Default: read-write
+        type: string
+        required: false
+        default: 'read-write'
       nyx-cache-name-restore-suffix:
         description: |-
           The suffix of the name to use for the cache that will be read by this
@@ -202,11 +210,13 @@ jobs:
         # Just restore the cache
         enable-action: false
         verbosity: ${{ inputs.verbosity }}
+        cache-mode: ${{ inputs.cache-mode }}
         cache-name-restore-suffix: ${{ inputs.nyx-cache-name-restore-suffix }}
     - id: java
       uses: mooltiverse/nyx/.github/actions/setup-java@main
       with:
         verbosity: ${{ inputs.verbosity }}
+        cache-mode: ${{ inputs.cache-mode }}
         # Restore the cache from the previous job to 'chain' the two caches
         cache-name-restore-suffix: ${{ inputs.java-cache-name-restore-suffix }}
     - id: gradle
@@ -218,6 +228,7 @@ jobs:
         install-jdk-distribution: ${{ inputs.install-jdk-distribution }}
         install-gradle: ${{ inputs.install-gradle }}
         install-gradle-version: ${{ inputs.install-gradle-version }}
+        cache-mode: ${{ inputs.cache-mode }}
         cache-name-prefix: ${{ inputs.gradle-cache-name-prefix }}
         # Restore the cache from the previous job to 'chain' the two caches
         cache-name-restore-suffix: ${{ inputs.gradle-cache-name-restore-suffix }}

@@ -21,6 +21,14 @@ on:
         type: string
         required: false
         default: 'quiet'
+      cache-mode:
+        description: |-
+          Whether to enable the cache and, if enabled, how to use it.
+          Allowed values are: 'read-write', 'read-only', 'write-only', 'disabled'.
+          Default: read-write
+        type: string
+        required: false
+        default: 'read-write'
     outputs:
       # Version attributes
       isCoreVersion:
@@ -97,30 +105,31 @@ jobs:
       uses: mooltiverse/nyx/.github/actions/setup-nyx@main
       with:
         verbosity: ${{ inputs.verbosity }}
+        cache-mode: ${{ inputs.cache-mode }}
         enable-artifacts: true
     - id: go
       uses: mooltiverse/nyx/.github/actions/setup-go@main
       with:
         verbosity: ${{ inputs.verbosity }}
-        enable-cache: false
+        cache-mode: disabled
         install-go: false
     - id: java
       uses: mooltiverse/nyx/.github/actions/setup-java@main
       with:
         verbosity: ${{ inputs.verbosity }}
-        enable-cache: false
+        cache-mode: disabled
         install-jdk: false
     - id: docker
       uses: mooltiverse/nyx/.github/actions/setup-docker@main
       with:
         verbosity: ${{ inputs.verbosity }}
-        enable-cache: false
+        cache-mode: disabled
         enable-containerd-image-store: false
     - id: docusaurus
       uses: mooltiverse/nyx/.github/actions/setup-docusaurus@main
       with:
         verbosity: ${{ inputs.verbosity }}
-        enable-cache: false
+        cache-mode: disabled
         install-node: false
     # Produce annotation and log outputs
     - name: Log the cache selection warning message
