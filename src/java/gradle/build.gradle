@@ -3,8 +3,9 @@
   https://docs.gradle.org/current/userguide/plugins.html#sec:plugins_block
 ------------------------------------------------------------------------------*/
 plugins {
-  id 'java-gradle-plugin'                             // See: https://docs.gradle.org/current/userguide/java_gradle_plugin.html
-  id 'com.gradle.plugin-publish' version '2.0.0'      // See: https://guides.gradle.org/publishing-plugins-to-gradle-plugin-portal/ and https://plugins.gradle.org/docs/publish-plugin
+  id 'java-gradle-plugin'                         // See: https://docs.gradle.org/current/userguide/java_gradle_plugin.html
+  id 'com.gradle.plugin-publish' version '2.0.0'  // See: https://guides.gradle.org/publishing-plugins-to-gradle-plugin-portal/ and https://plugins.gradle.org/docs/publish-plugin
+  id 'com.gradleup.shadow' version '9.3.0'        // See: https://github.com/GradleUp/shadow
 }
 
 /*------------------------------------------------------------------------------
@@ -18,6 +19,16 @@ description = 'The Nyx Gradle plugin'
 configurations {
   // this shouldn't be required but without this the plugin metadata is not available in the functional test classpath
   functionalTestRuntimeOnly.extendsFrom testRuntimeClasspath
+}
+
+shadowJar {
+  // Configure the "shadow" plugin to publish a single, self-contained "fat" JAR
+  // including all dependencies required to run the plugin.
+  archiveClassifier.set('')
+  // This replaces the default jar with the fat jar
+  //configurations = [project.configurations.shadow]
+  // Merge service files (common in plugins)
+  mergeServiceFiles()
 }
 
 /*------------------------------------------------------------------------------
@@ -76,6 +87,49 @@ gradlePlugin {
   }
 }
 
+/*------------------------------------------------------------------------------
+  Publications
+------------------------------------------------------------------------------*/
+// Override the default publication created by the parent project for proper
+// publication of the Gradle plugin.
+publishing {
+  publications {
+    maven(MavenPublication) {
+      // This forces the artifact ID to be 'nyx' instead of 'main' or 'gradle'
+      artifactId = rootProject.name
+      // Use the "shadow" plugin artifact which is a "fat" JAR including all dependencies
+      //from components.java
+      from components.shadow
+
+      pom {
+        name = rootProject.name
+        description = "$rootProject.group:$rootProject.name:$rootProject.version"
+        url = projectURL
+        licenses {
+          license {
+            name = projectLicenseName
+            url = projectLicenseURL
+          }
+        }
+        developers {
+          developer {
+            id = projectID
+            name = projectTeamName
+            email = projectTeamEmail
+            organization = projectOrganizationName
+            organizationUrl = projectOrganizationURL
+          }
+        }
+        scm {
+          connection = projectGitURL
+          developerConnection = projectGitURL
+          url = projectURL
+        }
+      }
+    }
+  }
+}
+
 // See https://github.com/gradle/gradle/issues/1246
 task setupPublishPluginCredentials() {
   group = 'Publishing'
@@ -98,6 +152,8 @@ task setupPublishPluginCredentials() {
 /*------------------------------------------------------------------------------
   Additional task dependencies
 ------------------------------------------------------------------------------*/
+tasks.assemble.dependsOn(shadowJar)
+
 tasks.publishPlugins.dependsOn tasks.setupPublishPluginCredentials
 tasks.publish.dependsOn tasks.publishPlugins
 // Make sure the global Java artifacts are published before the plugin

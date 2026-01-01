@@ -1,6 +1,6 @@
 # Nyx Release Notes
 
-## 3.1.5
+## 3.1.7
 
 This release is available at [this link](https://github.com/mooltiverse/nyx/releases/tag/3.1.5).
 
@@ -15,6 +15,14 @@ This release:
 * upgrades all the Go and Java libraries to fix the latest security alerts
 * adds support for Gradle up to `9.2.1`
 * removes the publication of Java artifacts to [Maven Central](https://search.maven.org/search?q=com.mooltiverse.oss.nyx) [55](https://github.com/mooltiverse/nyx/issues/55). From now on Java artifacts are only published to [GitHub Packages](https://github.com/orgs/mooltiverse/packages)
+
+## 3.1.6
+
+This release must be ignored as some artifacts were not properly published.
+
+## 3.1.5
+
+This release must be ignored as some artifacts were not properly published.
 
 ## 3.1.4
 
