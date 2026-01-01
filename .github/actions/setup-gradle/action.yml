@@ -43,12 +43,13 @@ inputs:
       Default: quiet
     required: false
     default: 'quiet'
-  enable-cache:
+  cache-mode:
     description: |-
-      Whether to enable the cache.
-      Default: true
+      Whether to enable the cache and, if enabled, how to use it.
+      Allowed values are: 'read-write', 'read-only', 'write-only', 'disabled'.
+      Default: read-write
     required: false
-    default: 'true'
+    default: 'read-write'
   cache-name-prefix:
     description: |-
       The prefix of the name to use for the cache that will be read and/or
@@ -227,7 +228,7 @@ runs:
       echo "As a consequence you may see Gradle re-running some tasks that"
       echo "already completed in previous jobs."
       echo "::endgroup::"
-  - name: Set up the ${{ inputs.cache-name-prefix }}-${{ inputs.cache-name-suffix }} cache
+  - name: Set up the ${{ inputs.cache-name-prefix }}-${{ inputs.cache-name-suffix }} read-write cache
     # The 'burrunan/gradle-cache-action' actions would be much more effective
     # but only works in the 'main' branch, so when the branch is not 'main'
     # we use this custom cache as a fallback.
@@ -235,15 +236,41 @@ runs:
     # handed over from one job to another using the 'cache-name-restore-suffix'
     # input, but doesn't allow merging caches from multiple jobs into one.
     uses: actions/cache@v4
-    if: ${{ inputs.enable-cache == 'true' && github.ref != 'refs/heads/main' }}
+    if: ${{ inputs.cache-mode == 'read-write' && github.ref != 'refs/heads/main' }}
     with:
       key: ${{ inputs.cache-name-prefix }}-${{ inputs.cache-name-suffix }}
       restore-keys: |-
         ${{ inputs.cache-name-prefix }}-${{ inputs.cache-name-restore-suffix }}
       path: ${{ inputs.cache-contents }}
       enableCrossOsArchive: true
+  - name: Set up the ${{ inputs.cache-name-prefix }}-${{ inputs.cache-name-suffix }} read-only cache
+    # The 'burrunan/gradle-cache-action' actions would be much more effective
+    # but only works in the 'main' branch, so when the branch is not 'main'
+    # we use this custom cache as a fallback.
+    # This custom cache works well in 'linear' scenarios, when one cache is
+    # handed over from one job to another using the 'cache-name-restore-suffix'
+    # input, but doesn't allow merging caches from multiple jobs into one.
+    uses: actions/cache/restore@v4
+    if: ${{ inputs.cache-mode == 'read-only' && github.ref != 'refs/heads/main' }}
+    with:
+      key: ${{ inputs.cache-name-prefix }}-${{ inputs.cache-name-suffix }}
+      restore-keys: |-
+        ${{ inputs.cache-name-prefix }}-${{ inputs.cache-name-restore-suffix }}
+      path: ${{ inputs.cache-contents }}
+  - name: Set up the ${{ inputs.cache-name-prefix }}-${{ inputs.cache-name-suffix }} write-only cache
+    # The 'burrunan/gradle-cache-action' actions would be much more effective
+    # but only works in the 'main' branch, so when the branch is not 'main'
+    # we use this custom cache as a fallback.
+    # This custom cache works well in 'linear' scenarios, when one cache is
+    # handed over from one job to another using the 'cache-name-restore-suffix'
+    # input, but doesn't allow merging caches from multiple jobs into one.
+    uses: actions/cache/save@v4
+    if: ${{ inputs.cache-mode == 'write-only' && github.ref != 'refs/heads/main' }}
+    with:
+      key: ${{ inputs.cache-name-prefix }}-${{ inputs.cache-name-suffix }}
+      path: ${{ inputs.cache-contents }}
   - name: List the cache contents
-    if: ${{ inputs.enable-cache == 'true' && github.ref != 'refs/heads/main' && inputs.verbosity == 'debug' }}
+    if: ${{ inputs.cache-mode != 'disabled' && github.ref != 'refs/heads/main' && inputs.verbosity == 'debug' }}
     shell: bash
     continue-on-error: true
     run: |
@@ -267,7 +294,7 @@ runs:
     # As a result, we only use this cache for the 'main' branch, where it's very
     # effective, otherwise we use the custom one above.
     uses: burrunan/gradle-cache-action@v3
-    if: ${{ inputs.enable-cache == 'true' && github.ref == 'refs/heads/main' }}
+    if: ${{ inputs.cache-mode != 'disabled' && github.ref == 'refs/heads/main' }}
     with:
       gradle-version: ${{ inputs.install-gradle-version }}
       # The remote cache needs to be identified by a 'group' of caches,
@@ -296,7 +323,7 @@ runs:
       verbosity: ${{ inputs.verbosity }}
       # No need to setup an extra cache for Java. The Gradle cache is enough.
       install-jdk: ${{ inputs.install-jdk }}
-      enable-cache: false
+      cache-mode: disabled
       enable-changed-files-detection: false
       install-jdk-distribution: ${{ inputs.install-jdk-distribution }}
       install-jdk-version: ${{ inputs.install-jdk-version }}
