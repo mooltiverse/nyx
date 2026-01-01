@@ -79,9 +79,16 @@ jobs:
   release:
     name: Release
     needs:
+    # The 'java-build' and 'go-build' jobs are required here just to use their output caches
+    # (see comments in the 'with' section below) because those caches contain the build artifacts
+    # to be published. Otherwise their dependencies would be implicit and transitive through
+    # the 'java-publish' and 'go-publish' jobs but that's not enough if we want to use their ouputs,
+    # so we need to declare them explicitly.
     - initialize
     - test
+    - java-build
     - java-publish
+    - go-build
     - go-publish
     - docker-publish
     - docusaurus-publish
@@ -93,6 +100,11 @@ jobs:
       install-jdk-version: 20
       # Restore the cache from the previous job to 'chain' caches
       nyx-cache-name-restore-suffix: ${{ needs.initialize.outputs.nyx-cache-name-suffix }}
+      # The cache from 'java-publish' and 'go-publish' may be evicted because it's too large and
+      # what we actually need here is the cache from the build jobs in order to retrieve the artifacts
+      # to be published.
+      #java-cache-name-restore-suffix: ${{ needs.java-publish.outputs.java-cache-name-suffix }}
+      #go-cache-name-restore-suffix: ${{ needs.go-publish.outputs.go-cache-name-suffix }}
       java-cache-name-restore-suffix: ${{ needs.java-build.outputs.java-cache-name-suffix }}
       go-cache-name-restore-suffix: ${{ needs.go-build.outputs.go-cache-name-suffix }}
       docusaurus-cache-name-restore-suffix: ${{ needs.docusaurus-publish.outputs.docusaurus-cache-name-suffix }}
