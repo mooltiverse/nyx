@@ -156,7 +156,7 @@ task deleteGitLabTestProjects() {
     logger.quiet "The authenticated user is: "+user.username
 
     logger.quiet "Fetching the list of GitLab projects..."
-    URL getProjectsURL = new URL('https://gitlab.com/api/v4/users/'+user.username+'/projects?per_page=100') // 100 is the maximum number of items per page
+    URL getProjectsURL = new URL('https://gitlab.com/api/v4/users/'+user.username+'/projects?per_page=100&active=true&archived=false&include_pending_delete=false') // 100 is the maximum number of items per page
     HttpURLConnection getProjectsURLConnection = (HttpURLConnection)getProjectsURL.openConnection()
     getProjectsURLConnection.setRequestProperty("Authorization", "Bearer "+findProperty("gitLabTestUserToken"))
     logger.quiet "Status code: ${getProjectsURLConnection.getResponseCode()}"
@@ -165,7 +165,6 @@ task deleteGitLabTestProjects() {
 
     projects.each { project ->
       logger.quiet "   Deleting project: ${project.path}"
-
       URL deleteProjectsURL = new URL('https://gitlab.com/api/v4/projects/'+project.id)
       HttpURLConnection deleteProjectsURLConnection = (HttpURLConnection)deleteProjectsURL.openConnection()
       deleteProjectsURLConnection.setRequestMethod("DELETE")

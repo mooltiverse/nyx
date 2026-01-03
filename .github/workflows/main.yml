@@ -168,9 +168,9 @@ jobs:
       java-cache-name-restore-suffix: ${{ needs.java-build.outputs.java-cache-name-suffix }}
       install-node: false
       install-newman: false
-      # When running in non-main branches reduce the number of test cases to speed up the build.
+      # Reduce the number of test cases to speed up the build.
       # Use the 'quickTests' for this purpose, which is a property parsed by the Gradle scripts
-      gradle-arguments: --build-cache --stacktrace ${{ github.ref == 'refs/heads/main' && '-PquickTests=false' || '-PquickTests=true' }}
+      gradle-arguments: --build-cache --stacktrace '-PquickTests=true'
     secrets:
       # Pass extra properties used by the Gradle scripts to run tests.
       # See the top level
@@ -281,9 +281,9 @@ jobs:
       go-cache-name-restore-suffix: ${{ needs.go-build.outputs.go-cache-name-suffix }}
       install-node: false
       install-newman: false
-      # When running in non-main branches reduce the number of test cases to speed up the build.
+      # Reduce the number of test cases to speed up the build.
       # Use the 'quickTests' for this purpose, which is a property parsed by the Gradle scripts
-      gradle-arguments: --build-cache --stacktrace ${{ github.ref == 'refs/heads/main' && '-PquickTests=false' || '-PquickTests=true' }}
+      gradle-arguments: --build-cache --stacktrace '-PquickTests=true'
     secrets:
       # Pass extra properties used by the Gradle scripts to run tests.
       # See the top level
