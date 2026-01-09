@@ -18,6 +18,10 @@
     color: var(--ifm-font-color-base);
 }
   
+.resourcesSection {
+    justify-content: center;
+}
+
 .resourcesSection > :global(.col) > * {
     margin-bottom: 2rem;
 }

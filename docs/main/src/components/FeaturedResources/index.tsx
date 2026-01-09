@@ -66,11 +66,6 @@ function Resource({name, environment, url, description, logo, links}: ResourceIt
   }
 
 export default function FeaturedResources({ resources }) {
-    const resourceColumns: ResourceItem[][] = [[], [], []];
-    resources.forEach((resource, i) =>
-        resourceColumns[i % 3]!.push(resource),
-    );
-
     return (
         <div className={clsx(styles.section, styles.sectionAlt)}>
         <div className="container">
@@ -78,11 +73,9 @@ export default function FeaturedResources({ resources }) {
             Featured Resources
             </Heading>
             <div className={clsx('row', styles.resourcesSection)}>
-            {resourceColumns.map((resourceItems, i) => (
+                {resources.map((resource, i) => (
                 <div className="col col--4" key={i}>
-                {resourceItems.map((resource) => (
                     <Resource {...resource} />
-                ))}
                 </div>
             ))}
             </div>
