@@ -2,29 +2,37 @@
  * Any CSS included here will be global. The classic template
  * bundles Infima by default. Infima is a CSS framework designed to
  * work well for content-centric websites.
+ *
+ * Here we import the theme from "theme.css" and use its variables
+ * to override Infima defaults.
+ * By using this mechanism we make the theme pluggable, so that in case
+ * the standard theme is updated, we only need to drop the updated
+ * "theme.css" file without changing this file.
  */
+
+@import "theme.css";
 
 /* You can override the default Infima variables here. */
 :root {
-  --ifm-color-primary: #4285F4;
-  --ifm-color-primary-dark: #202ae9;
-  --ifm-color-primary-darker: #070aad;
-  --ifm-color-primary-darkest: #000033;
-  --ifm-color-primary-light: #4c5ff7;
-  --ifm-color-primary-lighter: #93a9fd;
-  --ifm-color-primary-lightest: #ebf1ff;
+  --ifm-color-primary: var(--color-palette-primary-50);
+  --ifm-color-primary-dark: var(--color-palette-primary-35);
+  --ifm-color-primary-darker: var(--color-palette-primary-20);
+  --ifm-color-primary-darkest: var(--color-palette-primary-5);
+  --ifm-color-primary-light: var(--color-palette-primary-70);
+  --ifm-color-primary-lighter: var(--color-palette-primary-80);
+  --ifm-color-primary-lightest: var(--color-palette-primary-95);
   --ifm-code-font-size: 95%;
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.1);
 }
 
 /* For readability concerns, you should choose a lighter palette in dark mode. */
 [data-theme='dark'] {
-  --ifm-color-primary: #4285F4;
-  --ifm-color-primary-dark: #1c25d2;
-  --ifm-color-primary-darker: #1117bf;
-  --ifm-color-primary-darkest: #000033;
-  --ifm-color-primary-light: #495bf2;
-  --ifm-color-primary-lighter: #9fb4fa;
-  --ifm-color-primary-lightest: #ebf1ff;
+  --ifm-color-primary: var(--color-palette-primary-60);
+  --ifm-color-primary-dark: var(--color-palette-primary-35);
+  --ifm-color-primary-darker: var(--color-palette-primary-20);
+  --ifm-color-primary-darkest: var(--color-palette-primary-5);
+  --ifm-color-primary-light: var(--color-palette-primary-70);
+  --ifm-color-primary-lighter: var(--color-palette-primary-80);
+  --ifm-color-primary-lightest: var(--color-palette-primary-95);
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
 }

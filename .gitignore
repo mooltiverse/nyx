@@ -53,3 +53,7 @@ htmlcov
 
 # .env files
 *.env
+
+# Node dependency directories
+node_modules
+jspm_packages
