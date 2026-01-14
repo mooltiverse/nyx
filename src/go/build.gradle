@@ -38,12 +38,12 @@ subprojects {
     // Configurations can extend other configurations from within the same
     // project by means of 'extendsFrom'.
     // To add artifacts to configurations use the 'artifacts' section.
-    apiDocumentation {
-      // The 'apiDocumentation' configuration exposes the generated API
+    documentation {
+      // The 'documentation' configuration exposes the generated
       // documentation. This configuration is 'consumable' so it can be used
       // by other 'consumer' projects.
       // Artifacts are added to this configuration by means of the
-      // 'apiDocumentation' artifact in the 'artifacts' section.
+      // 'documentation' artifact in the 'artifacts' section.
       canBeConsumed = true
       canBeResolved = false
     }
@@ -523,7 +523,7 @@ subprojects {
     dependsOn goPublishToGoPkg, goPublishToGoDocs
   }
 
-  task exportAPIDocumentationArchive(type: Tar, group: 'build', description: 'Builds the API documentation archive for this project') {
+  task exportDocumentationArchive(type: Tar, group: 'build', description: 'Builds the documentation archive for this project') {
     // Task dependencies
     dependsOn goDocDown
 
@@ -552,7 +552,7 @@ subprojects {
 
   // This is a lifecycle task that will depend on other specific tasks.
   task documentation(group: 'build', description: 'Builds the documentation for this project') {
-    dependsOn exportAPIDocumentationArchive
+    dependsOn exportDocumentationArchive
   }
 
   task exportBinariesArchive(type: Tar, group: 'build', description: 'Creates the archive containing the binaries for this project') {
@@ -599,10 +599,10 @@ subprojects {
     // Here we associate artifacts produced by this project to the
     // configurations so that they can be consumed by other projects.
 
-    // Expose the API documentation.
-    // Here we associate the outputs from the 'exportAPIDocumentationArchive'
-    // task to the 'apiDocumentation' configuration.
-    apiDocumentation tasks.exportAPIDocumentationArchive
+    // Expose the documentation.
+    // Here we associate the outputs from the 'exportDocumentationArchive'
+    // task to the 'documentation' configuration.
+    documentation tasks.exportDocumentationArchive
 
     // Expose the binaries.
     // Here we associate the outputs from the 'exportBinariesArchive' task to
