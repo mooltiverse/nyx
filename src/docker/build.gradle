@@ -1296,7 +1296,7 @@ subprojects {
     // so when there are more than one they can be used as API docs
     // and stored together in the same directory.
     archiveBaseName = project.name
-    archiveAppendix = 'api-docs'
+    archiveAppendix = 'docs'
     archiveVersion = project.version
     archiveClassifier = null
     archiveExtension = 'tar.gz'
