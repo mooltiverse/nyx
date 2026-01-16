@@ -6,7 +6,7 @@ export default {
   // These are the site global metadata attributes
   title: 'Nyx',
   tagline: 'The one stop semantic release tool',
-  favicon: '/nyx/img/favicon.ico',
+  favicon: 'img/mooltiverse-icon-color-flat-transparent-64x64.png',
   url: 'https://mooltiverse.github.io/',
   baseUrl: '/nyx/',
   organizationName: 'mooltiverse',
@@ -149,7 +149,7 @@ export default {
     // This is the meta image URL for the site, relative to the site's "static" directory.
     // If the 'baseUrl' global attribute is other than '/', this path must also include
     // the 'baseUrl' as prefix. See https://docusaurus.io/docs/static-assets for more.
-    image: '/nyx/img/logo.png',
+    image: '/img/mooltiverse-icon-color-flat-transparent-64x64.png',
     // Configuration for the announcement bar.
     // Uncomment this block and edit its attributes in case you need
     // to display an announcement on your site.
@@ -180,7 +180,7 @@ export default {
       title: 'Nyx',
       logo: {
         alt: 'Logo',
-        src: '/nyx/img/icon.svg',
+        src: 'img/mooltiverse-symbol-color-gradient-transparent.svg',
       },
       // Configuration for the navbar items displayed on top of the site.
       // Note that internal links use the 'to' attribute to the local route,
