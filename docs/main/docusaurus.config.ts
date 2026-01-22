@@ -150,6 +150,13 @@ export default {
     // If the 'baseUrl' global attribute is other than '/', this path must also include
     // the 'baseUrl' as prefix. See https://docusaurus.io/docs/static-assets for more.
     image: '/img/mooltiverse-icon-color-64x64.png',
+    // This is the metadata section also used for the Search Engine Optimization (SEO).
+    // What goes here translates to <meta> tags
+    // For more see:
+    // - https://docusaurus.io/docs/seo
+    metadata: [
+      {name: 'keywords', content: 'nyx, mooltiverse, semantic version, semver, semantic release, release automation, release tool, conventional commits'},
+    ],
     // Configuration for the announcement bar.
     // Uncomment this block and edit its attributes in case you need
     // to display an announcement on your site.
