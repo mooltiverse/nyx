@@ -17,9 +17,9 @@
   "dependencies": {
     "@docusaurus/core": "^3.9.2",
     "@docusaurus/preset-classic": "^3.9.2",
-    "@docusaurus/theme-mermaid": "^3.9.2",
+    "@docusaurus/theme-mermaid": "^3.7.0",
     "@mdx-js/react": "^3.1.1",
-    "@react-oauth/google": "^0.12.2",
+    "@react-oauth/google": "^0.13.4",
     "chart.js": "^4.5.1",
     "clsx": "^2.1.1",
     "docusaurus-lunr-search": "^3.6.0",

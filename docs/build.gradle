@@ -178,6 +178,8 @@ subprojects {
     doLast {
       logger.quiet("Checking for packages requiring upgrade")
       injectedExecOps.execOps.exec {
+        // When some update is required this command returns 1
+        ignoreExitValue true
         workingDir projectDir
         commandLine 'npm', 'outdated'
       }
@@ -192,8 +194,17 @@ subprojects {
         commandLine 'npm', 'install' 
       }
       injectedExecOps.execOps.exec {
+        // When some update is required this command returns 1
+        ignoreExitValue true
         workingDir projectDir
-        commandLine 'npm', 'audit', 'fix'
+        commandLine 'npm', 'audit', 'fix', '--force'
+      }
+      // Issue requiring attention require to run the command twice
+      injectedExecOps.execOps.exec {
+        // When some update is required this command returns 1
+        ignoreExitValue true
+        workingDir projectDir
+        commandLine 'npm', 'audit', 'fix', '--force'
       }
 
       logger.quiet("Cleaning up the cache")

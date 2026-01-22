@@ -16,9 +16,10 @@ export default {
   // Allowed values are: 'ignore' | 'log' | 'warn' | 'throw'.
   // 'throw' means 'raise an error', which is the safest to avoid publishing
   // broken links.
+  //
+  // See also 'siteConfig.markdown.hooks.onBrokenMarkdownLinks'.
   onBrokenLinks: 'throw',
   onBrokenAnchors: 'throw',
-  onBrokenMarkdownLinks: 'throw',
   onDuplicateRoutes: 'throw',
 
   // Configure the site internationalization.
@@ -40,6 +41,21 @@ export default {
     // correctly in plain .md files).
     format: 'detect',
     mermaid: true,
+
+    hooks: {
+      // These attributes define the behavior when encountering broken links.
+      // Allowed values are: 'ignore' | 'log' | 'warn' | 'throw'.
+      // 'throw' means 'raise an error', which is the safest to avoid publishing
+      // broken links.
+      // Cases when you may need to use values other than 'throw':
+      // - the site uses drafts or unlisted pages (the front matter of some pages
+      //   has the 'draft' or the 'unlisted' field set to 'true').
+      //   When you have draft or unlisted pages Docusaurus fails to skip them in
+      //   some internal pages (i.e. the '404.html') so you need to lower the
+      //   check severity when building sites for production.
+      onBrokenMarkdownLinks: 'throw',
+      onBrokenMarkdownImages: 'throw',
+    },
   },
 
   // Non Docusaurus fields
