@@ -2,7 +2,7 @@
     padding: 40px 0;
 }
   
-  .sectionAlt {
+.sectionAlt {
     background-color: var(--ifm-color-emphasis-100);
 }
 
@@ -34,7 +34,7 @@
   
 @media (min-width: 997px) {
     .resourcesSection > :global(.col) > *:last-child {
-        margin-bottom: 0;
+        margin-bottom: 1rem;
     }
 }
   
