@@ -285,6 +285,11 @@ export default {
               label: 'Javadocs',
               to: 'https://javadoc.io/doc/com.mooltiverse.oss.nyx/java',
             },
+            { // The site map is built by the '@docusaurus/plugin-sitemap' plugin
+              // and is only available on the live site
+              label: 'Site Map',
+              href: 'sitemap.xml',
+            },
           ],
         },
         {
