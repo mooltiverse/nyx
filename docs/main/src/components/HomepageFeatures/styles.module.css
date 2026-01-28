@@ -3,6 +3,10 @@
     width: 100px;
 }
 
+.featureIcon {
+    color: var(--ifm-color-primary);
+}
+
 .features {
     display: flex;
     align-items: center;

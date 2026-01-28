@@ -30,12 +30,16 @@ const RESOURCES: ResourceItem[] = [
     description: (
       <></>
     ),
-    logo: '/nyx/img/github.svg',
+    image: {
+      src: 'mdi:github',
+      width: 200.00,
+      height: 100.00,
+      color: 'Black',
+    },
     links: [
       {
         "title": "Releases",
         "url": "https://github.com/mooltiverse/nyx/releases/latest",
-        "logo": ''
       }
     ]
   },
@@ -46,12 +50,16 @@ const RESOURCES: ResourceItem[] = [
     description: (
       <></>
     ),
-    logo: '/nyx/img/gradle.svg',
+    image: {
+      src: 'material-icon-theme:gradle',
+      width: 200.00,
+      height: 100.00,
+      color: 'Black',
+    },
     links: [
       {
         "title": "Plugin",
         "url": "https://plugins.gradle.org/plugin/com.mooltiverse.oss.nyx",
-        "logo": ''
       }
     ]
   },
@@ -62,17 +70,20 @@ const RESOURCES: ResourceItem[] = [
     description: (
       <></>
     ),
-    logo: '/nyx/img/docker.svg',
+    image: {
+      src: 'mdi:docker',
+      width: 200.00,
+      height: 100.00,
+      color: 'DodgerBlue',
+    },
     links: [
       {
         "title": "Docker Hub",
         "url": "https://hub.docker.com/repository/docker/mooltiverse/nyx",
-        "logo": '/nyx/img/docker.svg'
       },
       {
         "title": "GitHub",
         "url": "https://github.com/mooltiverse/nyx/pkgs/container/nyx",
-        "logo": '/nyx/img/github.svg'
       }
     ]
   },
@@ -83,17 +94,20 @@ const RESOURCES: ResourceItem[] = [
     description: (
       <></>
     ),
-    logo: '/nyx/img/news.svg',
+    image: {
+      src: 'fluent-color:news-16',
+      width: 200.00,
+      height: 100.00,
+      color: '',
+    },
     links: [
       {
         "title": "Nyx, the Semantic Release Automation Tool",
         "url": "https://levelup.gitconnected.com/nyx-the-semantic-release-automation-tool-4e2dfa949f38",
-        "logo": '/nyx/img/medium.svg'
       },
       {
         "title": "Semantic Release Automation with Gradle using Nyx",
         "url": "https://levelup.gitconnected.com/semantic-release-automation-with-gradle-using-nyx-ba345235a365",
-        "logo": '/nyx/img/medium.svg'
       }
     ]
   },
@@ -104,12 +118,16 @@ const RESOURCES: ResourceItem[] = [
     description: (
       <></>
     ),
-    logo: '/nyx/img/go.svg',
+    image: {
+      src: 'material-icon-theme:go',
+      width: 200.00,
+      height: 100.00,
+      color: '',
+    },
     links: [
       {
         "title": "Godoc",
         "url": "https://godocs.io/github.com/mooltiverse/nyx/src/go/nyx",
-        "logo": '/nyx/img/go.svg'
       }
     ]
   },
@@ -120,17 +138,20 @@ const RESOURCES: ResourceItem[] = [
     description: (
       <></>
     ),
-    logo: '/nyx/img/java.svg',
+    image: {
+      src: 'devicon:java',
+      width: 200.00,
+      height: 100.00,
+      color: '',
+    },
     links: [
       {
         "title": "GitHub",
         "url": "https://github.com/orgs/mooltiverse/packages?repo_name=nyx",
-        "logo": '/nyx/img/github.svg'
       },
       {
         "title": "Javadoc",
         "url": "https://javadoc.io/doc/com.mooltiverse.oss.nyx/java",
-        "logo": '/nyx/img/java.svg'
       }
     ]
   },

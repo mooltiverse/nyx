@@ -1,0 +1,77 @@
+# This workflow takes care of building  and publishing the documentation site.
+#
+# The whole process is split into jobs, each running on a different node.
+# Jobs are executed conditionally, only when required, in order to avoid wasting
+# build time on useless jobs.
+# Job dependencies also make longer and expensive tasks depend on the success
+# of previous, less expensive tasks. If upstream tasks fail, their dependencies
+# are not executed.
+#
+# Moreover, in order to avoid repeating tasks and start one job from where
+# previous ones have finished, intermediate artifacts are handed over from one
+# job to another by means of caches. Caches have a few caveats though, like
+# being read-only. This means that instead of updating an existing cache, one
+# needs to create a new one starting from the previous, so that caches are
+# somehow 'chained' together, with one link for each job.
+#
+# This way of modelling the workflow requires extra engineering but allows for
+# fine grained control over the pipeline as a whole. It also introduces some
+# overhead, but that comes with the benefit of controlling the workflow stage
+# by stage. On the other hand, most of this extra effort is solved using our
+# custom reusable actions.
+#
+# Gradle is used under the hood by reusable workflows and composite actions so
+# that we use the same build scripts that developers also use locally on their
+# workstations. This improves portability and consistency.
+
+name: Main
+
+# Only run this workflow manually, if the Main workflow is not necessary.
+on:
+  workflow_dispatch:
+
+# Avoid running multiple pipelines concurrently to avoid overlapping releases
+# and tags.
+# This is required because the current version is determined at the beginning
+# of the workflow using Nyx so if multiple workflows run at the same time they
+# may receive the same version and try to create overlapping tags and releases.
+# With this concurrency settings jobs are on hold until previous pipelines
+# have completed.
+concurrency:
+  group: project
+  cancel-in-progress: false
+
+jobs:
+  #############################################################################
+  # Lifecycle and Waypoint Jobs
+  #############################################################################
+  initialize:
+    name: Initialize
+    uses: mooltiverse/nyx/.github/workflows/initialize.yml@main
+  
+  build:
+    needs:
+    - docusaurus-build
+    uses: mooltiverse/nyx/.github/workflows/build.yml@main
+  
+  #############################################################################
+  # Docusaurus Jobs
+  #############################################################################
+  docusaurus-build:
+    name: Docusaurus Build
+    needs:
+    - initialize
+    uses: mooltiverse/nyx/.github/workflows/docusaurus-build.yml@main
+    with:
+      verbosity: info
+      install-jdk: true
+      install-jdk-version: 20
+      # Restore the cache from the previous job to 'chain' caches
+      nyx-cache-name-restore-suffix: ${{ needs.initialize.outputs.nyx-cache-name-suffix }}
+  
+  docusaurus-publish:
+    name: Docusaurus Publish
+    needs:
+    - initialize
+    - docusaurus-build
+    uses: mooltiverse/nyx/.github/workflows/docusaurus-publish.yml@main

@@ -1,5 +1,6 @@
 import clsx from 'clsx';
 import Heading from '@theme/Heading';
+import { Icon } from "@iconify/react";
 import styles from './styles.module.css';
 
 export type FeatureItem = {
@@ -8,6 +9,7 @@ export type FeatureItem = {
     src: string;
     width: number;
     height: number;
+    color: string;
   };
   description: JSX.Element;
 };
@@ -16,14 +18,14 @@ function Feature({title, image, description}: FeatureItem) {
   return (
     <div className={clsx('col')}>
       <div className="text--center">
-        <img
-          className={styles.featureImage}
-          alt={title}
-          width={Math.floor(image.width)}
-          height={Math.floor(image.height)}
-          src={image.src}
-          loading="lazy"
-        />
+        <Icon 
+            icon={image.src}
+            alt={title}
+            width={Math.floor(image.width)}
+            height={Math.floor(image.height)}
+            color={image.color}
+            className={styles.featureIcon}
+          />
       </div>
       <div className="text--center padding-horiz--md">
         <Heading as="h3">{title}</Heading>

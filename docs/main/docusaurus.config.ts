@@ -31,6 +31,32 @@ export default {
     locales: ['en'],
   },
 
+  // Configure the site to use custom fonts (Noto: https://fonts.google.com/noto).
+  headTags: [
+    {
+      tagName: 'link',
+      attributes: {
+        rel: 'preconnect',
+        href: 'https://fonts.googleapis.com',
+      },
+    },
+    {
+      tagName: 'link',
+      attributes: {
+        rel: 'preconnect',
+        href: 'https://fonts.gstatic.com',
+        crossorigin: 'anonymous',
+      },
+    },
+    { // Install the Noto font (https://fonts.google.com/noto)
+      tagName: 'link',
+      attributes: {
+        rel: 'stylesheet',
+        href: 'https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;700&display=swap',
+      },
+    },
+  ],
+
   // Markdown configuration.
   // For more see:
   // - https://docusaurus.io/docs/api/docusaurus-config#markdown
@@ -74,7 +100,27 @@ export default {
         // For more on the configuration of this plugin see:
         // - https://docusaurus.io/docs/api/themes/configuration
         // - https://docusaurus.io/docs/api/themes/@docusaurus/theme-classic
-        customCss: './src/css/custom.css',
+        //
+        // In this configuration:
+        // - the default stylesheet ('custom.css') has been replaced by
+        //   'infima-material-theme.css'
+        // - 'infima-material-theme.css' is a proxy to the Material theme
+        // - 'material-theme.css' contains the actual style variables. This
+        //   file is generated and published by the Brand Kit project.
+        //   For the latest version and artifacts please check out
+        //   https://github.com/mooltiverse/brand-kit.
+        //
+        // With this configuration, the Material theme is quickly replaceable
+        // by just replacing the 'material-theme.css' file.
+        // Note that 'material-theme.css' is also imported by
+        // 'infima-material-theme.css', but we load it here too, so it's
+        // better documented and its variables are globally accessible also
+        // without the proxy.
+        // See the comments inside the stylesheets for more.
+        customCss: [
+          './src/css/infima-material-theme.css',
+          './src/css/material-theme.css'
+        ],
       },
     ],
     [
@@ -249,7 +295,7 @@ export default {
     // For more see:
     // - https://docusaurus.io/docs/api/themes/configuration#footer-1
     footer: {
-      style: 'dark',
+      //style: 'dark',
       // Configuration for the footer links.
       // When using 'items' within 'links' elements are organized into columns.
       // Note that internal links use the 'to' attribute to the local route,

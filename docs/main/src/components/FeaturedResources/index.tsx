@@ -1,12 +1,18 @@
 import clsx from 'clsx';
 import Heading from '@theme/Heading';
 import Link from '@docusaurus/Link';
+import { Icon } from "@iconify/react";
 import styles from './styles.module.css';
 
 export interface LinkProps {
     title: string;
     url: string;
-    logo: string;
+    image: {
+      src: string;
+      width: number;
+      height: number;
+      color: string;
+    };
 }
 
 export type ResourceItem = {
@@ -14,23 +20,28 @@ export type ResourceItem = {
     environment: string;
     url: string;
     description: JSX.Element;
-    logo: string;
+    image: {
+      src: string;
+      width: number;
+      height: number;
+      color: string;
+    };
     links?: LinkProps[];
 };
 
-function Resource({name, environment, url, description, logo, links}: ResourceItem): JSX.Element {
+function Resource({name, environment, url, description, image, links}: ResourceItem): JSX.Element {
     return (
       <div className={clsx('card', styles.resource)}>
         <div className="card__header">
           <div className="avatar">
             <Link className={clsx(styles.resourceMeta)} to={url}>
-              <img
+              <Icon 
+                icon={image.src}
                 alt={name}
-                className="avatar__photo"
-                src={logo}
-                width="48"
-                height="48"
-                loading="lazy"
+                width={Math.floor(image.width)}
+                height={Math.floor(image.height)}
+                color={image.color}
+                className={styles.featureIcon}
               />
             </Link>
             <div className={clsx('avatar__intro', styles.resourceMeta)}>
@@ -48,13 +59,15 @@ function Resource({name, environment, url, description, logo, links}: ResourceIt
           <div className={styles.linksWrapper}>
             <div className={styles.links}>
               {links.map((link, index) => (
-                
                 <Link className={clsx(styles.link)} to={link.url}>
-                  <img 
-                    alt="" 
-                    className={styles.favicon}
-                    src={link.logo && link.logo || logo}
-                />
+                  <Icon 
+                    icon={link.image && link.image.src || image.src}
+                    alt={name}
+                    width={Math.floor(link.image && link.image.width || image.width)}
+                    height={Math.floor(link.image && link.image.height || image.height)}
+                    color={link.image && link.image.color || image.color}
+                    className={styles.linkIcon}
+                  />
                 {link.title}
                 </Link>
               ))}
@@ -66,6 +79,11 @@ function Resource({name, environment, url, description, logo, links}: ResourceIt
   }
 
 export default function FeaturedResources({ resources }) {
+    const resourceColumns: ResourceItem[][] = [[], [], []];
+    resources.forEach((resource, i) =>
+        resourceColumns[i % 3]!.push(resource),
+    );
+
     return (
         <div className={clsx(styles.section, styles.sectionAlt)}>
         <div className="container">
@@ -73,9 +91,11 @@ export default function FeaturedResources({ resources }) {
             Featured Resources
             </Heading>
             <div className={clsx('row', styles.resourcesSection)}>
-                {resources.map((resource, i) => (
+            {resourceColumns.map((resourceItems, i) => (
                 <div className="col col--4" key={i}>
+                {resourceItems.map((resource) => (
                     <Resource {...resource} />
+                ))}
                 </div>
             ))}
             </div>

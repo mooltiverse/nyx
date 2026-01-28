@@ -1,0 +1,497 @@
+/**
+ * Any CSS included here will be global. This is a replacement of the default
+ * Infima theme and acts as a proxy to the Material theme from
+ * 'material-theme.css', so that the whole theme is easily replaceable
+ * by just updating the imported 'material-theme.css', without affecting
+ * any other definitions in the site (as long as they use the variables
+ * defined here).
+ * The 'material-theme.css' file is generated and published by the Brand Kit
+ * project. For the latest version and artifacts please check out
+ * https://github.com/mooltiverse/brand-kit.
+ *
+ * This stylesheet sets the Infima and Docusaurus variables by using
+ * the values imported from 'material-theme.css'.
+ * Other variables used by other plugins may be also used.
+ *
+ * For more see:
+ * - The Material guide on how to use color roles:
+ *   https://m3.material.io/styles/color/roles
+ * - The official Infima site: https://infima.dev/
+ * - The (draft) documentation of CSS variables on the Docusaurus site:
+ *   https://docusaurus.community/knowledge/design/css/variables/
+ * - The Docusaurus "Styling and Layout" page:
+ *   https://docusaurus.io/docs/styling-layout
+ * - The Docusaurus "Customising Titles" page:
+ *   https://docusaurus.community/knowledge/design/css/customtitle/
+ * - The Docusaurus "SVG customizations & transforms" page:
+ *   https://docusaurus.community/knowledge/design/svg/
+ *
+ * Infima variables
+ * ----------------
+ * Infima does not provide the list of variables by any means so in order
+ * to retrieve all the managed variable we had to scrape them.
+ * Please note that since there is no official documentation for these
+ * variables, they may change at any time. Likewise, the following is the
+ * list of variables scraped as of this writing.
+ * Note that Infima variables are prefixed by '--ifm-' while Docusaurus
+ * variables are prefixed by '--docusaurus-'.
+ * Sources used to scrape the available variables are:
+ * - this page: https://docusaurus.community/knowledge/design/css/variables/#key-infima-variables
+ * - the browser's Developer Tools (F12) 
+* - this issue: https://github.com/facebook/docusaurus/issues/3955
+ * - this gist: https://gist.github.com/abhigyantrips/b828ca46b2460c6699c73e0162f6be80
+ */
+
+/* Import the variables from 'material-theme.css' so we can source them
+ * using the var() function.
+ */
+@import "material-theme.css";
+
+:root {
+  /* ---------- CUSTOM FONTS ---------- */
+  /* Here we use Noto (https://fonts.google.com/noto) */
+  --ifm-font-family-base: "Noto Sans", sans-serif;
+  --ifm-heading-font-family: "Noto Sans", sans-serif;
+  --ifm-font-family-monospace: "Noto Sans Mono", monospace; /* For code blocks */
+
+  /* ---------- OVERALL COLORS ---------- */
+  --ifm-color-primary: var(--md-sys-color-scheme-light-primary);
+  /* Material does not provide variants for dark-darkest and light-lightest
+     so we need to use the same color for all */
+  --ifm-color-primary-dark: var(--md-sys-color-scheme-light-primary);
+  --ifm-color-primary-darker: var(--md-sys-color-scheme-light-primary);
+  --ifm-color-primary-darkest: var(--md-sys-color-scheme-light-primary);
+  --ifm-color-primary-light: var(--md-sys-color-scheme-light-primary);
+  --ifm-color-primary-lighter: var(--md-sys-color-scheme-light-primary);
+  --ifm-color-primary-lightest: var(--md-sys-color-scheme-light-primary);
+  --ifm-color-secondary: var(--md-sys-color-scheme-light-secondary);
+  --ifm-color-secondary-dark: var(--md-sys-color-scheme-light-secondary);
+  --ifm-color-secondary-darker: var(--md-sys-color-scheme-light-secondary);
+  --ifm-color-secondary-darkest: var(--md-sys-color-scheme-light-secondary);
+  --ifm-color-secondary-light: var(--md-sys-color-scheme-light-secondary);
+  --ifm-color-secondary-lighter: var(--md-sys-color-scheme-light-secondary);
+  --ifm-color-secondary-lightest: var(--md-sys-color-scheme-light-secondary);
+
+  --ifm-font-color-base: var(--md-sys-color-scheme-light-on-surface);
+  --ifm-font-color-base-inverse: var(--md-sys-color-scheme-light-inverse-on-surface);
+  --ifm-font-color-secondary: var(--md-sys-color-scheme-light-secondary);
+  --ifm-color-content: var(--md-sys-color-scheme-light-on-surface);
+  --ifm-color-content-inverse: var(--md-sys-color-scheme-light-inverse-on-surface);
+  --ifm-color-content-secondary: var(--md-sys-color-scheme-light-secondary);
+  --ifm-link-color: var(--md-sys-color-scheme-light-primary);
+  --ifm-link-hover-color: var(--md-sys-color-scheme-light-primary);
+
+  /* ---------- BACKGROUND ---------- */
+  --ifm-background-color: var(--md-sys-color-scheme-light-surface);
+  --ifm-background-surface-color: var(--md-sys-color-scheme-light-surface-variant);
+
+  /* ---------- NAVBAR ---------- */
+  --ifm-navbar-link-color: var(--md-sys-color-scheme-light-on-surface-variant);
+  --ifm-navbar-link-hover-color: var(--md-sys-color-scheme-light-primary);
+  --ifm-navbar-link-active-color: var(--md-sys-color-scheme-light-primary);
+  --ifm-navbar-background-color: var(--md-sys-color-scheme-light-surface-variant);
+  --ifm-navbar-search-input-color: var(--md-sys-color-scheme-light-inverse-on-surface);
+  --ifm-navbar-search-input-placeholder-color: var(--md-sys-color-scheme-light-inverse-on-surface);
+  --ifm-navbar-search-input-background-color: var(--md-sys-color-scheme-light-inverse-surface);
+
+  /* ---------- MENUS ---------- */
+  --ifm-menu-color: var(--md-sys-color-scheme-light-on-surface);
+  --ifm-menu-color-active: var(--md-sys-color-scheme-light-primary);
+
+  /* ---------- HEADINGS ---------- */
+  --ifm-heading-color: var(--md-sys-color-scheme-light-on-surface);
+
+  /* ---------- BLOCKQUOTES ---------- */
+  --ifm-blockquote-color: var(--md-sys-color-scheme-light-on-surface);
+
+  /* ---------- TABS ---------- */
+  --ifm-tabs-color: var(--md-sys-color-scheme-light-on-surface);
+  --ifm-tabs-color-active: var(--md-sys-color-scheme-light-primary);
+  --ifm-tabs-color-active-border: var(--md-sys-color-scheme-light-primary);
+
+  /* ---------- BUTTONS ---------- */
+  --ifm-button-color: var(--md-sys-color-scheme-light-on-primary);
+  --ifm-button-border-color: var(--md-sys-color-scheme-light-primary);
+  --ifm-button-background-color: var(--md-sys-color-scheme-light-primary);
+
+  /* ---------- CODE BLOCKS ---------- */
+  --ifm-code-font-size: 90%;
+
+  /* ---------- HERO ---------- */
+  /* Hero component in some Docusaurus versions comes with hardcoded colors
+   * in the stylesheet. You can fix it in source stylesheets looking for
+   * .hero* classes.
+   * Moreover, something seems to overwrite the '.hero--primary' somewhere,
+   * forcing its colors to be the Docusaurus defaults. When that happens,
+   * the following variables have no effect. This issue is worth some further
+   * investigation.
+   * '--ifm-hero-title-color' is a custom variable we add here and is not on
+   * Docusaurus by default, but, if customizing the 'heroProjectTitle' CSS class,
+   * (i.e. 'color: var(--ifm-hero-title-color);') makes the Hero title nicer.
+   */
+  --ifm-hero-title-color: var(--md-sys-color-scheme-light-inverse-primary);
+  --ifm-hero-text-color: var(--md-sys-color-scheme-light-inverse-on-surface);
+  --ifm-hero-background-color: var(--md-sys-color-scheme-light-inverse-surface);
+
+  /* ---------- TOC ---------- */
+  --ifm-toc-link-color: var(--md-sys-color-scheme-light-on-surface);
+
+  /* ---------- FOOTER ---------- */
+  --ifm-footer-color: var(--md-sys-color-scheme-light-on-surface-variant);
+  --ifm-footer-title-color: var(--md-sys-color-scheme-light-on-surface-variant);
+  --ifm-footer-background-color: var(--md-sys-color-scheme-light-surface-variant);
+  --ifm-footer-link-hover-color: var(--md-sys-color-scheme-light-on-surface-variant);
+  --ifm-footer-link-color: var(--md-sys-color-scheme-light-on-surface-variant);
+}
+
+[data-theme='dark'] {
+  /* ---------- OVERALL COLORS ---------- */
+  --ifm-color-primary: var(--md-sys-color-scheme-dark-primary);
+  /* Material does not provide variants for dark-darkest and light-lightest
+     so we need to use the same color for all */
+  --ifm-color-primary-dark: var(--md-sys-color-scheme-dark-primary);
+  --ifm-color-primary-darker: var(--md-sys-color-scheme-dark-primary);
+  --ifm-color-primary-darkest: var(--md-sys-color-scheme-dark-primary);
+  --ifm-color-primary-light: var(--md-sys-color-scheme-dark-primary);
+  --ifm-color-primary-lighter: var(--md-sys-color-scheme-dark-primary);
+  --ifm-color-primary-lightest: var(--md-sys-color-scheme-dark-primary);
+  --ifm-color-secondary: var(--md-sys-color-scheme-dark-secondary);
+  --ifm-color-secondary-dark: var(--md-sys-color-scheme-dark-secondary);
+  --ifm-color-secondary-darker: var(--md-sys-color-scheme-dark-secondary);
+  --ifm-color-secondary-darkest: var(--md-sys-color-scheme-dark-secondary);
+  --ifm-color-secondary-light: var(--md-sys-color-scheme-dark-secondary);
+  --ifm-color-secondary-lighter: var(--md-sys-color-scheme-dark-secondary);
+  --ifm-color-secondary-lightest: var(--md-sys-color-scheme-dark-secondary);
+
+  --ifm-font-color-base: var(--md-sys-color-scheme-dark-on-surface);
+  --ifm-font-color-base-inverse: var(--md-sys-color-scheme-dark-inverse-on-surface);
+  --ifm-font-color-secondary: var(--md-sys-color-scheme-dark-secondary);
+  --ifm-color-content: var(--md-sys-color-scheme-dark-on-surface);
+  --ifm-color-content-inverse: var(--md-sys-color-scheme-dark-inverse-on-surface);
+  --ifm-color-content-secondary: var(--md-sys-color-scheme-dark-secondary);
+  --ifm-link-color: var(--md-sys-color-scheme-dark-primary);
+  --ifm-link-hover-color: var(--md-sys-color-scheme-dark-primary);
+
+  /* ---------- BACKGROUND ---------- */
+  --ifm-background-color: var(--md-sys-color-scheme-dark-surface);
+  --ifm-background-surface-color: var(--md-sys-color-scheme-dark-surface-variant);
+
+  /* ---------- NAVBAR ---------- */
+  --ifm-navbar-link-color: var(--md-sys-color-scheme-dark-on-surface-variant);
+  --ifm-navbar-link-hover-color: var(--md-sys-color-scheme-dark-primary);
+  --ifm-navbar-link-active-color: var(--md-sys-color-scheme-dark-primary);
+  --ifm-navbar-background-color: var(--md-sys-color-scheme-dark-surface-variant);
+  --ifm-navbar-search-input-color: var(--md-sys-color-scheme-dark-inverse-on-surface);
+  --ifm-navbar-search-input-placeholder-color: var(--md-sys-color-scheme-dark-inverse-on-surface);
+  --ifm-navbar-search-input-background-color: var(--md-sys-color-scheme-dark-inverse-surface);
+
+  /* ---------- MENUS ---------- */
+  --ifm-menu-color: var(--md-sys-color-scheme-dark-on-surface);
+  --ifm-menu-color-active: var(--md-sys-color-scheme-dark-primary);
+
+  /* ---------- HEADINGS ---------- */
+  --ifm-heading-color: var(--md-sys-color-scheme-dark-on-surface);
+
+  /* ---------- BLOCKQUOTES ---------- */
+  --ifm-blockquote-color: var(--md-sys-color-scheme-dark-on-surface);
+
+  /* ---------- TABS ---------- */
+  --ifm-tabs-color: var(--md-sys-color-scheme-dark-on-surface);
+  --ifm-tabs-color-active: var(--md-sys-color-scheme-dark-primary);
+  --ifm-tabs-color-active-border: var(--md-sys-color-scheme-dark-primary);
+
+  /* ---------- BUTTONS ---------- */
+  --ifm-button-color: var(--md-sys-color-scheme-dark-on-primary);
+  --ifm-button-border-color: var(--md-sys-color-scheme-dark-primary);
+  --ifm-button-background-color: var(--md-sys-color-scheme-dark-primary);
+
+  /* ---------- CODE BLOCKS ---------- */
+  --ifm-code-font-size: 90%;
+
+  /* ---------- HERO ---------- */
+  /* Hero component in some Docusaurus versions comes with hardcoded colors
+   * in the stylesheet. You can fix it in source stylesheets looking for
+   * .hero* classes.
+   * Moreover, something seems to overwrite the '.hero--primary' somewhere,
+   * forcing its colors to be the Docusaurus defaults. When that happens,
+   * the following variables have no effect. This issue is worth some further
+   * investigation.
+   * '--ifm-hero-title-color' is a custom variable we add here and is not on
+   * Docusaurus by default, but, if customizing the 'heroProjectTitle' CSS class,
+   * (i.e. 'color: var(--ifm-hero-title-color);') makes the Hero title nicer.
+   */
+  --ifm-hero-title-color: var(--md-sys-color-scheme-dark-inverse-primary);
+  --ifm-hero-text-color: var(--md-sys-color-scheme-dark-inverse-on-surface);
+  --ifm-hero-background-color: var(--md-sys-color-scheme-dark-inverse-surface);
+
+  /* ---------- TOC ---------- */
+  --ifm-toc-link-color: var(--md-sys-color-scheme-dark-on-surface);
+
+  /* ---------- FOOTER ---------- */
+  --ifm-footer-color: var(--md-sys-color-scheme-dark-on-surface-variant);
+  --ifm-footer-title-color: var(--md-sys-color-scheme-dark-on-surface-variant);
+  --ifm-footer-background-color: var(--md-sys-color-scheme-dark-surface-variant);
+  --ifm-footer-link-hover-color: var(--md-sys-color-scheme-dark-on-surface-variant);
+  --ifm-footer-link-color: var(--md-sys-color-scheme-dark-on-surface-variant);
+}
+
+/*
+ * Other values scraped from variables but not overridden by this CSS.
+ * Note that Docusaurus infers most of these values from the ones that have been
+ * set above, either by just inheriting them or by computing new ones starting
+ * from base values.
+ */
+
+/* --docusaurus-announcement-bar-height */
+/* --docusaurus-collapse-button-bg */
+/* --docusaurus-collapse-button-bg-hover */
+/* --docusaurus-details-decoration-color */
+/* --docusaurus-details-transition */
+/* --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.1); */
+/* --docusaurus-progress-bar-color */
+/* --docusaurus-tag-list-border */
+/* --ifm-alert-background-color */
+/* --ifm-alert-background-color */
+/* --ifm-alert-background-color-highlight */
+/* --ifm-alert-border-color */
+/* --ifm-alert-border-left-width */
+/* --ifm-alert-border-radius */
+/* --ifm-alert-border-width */
+/* --ifm-alert-color */
+/* --ifm-alert-foreground-color */
+/* --ifm-alert-padding-horizontal */
+/* --ifm-alert-padding-vertical */
+/* --ifm-alert-shadow */
+/* --ifm-avatar-intro-alignment */
+/* --ifm-avatar-intro-margin */
+/* --ifm-avatar-photo-size */
+/* --ifm-badge-background-color */
+/* --ifm-badge-border-color */
+/* --ifm-badge-border-radius */
+/* --ifm-badge-border-width */
+/* --ifm-badge-color */
+/* --ifm-badge-padding-horizontal */
+/* --ifm-badge-padding-vertical */
+/* --ifm-blockquote-border-color */
+/* --ifm-blockquote-border-left-width */
+/* --ifm-blockquote-font-size */
+/* --ifm-blockquote-padding-horizontal */
+/* --ifm-blockquote-padding-vertical */
+/* --ifm-blockquote-shadow */
+/* --ifm-breadcrumb-border-radius */
+/* --ifm-breadcrumb-color-active */
+/* --ifm-breadcrumb-item-background-active */
+/* --ifm-breadcrumb-padding-horizontal */
+/* --ifm-breadcrumb-padding-vertical */
+/* --ifm-breadcrumb-separator */
+/* --ifm-breadcrumb-separator-filter */
+/* --ifm-breadcrumb-separator-size */
+/* --ifm-breadcrumb-separator-size-multiplier */
+/* --ifm-breadcrumb-size-multiplier */
+/* --ifm-breadcrumb-spacing */
+/* --ifm-button-border-radius */
+/* --ifm-button-border-width */
+/* --ifm-button-font-weight */
+/* --ifm-button-group-spacing */
+/* --ifm-button-padding-horizontal */
+/* --ifm-button-padding-vertical */
+/* --ifm-button-size-multiplier */
+/* --ifm-button-transition-duration */
+/* --ifm-card-background-color */
+/* --ifm-card-border-radius */
+/* --ifm-card-horizontal-spacing */
+/* --ifm-card-vertical-spacing */
+/* --ifm-code-background */
+/* --ifm-code-border-radius */
+/* --ifm-code-color */
+/* --ifm-code-padding-horizontal */
+/* --ifm-code-padding-vertical */
+/* --ifm-color-black */
+/* --ifm-color-danger */
+/* --ifm-color-danger-contrast-background */
+/* --ifm-color-danger-contrast-foreground */
+/* --ifm-color-danger-dark */
+/* --ifm-color-danger-darker */
+/* --ifm-color-danger-darkest */
+/* --ifm-color-danger-light */
+/* --ifm-color-danger-lighter */
+/* --ifm-color-danger-lightest */
+/* --ifm-color-emphasis-0 */
+/* --ifm-color-emphasis-100 */
+/* --ifm-color-emphasis-1000 */
+/* --ifm-color-emphasis-200 */
+/* --ifm-color-emphasis-300 */
+/* --ifm-color-emphasis-400 */
+/* --ifm-color-emphasis-500 */
+/* --ifm-color-emphasis-600 */
+/* --ifm-color-emphasis-700 */
+/* --ifm-color-emphasis-800 */
+/* --ifm-color-emphasis-900 */
+/* --ifm-color-gray-0 */
+/* --ifm-color-gray-100 */
+/* --ifm-color-gray-1000 */
+/* --ifm-color-gray-200 */
+/* --ifm-color-gray-300 */
+/* --ifm-color-gray-400 */
+/* --ifm-color-gray-500 */
+/* --ifm-color-gray-600 */
+/* --ifm-color-gray-700 */
+/* --ifm-color-gray-800 */
+/* --ifm-color-gray-900 */
+/* --ifm-color-info */
+/* --ifm-color-info */
+/* --ifm-color-info-contrast-background */
+/* --ifm-color-info-contrast-foreground */
+/* --ifm-color-info-dark */
+/* --ifm-color-info-darker */
+/* --ifm-color-info-darkest */
+/* --ifm-color-info-light */
+/* --ifm-color-info-lighter */
+/* --ifm-color-info-lightest */
+/* --ifm-color-primary-contrast-background */
+/* --ifm-color-primary-contrast-foreground */
+/* --ifm-color-secondary-contrast-background */
+/* --ifm-color-secondary-contrast-foreground */
+/* --ifm-color-success */
+/* --ifm-color-success-contrast-background */
+/* --ifm-color-success-contrast-foreground */
+/* --ifm-color-success-dark */
+/* --ifm-color-success-darker */
+/* --ifm-color-success-darkest */
+/* --ifm-color-success-light */
+/* --ifm-color-success-lighter */
+/* --ifm-color-success-lightest */
+/* --ifm-color-warning */
+/* --ifm-color-warning-contrast-background */
+/* --ifm-color-warning-contrast-foreground */
+/* --ifm-color-warning-dark */
+/* --ifm-color-warning-darker */
+/* --ifm-color-warning-darkest */
+/* --ifm-color-warning-light */
+/* --ifm-color-warning-lighter */
+/* --ifm-color-warning-lightest */
+/* --ifm-color-white */
+/* --ifm-container-width */
+/* --ifm-contrast-background-dark-value */
+/* --ifm-contrast-background-value */
+/* --ifm-contrast-foreground-dark-value */
+/* --ifm-contrast-foreground-value */
+/* --ifm-dark-value */
+/* --ifm-darker-value */
+/* --ifm-darkest-value */
+/* --ifm-dropdown-background-color */
+/* --ifm-dropdown-font-weight */
+/* --ifm-dropdown-hover-background-color */
+/* --ifm-dropdown-link-color */
+/* --ifm-font-family-base */
+/* --ifm-font-family-monospace */
+/* --ifm-font-size-base */
+/* --ifm-font-weight-base */
+/* --ifm-font-weight-bold */
+/* --ifm-font-weight-light */
+/* --ifm-font-weight-normal */
+/* --ifm-font-weight-semibold */
+/* --ifm-footer-link-horizontal-spacing */
+/* --ifm-footer-logo-max-width */
+/* --ifm-footer-padding-horizontal */
+/* --ifm-footer-padding-vertical */
+/* --ifm-fotter-padding-horizontal */
+/* --ifm-global-border-width */
+/* --ifm-global-radius */
+/* --ifm-global-shadow-lw */
+/* --ifm-global-shadow-md */
+/* --ifm-global-shadow-tl */
+/* --ifm-global-spacing */
+/* --ifm-h1-font-size */
+/* --ifm-h1-vertical-rhythm-bottom */
+/* --ifm-h2-font-size */
+/* --ifm-h2-vertical-rhythm-top */
+/* --ifm-h3-font-size */
+/* --ifm-h3-vertical-rhythm-top */
+/* --ifm-h4-font-size */
+/* --ifm-h5-font-size */
+/* --ifm-h6-font-size */
+/* --ifm-heading-font-family*/
+/* --ifm-heading-font-weight*/
+/* --ifm-heading-h1-font-size*/
+/* --ifm-heading-line-height*/
+/* --ifm-heading-margin-bottom */
+/* --ifm-heading-margin-top */
+/* --ifm-heading-vertical-rhythm-bottom */
+/* --ifm-heading-vertical-rhythm-top */
+/* --ifm-hover-overlay */
+/* --ifm-hr-background-color */
+/* --ifm-hr-height */
+/* --ifm-hr-margin-vertical */
+/* --ifm-image-alignment-padding */
+/* --ifm-leading */
+/* --ifm-leading */
+/* --ifm-leading-desktop */
+/* --ifm-light-value */
+/* --ifm-lighter-value */
+/* --ifm-lightest-value */
+/* --ifm-line-height-base */
+/* --ifm-link-decoration */
+/* --ifm-link-hover-decoration */
+/* --ifm-list-item-margin */
+/* --ifm-list-left-padding */
+/* --ifm-list-margin */
+/* --ifm-list-paragraph-margin */
+/* --ifm-menu-color-background-active */
+/* --ifm-menu-color-background-hover */
+/* --ifm-menu-link-padding-horizontal */
+/* --ifm-menu-link-padding-vertical */
+/* --ifm-menu-link-sublist-icon */
+/* --ifm-menu-link-sublist-icon-filter */
+/* --ifm-navbar-height */
+/* --ifm-navbar-item-padding-horizontal */
+/* --ifm-navbar-item-padding-vertical */
+/* --ifm-navbar-padding-horizontal */
+/* --ifm-navbar-padding-vertical */
+/* --ifm-navbar-search-input-icon */
+/* --ifm-navbar-shadow */
+/* --ifm-navbar-sidebar-width */
+/* --ifm-pagination-border-radius */
+/* --ifm-pagination-color-active */
+/* --ifm-pagination-font-size */
+/* --ifm-pagination-item-active-background */
+/* --ifm-pagination-nav-border-radius */
+/* --ifm-pagination-nav-color-hover */
+/* --ifm-pagination-padding-horizontal */
+/* --ifm-pagination-padding-vertical */
+/* --ifm-pagination-page-spacing */
+/* --ifm-paragraph-margin-bottom */
+/* --ifm-pills-color-active */
+/* --ifm-pills-color-background-active */
+/* --ifm-pills-spacing */
+/* --ifm-pre-background */
+/* --ifm-pre-border-radius */
+/* --ifm-pre-color */
+/* --ifm-pre-line-height */
+/* --ifm-pre-padding */
+/* --ifm-scrollbar-size */
+/* --ifm-scrollbar-thumb-background-color */
+/* --ifm-scrollbar-thumb-hover-background-color */
+/* --ifm-scrollbar-track-background-color */
+/* --ifm-spacing-horizontal */
+/* --ifm-spacing-vertical */
+/* --ifm-table-background */
+/* --ifm-table-border-color */
+/* --ifm-table-border-width */
+/* --ifm-table-cell-color */
+/* --ifm-table-cell-padding */
+/* --ifm-table-head-background */
+/* --ifm-table-head-color */
+/* --ifm-table-head-font-weight */
+/* --ifm-table-stripe-background */
+/* --ifm-tabs-padding-horizontal */
+/* --ifm-tabs-padding-vertical */
+/* --ifm-toc-border-color */
+/* --ifm-toc-padding-horizontal */
+/* --ifm-toc-padding-vertical */
+/* --ifm-transition-fast */
+/* --ifm-transition-slow */
+/* --ifm-transition-timing-default */
+/* --ifm-z-index-dropdown */
+/* --ifm-z-index-fixed */
+/* --ifm-z-index-overlay */

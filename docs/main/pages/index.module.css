@@ -3,8 +3,20 @@
  * and scoped locally.
  */
 
+/* For some reason yet to figure out Docusaurus overwrites the colors
+ * of the following classes to defaults so we had to create separate
+ * classes depending on the selected theme using Material variables
+ * directly.
+ */
 .heroBanner {
-  background-color: #2b3137;
+  background-color: var(--md-sys-color-scheme-light-inverse-surface);
+  padding: 4rem 0;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+[data-theme='dark'] .heroBanner {
+  background-color: var(--md-sys-color-scheme-dark-inverse-surface);
   padding: 4rem 0;
   text-align: center;
   position: relative;
@@ -12,14 +24,29 @@
 }
 
 .heroProjectTitle {
-  color: var(--ifm-color-primary);
+  color: var(--md-sys-color-scheme-light-inverse-primary);
+  font-size: 60px;
+  margin: 0;
+}
+[data-theme='dark'] .heroProjectTitle {
+  color: var(--md-sys-color-scheme-dark-inverse-primary);
   font-size: 60px;
   margin: 0;
 }
 
 .heroProjectTagline {
-  color: #fff;
+  color: var(--md-sys-color-scheme-light-inverse-on-surface);
   font-size: 20px;
+}
+[data-theme='dark'] .heroProjectTagline {
+  color: var(--md-sys-color-scheme-dark-inverse-on-surface);
+  font-size: 20px;
+}
+
+@media screen and (max-width: 996px) {
+  .heroBanner {
+    padding: 2rem;
+  }
 }
 
 @media screen and (max-width: 996px) {

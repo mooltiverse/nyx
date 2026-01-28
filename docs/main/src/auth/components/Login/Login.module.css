@@ -45,7 +45,7 @@
 
 .errorMessage {
     margin-top: 1rem;
-    color: #dc3545;
+    color: var(--md-sys-color-scheme-light-error);
     font-size: 0.9rem;
 }
 
