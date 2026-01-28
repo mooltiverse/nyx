@@ -102,12 +102,24 @@ const RESOURCES: ResourceItem[] = [
     },
     links: [
       {
-        "title": "Nyx, the Semantic Release Automation Tool",
+        "title": "Nyx, the Semantic Release Automation...",
         "url": "https://levelup.gitconnected.com/nyx-the-semantic-release-automation-tool-4e2dfa949f38",
+        image: {
+          src: 'mingcute:medium-fill',
+          width: 200.00,
+          height: 100.00,
+          color: 'Black',
+        },
       },
       {
-        "title": "Semantic Release Automation with Gradle using Nyx",
+        "title": "Semantic Release Automation...",
         "url": "https://levelup.gitconnected.com/semantic-release-automation-with-gradle-using-nyx-ba345235a365",
+        image: {
+          src: 'mingcute:medium-fill',
+          width: 200.00,
+          height: 100.00,
+          color: 'Black',
+        },
       }
     ]
   },
@@ -164,9 +176,10 @@ const FEATURES: FeatureItem[] = [
   {
     title: 'Semantic Release Automation',
     image: {
-      src: '/nyx/img/rocket.svg',
+      src: 'material-symbols:rocket-launch',
       width: 100.00,
       height: 50.00,
+      color: 'OrangeRed',
     },
     description: (
       <>
@@ -177,9 +190,10 @@ const FEATURES: FeatureItem[] = [
   {
     title: 'Semantic Versioning',
     image: {
-      src: '/nyx/img/protocol.svg',
+      src: 'mdi:git-repository',
       width: 100.00,
       height: 50.00,
+      color: 'DodgerBlue',
     },
     description: (
       <>
@@ -190,9 +204,10 @@ const FEATURES: FeatureItem[] = [
   {
     title: 'Conventions Support',
     image: {
-      src: '/nyx/img/handshake.svg',
-      width: 50.00,
+      src: 'hugeicons:agreement-02',
+      width: 100.00,
       height: 50.00,
+      color: 'Green',
     },
     description: (
       <>
@@ -203,9 +218,10 @@ const FEATURES: FeatureItem[] = [
   {
     title: 'Release Management',
     image: {
-      src: '/nyx/img/package.svg',
+      src: 'fluent-mdl2:release-gate',
       width: 100.00,
       height: 50.00,
+      color: 'Orange',
     },
     description: (
       <>
@@ -216,9 +232,10 @@ const FEATURES: FeatureItem[] = [
   {
     title: 'Changelog Generation',
     image: {
-      src: '/nyx/img/log.svg',
+      src: 'material-icon-theme:log',
       width: 100.00,
       height: 50.00,
+      color: '',
     },
     description: (
       <>
@@ -229,27 +246,24 @@ const FEATURES: FeatureItem[] = [
   {
     title: 'Branching Models',
     image: {
-      src: '/nyx/img/workflow.svg',
+      src: 'qlementine-icons:version-control-16',
       width: 100.00,
       height: 50.00,
+      color: 'Cyan',
     },
     description: (
       <>
-        Supports any standard workflow (i.e.
-        <a href='https://nvie.com/posts/a-successful-git-branching-model/' target='_blank'>GitFlow</a>,
-        <a href='https://help.github.com/en/github/collaborating-with-issues-and-pull-requests/github-flow' target='_blank'>GitHub Flow</a>
-        <a href='https://docs.gitlab.com/ee/topics/gitlab_flow.html' target='_blank'>GitLab Flow</a>
-        <a href='https://www.endoflineblog.com/oneflow-a-git-branching-model-and-workflow' target='_blank'>OneFlow</a>
-        ) as well as custom ones.
+        Supports any standard workflow (i.e. <a href='https://nvie.com/posts/a-successful-git-branching-model/' target='_blank'>GitFlow</a>, <a href='https://help.github.com/en/github/collaborating-with-issues-and-pull-requests/github-flow' target='_blank'>GitHub Flow</a>, <a href='https://docs.gitlab.com/ee/topics/gitlab_flow.html' target='_blank'>GitLab Flow</a>, <a href='https://www.endoflineblog.com/oneflow-a-git-branching-model-and-workflow' target='_blank'>OneFlow</a>) as well as custom ones.
       </>
     ),
   },
   {
     title: 'GitHub Actions',
     image: {
-      src: '/nyx/img/github-actions.svg',
+      src: 'devicon:githubactions',
       width: 100.00,
       height: 50.00,
+      color: '',
     },
     description: (
       <>
@@ -260,9 +274,10 @@ const FEATURES: FeatureItem[] = [
   {
     title: 'Gradle Support',
     image: {
-      src: '/nyx/img/gradle.svg',
+      src: 'material-icon-theme:gradle',
       width: 100.00,
       height: 50.00,
+      color: '',
     },
     description: (
       <>
