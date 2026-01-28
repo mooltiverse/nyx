@@ -49,11 +49,6 @@ jobs:
     name: Initialize
     uses: mooltiverse/nyx/.github/workflows/initialize.yml@main
   
-  build:
-    needs:
-    - docusaurus-build
-    uses: mooltiverse/nyx/.github/workflows/build.yml@main
-  
   #############################################################################
   # Docusaurus Jobs
   #############################################################################
