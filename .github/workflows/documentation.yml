@@ -24,7 +24,7 @@
 # that we use the same build scripts that developers also use locally on their
 # workstations. This improves portability and consistency.
 
-name: Docsumentation
+name: Documentation
 
 # Only run this workflow manually, if the Main workflow is not necessary.
 on:
