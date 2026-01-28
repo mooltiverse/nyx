@@ -435,3 +435,13 @@ jobs:
     - docusaurus-build
     if: needs.initialize.outputs.docusaurusChanged == 'true' || needs.initialize.outputs.release == 'true'
     uses: mooltiverse/nyx/.github/workflows/docusaurus-publish.yml@main
+    with:
+      verbosity: info
+      install-jdk: true
+      install-jdk-version: 20
+      # Restore the cache from the previous job to 'chain' caches
+      nyx-cache-name-restore-suffix: ${{ needs.initialize.outputs.nyx-cache-name-suffix }}
+      gradle-cache-name-restore-suffix: ${{ needs.docusaurus-build.outputs.gradle-cache-name-suffix }}
+      docusaurus-cache-name-restore-suffix: ${{ needs.docusaurus-build.outputs.docusaurus-cache-name-suffix }}
+      path: 'docs/main/build'
+      enable-github-pages: ${{ github.ref == 'refs/heads/main' }}
