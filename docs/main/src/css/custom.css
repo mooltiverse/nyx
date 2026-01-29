@@ -1,0 +1,20 @@
+/**
+ * Any CSS included here will be global. This is a replacement of the default
+ * CSS that comes with Docusaurus and only contains customizations for the local
+ * site that are not already covered in other CSS stylesheets like
+ * 'infima-material-theme.css'.
+ * This file should be loaded last in the 'docusaurus.config.ts' configuration
+ * file (see the 'customCss' section) so the value it overrides have higher
+ * priority over those defined by other files.
+ */
+
+:root {
+  /* ---------- CUSTOM FONTS ---------- */
+  /* Here we use Noto (https://fonts.google.com/noto) */
+  --ifm-font-family-base: "Noto Sans", sans-serif;
+  --ifm-heading-font-family: "Noto Sans", sans-serif;
+  --ifm-font-family-monospace: "Noto Sans Mono", monospace; /* For code blocks */
+}
+
+[data-theme='dark'] {
+}

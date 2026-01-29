@@ -102,13 +102,15 @@ export default {
         // - https://docusaurus.io/docs/api/themes/@docusaurus/theme-classic
         //
         // In this configuration:
-        // - the default stylesheet ('custom.css') has been replaced by
-        //   'infima-material-theme.css'
         // - 'infima-material-theme.css' is a proxy to the Material theme
         // - 'material-theme.css' contains the actual style variables. This
         //   file is generated and published by the Brand Kit project.
         //   For the latest version and artifacts please check out
-        //   https://github.com/mooltiverse/brand-kit.
+        //   https://github.com/mooltiverse/brand-kit
+        // - the default stylesheet ('custom.css') has been replaced by
+        //   a simpler version, only used to override values for the local
+        //   site, even those configured in other CSS files (becauuse it's
+        //   loaded last)
         //
         // With this configuration, the Material theme is quickly replaceable
         // by just replacing the 'material-theme.css' file.
@@ -119,7 +121,8 @@ export default {
         // See the comments inside the stylesheets for more.
         customCss: [
           './src/css/infima-material-theme.css',
-          './src/css/material-theme.css'
+          './src/css/material-theme.css',
+          './src/css/custom.css'
         ],
       },
     ],

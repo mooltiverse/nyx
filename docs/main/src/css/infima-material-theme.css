@@ -5,6 +5,7 @@
  * by just updating the imported 'material-theme.css', without affecting
  * any other definitions in the site (as long as they use the variables
  * defined here).
+ * You can customize this file to your needs.
  * The 'material-theme.css' file is generated and published by the Brand Kit
  * project. For the latest version and artifacts please check out
  * https://github.com/mooltiverse/brand-kit.
@@ -38,7 +39,7 @@
  * Sources used to scrape the available variables are:
  * - this page: https://docusaurus.community/knowledge/design/css/variables/#key-infima-variables
  * - the browser's Developer Tools (F12) 
-* - this issue: https://github.com/facebook/docusaurus/issues/3955
+ * - this issue: https://github.com/facebook/docusaurus/issues/3955
  * - this gist: https://gist.github.com/abhigyantrips/b828ca46b2460c6699c73e0162f6be80
  */
 
@@ -48,12 +49,6 @@
 @import "material-theme.css";
 
 :root {
-  /* ---------- CUSTOM FONTS ---------- */
-  /* Here we use Noto (https://fonts.google.com/noto) */
-  --ifm-font-family-base: "Noto Sans", sans-serif;
-  --ifm-heading-font-family: "Noto Sans", sans-serif;
-  --ifm-font-family-monospace: "Noto Sans Mono", monospace; /* For code blocks */
-
   /* ---------- OVERALL COLORS ---------- */
   --ifm-color-primary: var(--md-sys-color-scheme-light-primary);
   /* Material does not provide variants for dark-darkest and light-lightest
