@@ -9,27 +9,12 @@ description: |-
   Please note that this Action doesn't run any actual command or task other
   than those used to set up the environment. Build commands are to be executed
   after this Action completes.
-  
-  Also note that the underlying cache implementation is different when the
-  workflow runs in the 'main' branch or not.
-  When in the 'main' branch it uses the 'burrunan/gradle-cache-action@', which
-  is much more efficient but since that action doesn't work on any other branch
-  than 'main' we need to fall back to a custom cache handling when in other
-  branches.
-  The custom cache works well in a 'linear' scenario, when one job follows the
-  other, but has issues in merging caches from multiple jobs into one (i.e.
-  for 'fan-in' or 'waypoint' jobs) so in that case you basically just need
-  to start from the most significant cache, and Gradle will consider all the
-  tasks executed by other jobs not up to date.
-  Due to the above, the 'cache-name-suffix' and 'cache-name-restore-suffix'
-  inputs are only used for non-'main' branches, while for the 'main' branch
-  the centralized cache will only use the 'cache-name-prefix' for all caches.
 inputs:
   directory:
     description: |-
       The directory, relative to the repository root and without the trailing
       slash, where the contents for this feature are stored.
-      As long as you are using the common project layour you don't need to
+      As long as you are using the common project layout you don't need to
       change this directory.
       This directory is used to probe this feature. See the 'probed' output for
       more.
@@ -200,43 +185,9 @@ runs:
     uses: andstor/file-existence-action@v3
     with:
       files: "${{ inputs.directory }}/gradlew ${{ inputs.directory }}/*.gradle ${{ inputs.directory }}/gradle.*"
-  - name: Log the cache selection warnings
-    if: ${{ github.ref != 'refs/heads/main' && (inputs.verbosity == 'warning' || inputs.verbosity == 'quiet' || inputs.verbosity == 'info' || inputs.verbosity == 'debug') }}
-    shell: bash
-    run: |
-      echo "::group::Limited Gradle cache support"
-      echo "This action uses the 'burrunan/gradle-cache-action' distributed"
-      echo "Gradle cache when in the 'main' branch and the custom, standard,"
-      echo "'actions/cache' when in any other branch."
-      echo "This is due to a limitation of the 'burrunan/gradle-cache-action',"
-      echo "which is much more efficient and, since it's 'distributed', also"
-      echo "allows 'fan-in' or 'waypoint' jobs."
-      echo "The 'actions/cache' cache, though, is limited and cannot reconcile"
-      echo "in case of multiple streams of jobs and workflows."
-      echo "In other words, the 'burrunan/gradle-cache-action' is able to"
-      echo "manage the Gradle cache across multiple jobs and workers, while"
-      echo "the 'actions/cache' is limited to a single one, even when"
-      echo "this action carries on the cache from one job to another through"
-      echo "'chaining'. However, 'chaining' cannot merge among multiple sources"
-      echo "so in case of 'fan in' jobs (with multiple sources) the upstream"
-      echo "cache can't be used (or, in the best case, you can use a single"
-      echo "one, that you consider the most significant)."
-      echo "Therefore, when in non 'main' branches the cache will be less"
-      echo "efficient and Gradle will fail some up-to-date checks if you"
-      echo "previously had to select which cache to start from when in"
-      echo "'fan-in' or 'waypoint' jobs."
-      echo "As a consequence you may see Gradle re-running some tasks that"
-      echo "already completed in previous jobs."
-      echo "::endgroup::"
   - name: Set up the ${{ inputs.cache-name-prefix }}-${{ inputs.cache-name-suffix }} read-write cache
-    # The 'burrunan/gradle-cache-action' actions would be much more effective
-    # but only works in the 'main' branch, so when the branch is not 'main'
-    # we use this custom cache as a fallback.
-    # This custom cache works well in 'linear' scenarios, when one cache is
-    # handed over from one job to another using the 'cache-name-restore-suffix'
-    # input, but doesn't allow merging caches from multiple jobs into one.
     uses: actions/cache@v4
-    if: ${{ inputs.cache-mode == 'read-write' && github.ref != 'refs/heads/main' }}
+    if: ${{ inputs.cache-mode == 'read-write' }}
     with:
       key: ${{ inputs.cache-name-prefix }}-${{ inputs.cache-name-suffix }}
       restore-keys: |-
@@ -244,71 +195,49 @@ runs:
       path: ${{ inputs.cache-contents }}
       enableCrossOsArchive: true
   - name: Set up the ${{ inputs.cache-name-prefix }}-${{ inputs.cache-name-suffix }} read-only cache
-    # The 'burrunan/gradle-cache-action' actions would be much more effective
-    # but only works in the 'main' branch, so when the branch is not 'main'
-    # we use this custom cache as a fallback.
-    # This custom cache works well in 'linear' scenarios, when one cache is
-    # handed over from one job to another using the 'cache-name-restore-suffix'
-    # input, but doesn't allow merging caches from multiple jobs into one.
     uses: actions/cache/restore@v4
-    if: ${{ inputs.cache-mode == 'read-only' && github.ref != 'refs/heads/main' }}
+    if: ${{ inputs.cache-mode == 'read-only' }}
     with:
       key: ${{ inputs.cache-name-prefix }}-${{ inputs.cache-name-suffix }}
       restore-keys: |-
         ${{ inputs.cache-name-prefix }}-${{ inputs.cache-name-restore-suffix }}
       path: ${{ inputs.cache-contents }}
   - name: Set up the ${{ inputs.cache-name-prefix }}-${{ inputs.cache-name-suffix }} write-only cache
-    # The 'burrunan/gradle-cache-action' actions would be much more effective
-    # but only works in the 'main' branch, so when the branch is not 'main'
-    # we use this custom cache as a fallback.
-    # This custom cache works well in 'linear' scenarios, when one cache is
-    # handed over from one job to another using the 'cache-name-restore-suffix'
-    # input, but doesn't allow merging caches from multiple jobs into one.
     uses: actions/cache/save@v4
-    if: ${{ inputs.cache-mode == 'write-only' && github.ref != 'refs/heads/main' }}
+    if: ${{ inputs.cache-mode == 'write-only' }}
     with:
       key: ${{ inputs.cache-name-prefix }}-${{ inputs.cache-name-suffix }}
       path: ${{ inputs.cache-contents }}
   - name: List the cache contents
-    if: ${{ inputs.cache-mode != 'disabled' && github.ref != 'refs/heads/main' && inputs.verbosity == 'debug' }}
+    if: ${{ inputs.cache-mode != 'disabled' && inputs.verbosity == 'debug' }}
     shell: bash
     continue-on-error: true
     run: |
       echo "::group::Cache contents"
       ls -alR ${{ inputs.cache-contents }}
       echo "::endgroup::"
-  - name: Set up the ${{ inputs.cache-name-prefix }}-${{ inputs.cache-name-suffix }} remote cache
-    # Unfortunately this cache is only effective when in the 'main' branch.
-    # When not in the 'main' branch it will never store the cache at the end
-    # of a job and this is visible by the message it logs, like:
-    #     local-build-cache: old contents is not found, and the current cache
-    #         gradle-build-cache-Linux-gradle-11650325575-Linux-docker-gradle-8.10.1-feature-cccc10446ba74206a26ea2ac72221e2d137aa2ab
-    #     does not start with
-    #         gradle-build-cache-Linux-gradle-11650325575-Linux-docker-gradle-8.10.1-defaultbranch
-    #     so cache saving can't be done
-    # so the next jobs will never find any available cache.
-    # Unfortunately there is no way to control the cache key and the trailing
-    # part of the key, containing the branch name, is always added by the
-    # action so we can't force it to match the 'defaultbranch', which is also
-    # hardcoded for non 'main' branches.
-    # As a result, we only use this cache for the 'main' branch, where it's very
-    # effective, otherwise we use the custom one above.
-    uses: burrunan/gradle-cache-action@v3
-    if: ${{ inputs.cache-mode != 'disabled' && github.ref == 'refs/heads/main' }}
-    with:
-      gradle-version: ${{ inputs.install-gradle-version }}
-      # The remote cache needs to be identified by a 'group' of caches,
-      # otherwise storing the cache for each individual job won't share
-      # anything aming jobs, so here we use the prefix, that must be common
-      # for all jobs within a workflow.
-      job-id: ${{ inputs.cache-name-prefix }}
-      read-only: false
-      concurrent: true
-      save-local-build-cache: true
-      save-generated-gradle-jars: true
-      save-gradle-dependencies-cache: true
-      remote-build-cache-proxy-enabled: true
-      gradle-distribution-sha-256-sum-warning: false
+  # The burrunan/gradle-cache-action@v3 is supposed to be more effective as it provides
+  # a distributed multi-layered cache, but it's so unreliable and causes so many cache
+  # miss that cause jobs to re-run.
+  # So, even if with regular cache (see above) we can't reconcile caches when merging
+  # from build paths, at least it's reliable so we only use that.
+  #- name: Set up the Gradle distributed cache
+  #  uses: burrunan/gradle-cache-action@v3
+  #  if: ${{ inputs.cache-mode != 'disabled' && github.ref == 'refs/heads/main' }}
+  #  with:
+  #    gradle-version: ${{ inputs.install-gradle-version }}
+  #    # In order to maximize cache efficiency use a single cache for each workflow run.
+  #    job-id: ${{ github.run_id }}
+  #    read-only: ${{ inputs.cache-mode == 'read-only' }}
+  #    concurrent: true
+  #    save-local-build-cache: true
+  #    save-generated-gradle-jars: true
+  #    save-gradle-dependencies-cache: true
+  #    save-maven-dependencies-cache: false
+  #    remote-build-cache-proxy-enabled: true
+  #    gradle-distribution-sha-256-sum-warning: false
+  #    # Arguments must not be declared in order to make it work in cache-only mode.
+  #    #arguments:
   - name: Grant execute permission for the 'gradlew' executable and make Git ignore file permissions
     shell: bash
     # We need to make Git ignore execute permission changes to avoid

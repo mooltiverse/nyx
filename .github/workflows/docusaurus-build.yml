@@ -51,7 +51,7 @@ on:
           when you need a specific version.
           To check out if it's already installed see:
           - https://docs.github.com/en/actions/using-github-hosted-runners/using-github-hosted-runners/about-github-hosted-runners#preinstalled-software
-          Default: false
+          Default: true
         type: boolean
         required: false
         default: true
