@@ -200,7 +200,7 @@ runs:
         echo "$file"
       done
   - name: Setup Node
-    uses: mooltiverse/nyx/.github/actions/setup-node@ghwfcache
+    uses: mooltiverse/nyx/.github/actions/setup-node@main
     if: ${{ inputs.install-node == 'true' }}
     with:
       verbosity: ${{ inputs.verbosity }}

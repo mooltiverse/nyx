@@ -90,35 +90,35 @@ jobs:
     # Software setups and caches are disabled at this stage as we just need
     # to detect whether or not certain workflows must be enabled.
     - id: git
-      uses: mooltiverse/nyx/.github/actions/setup-git@ghwfcache
+      uses: mooltiverse/nyx/.github/actions/setup-git@main
       with:
         verbosity: ${{ inputs.verbosity }}
     - id: nyx
-      uses: mooltiverse/nyx/.github/actions/setup-nyx@ghwfcache
+      uses: mooltiverse/nyx/.github/actions/setup-nyx@main
       with:
         verbosity: ${{ inputs.verbosity }}
         cache-mode: read-write
         enable-artifacts: true
     - id: go
-      uses: mooltiverse/nyx/.github/actions/setup-go@ghwfcache
+      uses: mooltiverse/nyx/.github/actions/setup-go@main
       with:
         verbosity: ${{ inputs.verbosity }}
         cache-mode: disabled
         install-go: false
     - id: java
-      uses: mooltiverse/nyx/.github/actions/setup-java@ghwfcache
+      uses: mooltiverse/nyx/.github/actions/setup-java@main
       with:
         verbosity: ${{ inputs.verbosity }}
         cache-mode: disabled
         install-jdk: false
     - id: docker
-      uses: mooltiverse/nyx/.github/actions/setup-docker@ghwfcache
+      uses: mooltiverse/nyx/.github/actions/setup-docker@main
       with:
         verbosity: ${{ inputs.verbosity }}
         cache-mode: disabled
         enable-containerd-image-store: false
     - id: docusaurus
-      uses: mooltiverse/nyx/.github/actions/setup-docusaurus@ghwfcache
+      uses: mooltiverse/nyx/.github/actions/setup-docusaurus@main
       with:
         verbosity: ${{ inputs.verbosity }}
         cache-mode: disabled

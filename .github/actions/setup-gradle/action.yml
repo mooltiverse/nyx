@@ -206,7 +206,7 @@ runs:
       git config core.fileMode false
       chmod +x gradlew
   - name: Setup Java
-    uses: mooltiverse/nyx/.github/actions/setup-java@ghwfcache
+    uses: mooltiverse/nyx/.github/actions/setup-java@main
     if: ${{ inputs.install-jdk == 'true' }}
     with:
       verbosity: ${{ inputs.verbosity }}

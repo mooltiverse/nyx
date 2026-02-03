@@ -344,11 +344,11 @@ jobs:
     name: Unit Test
     runs-on: ${{ inputs.runs-on }}
     steps:
-    - uses: mooltiverse/nyx/.github/actions/setup-git@ghwfcache
+    - uses: mooltiverse/nyx/.github/actions/setup-git@main
       with:
         verbosity: ${{ inputs.verbosity }}
     - id: nyx
-      uses: mooltiverse/nyx/.github/actions/setup-nyx@ghwfcache
+      uses: mooltiverse/nyx/.github/actions/setup-nyx@main
       with:
         # Just restore the cache
         enable-action: false
@@ -357,7 +357,7 @@ jobs:
         cache-name: ${{ inputs.nyx-cache-name }}
         cache-from: ${{ inputs.nyx-cache-from }}
     - id: java
-      uses: mooltiverse/nyx/.github/actions/setup-java@ghwfcache
+      uses: mooltiverse/nyx/.github/actions/setup-java@main
       with:
         verbosity: ${{ inputs.verbosity }}
         cache-mode: ${{ inputs.java-cache-mode }}
@@ -365,7 +365,7 @@ jobs:
         cache-from: ${{ inputs.java-cache-from }}
     - id: node
       if: inputs.node-cache-from != ''
-      uses: mooltiverse/nyx/.github/actions/setup-node@ghwfcache
+      uses: mooltiverse/nyx/.github/actions/setup-node@main
       with:
         verbosity: ${{ inputs.verbosity }}
         install-node: ${{ inputs.install-node }}
@@ -375,7 +375,7 @@ jobs:
         cache-name: ${{ inputs.node-cache-name }}
         cache-from: ${{ inputs.node-cache-from }}
     - id: gradle
-      uses: mooltiverse/nyx/.github/actions/setup-gradle@ghwfcache
+      uses: mooltiverse/nyx/.github/actions/setup-gradle@main
       with:
         verbosity: ${{ inputs.verbosity }}
         install-jdk: ${{ inputs.install-jdk }}
@@ -411,11 +411,11 @@ jobs:
       group: access-to-rate-limited-remote-services
       cancel-in-progress: false
     steps:
-    - uses: mooltiverse/nyx/.github/actions/setup-git@ghwfcache
+    - uses: mooltiverse/nyx/.github/actions/setup-git@main
       with:
         verbosity: ${{ inputs.verbosity }}
     - id: nyx
-      uses: mooltiverse/nyx/.github/actions/setup-nyx@ghwfcache
+      uses: mooltiverse/nyx/.github/actions/setup-nyx@main
       with:
         # Just restore the cache
         enable-action: false
@@ -424,12 +424,12 @@ jobs:
         cache-name: ${{ inputs.nyx-cache-name }}
         cache-from: ${{ inputs.nyx-cache-from }}
     - id: java
-      uses: mooltiverse/nyx/.github/actions/setup-java@ghwfcache
+      uses: mooltiverse/nyx/.github/actions/setup-java@main
       with:
         verbosity: ${{ inputs.verbosity }}
         cache-from: ${{ needs.test-unit.outputs.java-cache-name }}
     - id: gradle
-      uses: mooltiverse/nyx/.github/actions/setup-gradle@ghwfcache
+      uses: mooltiverse/nyx/.github/actions/setup-gradle@main
       with:
         verbosity: ${{ inputs.verbosity }}
         install-jdk: ${{ inputs.install-jdk }}
@@ -465,11 +465,11 @@ jobs:
       group: access-to-rate-limited-remote-services
       cancel-in-progress: false
     steps:
-    - uses: mooltiverse/nyx/.github/actions/setup-git@ghwfcache
+    - uses: mooltiverse/nyx/.github/actions/setup-git@main
       with:
         verbosity: ${{ inputs.verbosity }}
     - id: nyx
-      uses: mooltiverse/nyx/.github/actions/setup-nyx@ghwfcache
+      uses: mooltiverse/nyx/.github/actions/setup-nyx@main
       with:
         # Just restore the cache
         enable-action: false
@@ -478,12 +478,12 @@ jobs:
         cache-name: ${{ inputs.nyx-cache-name }}
         cache-from: ${{ inputs.nyx-cache-from }}
     - id: java
-      uses: mooltiverse/nyx/.github/actions/setup-java@ghwfcache
+      uses: mooltiverse/nyx/.github/actions/setup-java@main
       with:
         verbosity: ${{ inputs.verbosity }}
         cache-from: ${{ needs.test-integration.outputs.java-cache-name }}
     - id: gradle
-      uses: mooltiverse/nyx/.github/actions/setup-gradle@ghwfcache
+      uses: mooltiverse/nyx/.github/actions/setup-gradle@main
       with:
         verbosity: ${{ inputs.verbosity }}
         install-jdk: ${{ inputs.install-jdk }}

@@ -47,7 +47,7 @@ jobs:
   #############################################################################
   initialize:
     name: Initialize
-    uses: mooltiverse/nyx/.github/workflows/initialize.yml@ghwfcache
+    uses: mooltiverse/nyx/.github/workflows/initialize.yml@main
   
   #############################################################################
   # Docusaurus Jobs
@@ -56,7 +56,7 @@ jobs:
     name: Docusaurus Build
     needs:
     - initialize
-    uses: mooltiverse/nyx/.github/workflows/docusaurus-build.yml@ghwfcache
+    uses: mooltiverse/nyx/.github/workflows/docusaurus-build.yml@main
     with:
       verbosity: info
       install-jdk: true
@@ -69,7 +69,7 @@ jobs:
     needs:
     - initialize
     - docusaurus-build
-    uses: mooltiverse/nyx/.github/workflows/docusaurus-publish.yml@ghwfcache
+    uses: mooltiverse/nyx/.github/workflows/docusaurus-publish.yml@main
     with:
       verbosity: info
       install-jdk: true

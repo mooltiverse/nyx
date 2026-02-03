@@ -650,11 +650,11 @@ jobs:
       if: runner.os != 'Linux' && (inputs.delete-tool-cache || inputs.delete-android || inputs.delete-dotnet || inputs.delete-haskell || inputs.delete-large-packages || inputs.delete-docker-images || inputs.delete-swap-storage)
       shell: bash
       run: echo "::warning title=Unable to free disk space on ${{ runner.os }}::The job has been configured to delete preconfigured packages to free disk space but that feature is only supported on Linux (Ubuntu) runners, while this instance runs on ${{ runner.os }}."
-    - uses: mooltiverse/nyx/.github/actions/setup-git@ghwfcache
+    - uses: mooltiverse/nyx/.github/actions/setup-git@main
       with:
         verbosity: ${{ inputs.verbosity }}
     - id: nyx
-      uses: mooltiverse/nyx/.github/actions/setup-nyx@ghwfcache
+      uses: mooltiverse/nyx/.github/actions/setup-nyx@main
       with:
         # Just restore the cache
         enable-action: false
@@ -664,7 +664,7 @@ jobs:
         cache-from: ${{ inputs.nyx-cache-from }}
     - id: go
       if: inputs.go-cache-from != ''
-      uses: mooltiverse/nyx/.github/actions/setup-go@ghwfcache
+      uses: mooltiverse/nyx/.github/actions/setup-go@main
       with:
         verbosity: ${{ inputs.verbosity }}
         cache-mode: ${{ inputs.go-cache-mode }}
@@ -672,14 +672,14 @@ jobs:
         cache-from: ${{ inputs.go-cache-from }}
     - id: java
       if: inputs.java-cache-from != ''
-      uses: mooltiverse/nyx/.github/actions/setup-java@ghwfcache
+      uses: mooltiverse/nyx/.github/actions/setup-java@main
       with:
         verbosity: ${{ inputs.verbosity }}
         cache-mode: ${{ inputs.java-cache-mode }}
         cache-name: ${{ inputs.java-cache-name }}
         cache-from: ${{ inputs.java-cache-from }}
     - id: docker
-      uses: mooltiverse/nyx/.github/actions/setup-docker@ghwfcache
+      uses: mooltiverse/nyx/.github/actions/setup-docker@main
       with:
         verbosity: ${{ inputs.verbosity }}
         cache-mode: ${{ inputs.docker-cache-mode }}
@@ -698,7 +698,7 @@ jobs:
         aws-secret-access-key: ${{ secrets.aws-secret-access-key }}
     - id: node
       if: inputs.node-cache-from != ''
-      uses: mooltiverse/nyx/.github/actions/setup-node@ghwfcache
+      uses: mooltiverse/nyx/.github/actions/setup-node@main
       with:
         verbosity: ${{ inputs.verbosity }}
         install-node: ${{ inputs.install-node }}
@@ -708,7 +708,7 @@ jobs:
         cache-name: ${{ inputs.node-cache-name }}
         cache-from: ${{ inputs.node-cache-from }}
     - id: gradle
-      uses: mooltiverse/nyx/.github/actions/setup-gradle@ghwfcache
+      uses: mooltiverse/nyx/.github/actions/setup-gradle@main
       with:
         verbosity: ${{ inputs.verbosity }}
         install-jdk: ${{ inputs.install-jdk || inputs.delete-tool-cache }}

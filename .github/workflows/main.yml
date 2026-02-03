@@ -54,7 +54,7 @@ jobs:
   #############################################################################
   initialize:
     name: Initialize
-    uses: mooltiverse/nyx/.github/workflows/initialize.yml@ghwfcache
+    uses: mooltiverse/nyx/.github/workflows/initialize.yml@main
   
   build:
     name: Waypoint
@@ -64,7 +64,7 @@ jobs:
     - go-build
     - docker-build
     - docusaurus-build
-    uses: mooltiverse/nyx/.github/workflows/build.yml@ghwfcache
+    uses: mooltiverse/nyx/.github/workflows/build.yml@main
   
   test:
     name: Waypoint
@@ -74,7 +74,7 @@ jobs:
     - java-test
     - go-test
     - docker-test
-    uses: mooltiverse/nyx/.github/workflows/test.yml@ghwfcache
+    uses: mooltiverse/nyx/.github/workflows/test.yml@main
 
   release:
     name: Release
@@ -94,7 +94,7 @@ jobs:
     - docker-publish
     - docusaurus-publish
     if: needs.initialize.outputs.release == 'true'
-    uses: mooltiverse/nyx/.github/workflows/release.yml@ghwfcache
+    uses: mooltiverse/nyx/.github/workflows/release.yml@main
     with:
       verbosity: info
       install-jdk: true
@@ -121,7 +121,7 @@ jobs:
     needs:
     - initialize
     if: needs.initialize.outputs.javaChanged == 'true' || needs.initialize.outputs.release == 'true'
-    uses: mooltiverse/nyx/.github/workflows/java-build.yml@ghwfcache
+    uses: mooltiverse/nyx/.github/workflows/java-build.yml@main
     with:
       verbosity: info
       install-jdk: true
@@ -154,7 +154,7 @@ jobs:
     strategy:
       matrix:
         java: [ '17', '20' ]
-    uses: mooltiverse/nyx/.github/workflows/java-test-sequence.yml@ghwfcache
+    uses: mooltiverse/nyx/.github/workflows/java-test-sequence.yml@main
     with:
       verbosity: info
       # Avoid hitting the 10GB limit for GitHub Actions cache by using read-only mode on this job
@@ -199,7 +199,7 @@ jobs:
     - java-build
     - java-test
     if: needs.initialize.outputs.release == 'true'
-    uses: mooltiverse/nyx/.github/workflows/java-publish.yml@ghwfcache
+    uses: mooltiverse/nyx/.github/workflows/java-publish.yml@main
     with:
       verbosity: info
       # Avoid hitting the 10GB limit for GitHub Actions cache by using read-only mode on this job
@@ -234,7 +234,7 @@ jobs:
     needs:
     - initialize
     if: needs.initialize.outputs.goChanged == 'true' || needs.initialize.outputs.dockerChanged == 'true' || needs.initialize.outputs.release == 'true'
-    uses: mooltiverse/nyx/.github/workflows/go-build.yml@ghwfcache
+    uses: mooltiverse/nyx/.github/workflows/go-build.yml@main
     with:
       verbosity: info
       install-go: true
@@ -266,7 +266,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
-    uses: mooltiverse/nyx/.github/workflows/go-test-sequence.yml@ghwfcache
+    uses: mooltiverse/nyx/.github/workflows/go-test-sequence.yml@main
     with:
       verbosity: info
       # Avoid hitting the 10GB limit for GitHub Actions cache by using read-only mode on this job
@@ -314,7 +314,7 @@ jobs:
     - go-build
     - go-test
     if: needs.initialize.outputs.release == 'true'
-    uses: mooltiverse/nyx/.github/workflows/go-publish.yml@ghwfcache
+    uses: mooltiverse/nyx/.github/workflows/go-publish.yml@main
     with:
       verbosity: info
       # Avoid hitting the 10GB limit for GitHub Actions cache by using read-only mode on this job
@@ -339,7 +339,7 @@ jobs:
     - initialize
     - go-build
     if: needs.initialize.outputs.dockerChanged == 'true' || needs.initialize.outputs.goChanged == 'true' || needs.initialize.outputs.release == 'true'
-    uses: mooltiverse/nyx/.github/workflows/docker-build.yml@ghwfcache
+    uses: mooltiverse/nyx/.github/workflows/docker-build.yml@main
     with:
       verbosity: info
       install-jdk: true
@@ -355,7 +355,7 @@ jobs:
     - go-build
     - docker-build
     if: needs.initialize.outputs.dockerChanged == 'true' || needs.initialize.outputs.goChanged == 'true' || needs.initialize.outputs.release == 'true'
-    uses: mooltiverse/nyx/.github/workflows/docker-test-compact.yml@ghwfcache
+    uses: mooltiverse/nyx/.github/workflows/docker-test-compact.yml@main
     with:
       verbosity: info
       # Avoid hitting the 10GB limit for GitHub Actions cache by using read-only mode on this job
@@ -398,7 +398,7 @@ jobs:
     - docker-build
     - docker-test
     if: needs.initialize.outputs.release == 'true'
-    uses: mooltiverse/nyx/.github/workflows/docker-publish.yml@ghwfcache
+    uses: mooltiverse/nyx/.github/workflows/docker-publish.yml@main
     with:
       verbosity: info
       # Avoid hitting the 10GB limit for GitHub Actions cache by using read-only mode on this job
@@ -425,7 +425,7 @@ jobs:
     needs:
     - initialize
     if: needs.initialize.outputs.docusaurusChanged == 'true' || needs.initialize.outputs.release == 'true'
-    uses: mooltiverse/nyx/.github/workflows/docusaurus-build.yml@ghwfcache
+    uses: mooltiverse/nyx/.github/workflows/docusaurus-build.yml@main
     with:
       verbosity: info
       install-jdk: true
@@ -440,7 +440,7 @@ jobs:
     #- test
     - docusaurus-build
     if: needs.initialize.outputs.docusaurusChanged == 'true' || needs.initialize.outputs.release == 'true'
-    uses: mooltiverse/nyx/.github/workflows/docusaurus-publish.yml@ghwfcache
+    uses: mooltiverse/nyx/.github/workflows/docusaurus-publish.yml@main
     with:
       verbosity: info
       install-jdk: true

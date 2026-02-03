@@ -242,11 +242,11 @@ jobs:
     name: Publish
     runs-on: ${{ inputs.runs-on }}
     steps:
-    - uses: mooltiverse/nyx/.github/actions/setup-git@ghwfcache
+    - uses: mooltiverse/nyx/.github/actions/setup-git@main
       with:
         verbosity: ${{ inputs.verbosity }}
     - id: nyx
-      uses: mooltiverse/nyx/.github/actions/setup-nyx@ghwfcache
+      uses: mooltiverse/nyx/.github/actions/setup-nyx@main
       with:
         # Just restore the cache
         enable-action: false
@@ -255,14 +255,14 @@ jobs:
         cache-name: ${{ inputs.nyx-cache-name }}
         cache-from: ${{ inputs.nyx-cache-from }}
     - id: java
-      uses: mooltiverse/nyx/.github/actions/setup-java@ghwfcache
+      uses: mooltiverse/nyx/.github/actions/setup-java@main
       with:
         verbosity: ${{ inputs.verbosity }}
         cache-mode: ${{ inputs.java-cache-mode }}
         cache-name: ${{ inputs.java-cache-name }}
         cache-from: ${{ inputs.java-cache-from }}
     - id: gradle
-      uses: mooltiverse/nyx/.github/actions/setup-gradle@ghwfcache
+      uses: mooltiverse/nyx/.github/actions/setup-gradle@main
       with:
         verbosity: ${{ inputs.verbosity }}
         install-jdk: ${{ inputs.install-jdk }}

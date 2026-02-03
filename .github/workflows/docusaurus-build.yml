@@ -278,11 +278,11 @@ jobs:
     name: Build
     runs-on: ${{ inputs.runs-on }}
     steps:
-    - uses: mooltiverse/nyx/.github/actions/setup-git@ghwfcache
+    - uses: mooltiverse/nyx/.github/actions/setup-git@main
       with:
         verbosity: ${{ inputs.verbosity }}
     - id: nyx
-      uses: mooltiverse/nyx/.github/actions/setup-nyx@ghwfcache
+      uses: mooltiverse/nyx/.github/actions/setup-nyx@main
       with:
         # Just restore the cache
         enable-action: false
@@ -291,7 +291,7 @@ jobs:
         cache-name: ${{ inputs.nyx-cache-name }}
         cache-from: ${{ inputs.nyx-cache-from }}
     - id: docusaurus
-      uses: mooltiverse/nyx/.github/actions/setup-docusaurus@ghwfcache
+      uses: mooltiverse/nyx/.github/actions/setup-docusaurus@main
       with:
         verbosity: ${{ inputs.verbosity }}
         install-node: ${{ inputs.install-node }}
@@ -300,7 +300,7 @@ jobs:
         cache-name: ${{ inputs.docusaurus-cache-name }}
         cache-from: ${{ inputs.docusaurus-cache-from }}
     - id: gradle
-      uses: mooltiverse/nyx/.github/actions/setup-gradle@ghwfcache
+      uses: mooltiverse/nyx/.github/actions/setup-gradle@main
       with:
         verbosity: ${{ inputs.verbosity }}
         install-jdk: ${{ inputs.install-jdk }}
