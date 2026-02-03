@@ -45,8 +45,9 @@ inputs:
     default: 'node-${{ github.run_id }}'
   cache-from:
     description: |-
-      The cache to read from by this Action. The contents of this cash,
-      when it exists, will be imported into the cache defined in 'cache-name'.
+      The cache this Action will read from to initialize the cache defined in
+      'cache-name'. The contents of this cache, when it exists, will be imported
+      into the cache defined in 'cache-name'.
       If this cache does not exist then 'cache-name' will be started from
       scratch.
       Default: ''
