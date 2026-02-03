@@ -17,6 +17,7 @@ ARG TARGETOS
 ARG TARGETARCH
 ARG TARGETVARIANT
 
+
 # The volume to mount is also the working dir
 WORKDIR /project
 VOLUME /project
