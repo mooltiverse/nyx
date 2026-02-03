@@ -276,11 +276,11 @@ jobs:
     name: Unit Test
     runs-on: ${{ inputs.runs-on }}
     steps:
-    - uses: mooltiverse/nyx/.github/actions/setup-git@main
+    - uses: mooltiverse/nyx/.github/actions/setup-git@ghwfcache
       with:
         verbosity: ${{ inputs.verbosity }}
     - id: nyx
-      uses: mooltiverse/nyx/.github/actions/setup-nyx@main
+      uses: mooltiverse/nyx/.github/actions/setup-nyx@ghwfcache
       with:
         # Just restore the cache
         enable-action: false
@@ -288,7 +288,7 @@ jobs:
         cache-mode: ${{ inputs.cache-mode }}
         cache-name-restore-suffix: ${{ inputs.nyx-cache-name-restore-suffix }}
     - id: go
-      uses: mooltiverse/nyx/.github/actions/setup-go@main
+      uses: mooltiverse/nyx/.github/actions/setup-go@ghwfcache
       with:
         verbosity: ${{ inputs.verbosity }}
         install-go: ${{ inputs.install-go }}
@@ -298,7 +298,7 @@ jobs:
         cache-name-restore-suffix: ${{ inputs.go-cache-name-restore-suffix }}
     - id: node
       if: inputs.node-cache-name-restore-suffix != ''
-      uses: mooltiverse/nyx/.github/actions/setup-node@main
+      uses: mooltiverse/nyx/.github/actions/setup-node@ghwfcache
       with:
         verbosity: ${{ inputs.verbosity }}
         install-node: ${{ inputs.install-node }}
@@ -308,7 +308,7 @@ jobs:
         # Restore the cache from the previous job to 'chain' the two caches
         cache-name-restore-suffix: ${{ inputs.node-cache-name-restore-suffix }}
     - id: gradle
-      uses: mooltiverse/nyx/.github/actions/setup-gradle@main
+      uses: mooltiverse/nyx/.github/actions/setup-gradle@ghwfcache
       with:
         verbosity: ${{ inputs.verbosity }}
         install-jdk: ${{ inputs.install-jdk }}
@@ -345,11 +345,11 @@ jobs:
       group: access-to-rate-limited-remote-services
       cancel-in-progress: false
     steps:
-    - uses: mooltiverse/nyx/.github/actions/setup-git@main
+    - uses: mooltiverse/nyx/.github/actions/setup-git@ghwfcache
       with:
         verbosity: ${{ inputs.verbosity }}
     - id: nyx
-      uses: mooltiverse/nyx/.github/actions/setup-nyx@main
+      uses: mooltiverse/nyx/.github/actions/setup-nyx@ghwfcache
       with:
         # Just restore the cache
         enable-action: false
@@ -357,7 +357,7 @@ jobs:
         cache-mode: ${{ inputs.cache-mode }}
         cache-name-restore-suffix: ${{ inputs.nyx-cache-name-restore-suffix }}
     - id: go
-      uses: mooltiverse/nyx/.github/actions/setup-go@main
+      uses: mooltiverse/nyx/.github/actions/setup-go@ghwfcache
       with:
         verbosity: ${{ inputs.verbosity }}
         install-go: ${{ inputs.install-go }}
@@ -366,7 +366,7 @@ jobs:
         # Restore the cache from the previous job to 'chain' the two caches
         cache-name-restore-suffix: ${{ needs.test-unit.outputs.go-cache-name-suffix }}
     - id: gradle
-      uses: mooltiverse/nyx/.github/actions/setup-gradle@main
+      uses: mooltiverse/nyx/.github/actions/setup-gradle@ghwfcache
       with:
         verbosity: ${{ inputs.verbosity }}
         install-jdk: ${{ inputs.install-jdk }}
@@ -403,11 +403,11 @@ jobs:
       group: access-to-rate-limited-remote-services
       cancel-in-progress: false
     steps:
-    - uses: mooltiverse/nyx/.github/actions/setup-git@main
+    - uses: mooltiverse/nyx/.github/actions/setup-git@ghwfcache
       with:
         verbosity: ${{ inputs.verbosity }}
     - id: nyx
-      uses: mooltiverse/nyx/.github/actions/setup-nyx@main
+      uses: mooltiverse/nyx/.github/actions/setup-nyx@ghwfcache
       with:
         # Just restore the cache
         enable-action: false
@@ -415,7 +415,7 @@ jobs:
         cache-mode: ${{ inputs.cache-mode }}
         cache-name-restore-suffix: ${{ inputs.nyx-cache-name-restore-suffix }}
     - id: go
-      uses: mooltiverse/nyx/.github/actions/setup-go@main
+      uses: mooltiverse/nyx/.github/actions/setup-go@ghwfcache
       with:
         verbosity: ${{ inputs.verbosity }}
         install-go: ${{ inputs.install-go }}
@@ -424,7 +424,7 @@ jobs:
         # Restore the cache from the previous job to 'chain' the two caches
         cache-name-restore-suffix: ${{ needs.test-integration.outputs.go-cache-name-suffix }}
     - id: gradle
-      uses: mooltiverse/nyx/.github/actions/setup-gradle@main
+      uses: mooltiverse/nyx/.github/actions/setup-gradle@ghwfcache
       with:
         verbosity: ${{ inputs.verbosity }}
         install-jdk: ${{ inputs.install-jdk }}

@@ -294,18 +294,18 @@ jobs:
     name: Release
     runs-on: ${{ inputs.runs-on }}
     steps:
-    - uses: mooltiverse/nyx/.github/actions/setup-git@main
+    - uses: mooltiverse/nyx/.github/actions/setup-git@ghwfcache
       with:
         verbosity: ${{ inputs.verbosity }}
     - id: nyx
-      uses: mooltiverse/nyx/.github/actions/setup-nyx@main
+      uses: mooltiverse/nyx/.github/actions/setup-nyx@ghwfcache
       with:
         verbosity: ${{ inputs.verbosity }}
         cache-mode: ${{ inputs.cache-mode }}
         cache-name-restore-suffix: ${{ inputs.nyx-cache-name-restore-suffix }}
     - id: go
       if: steps.nyx.outputs.newRelease == 'true' && inputs.go-cache-name-restore-suffix != ''
-      uses: mooltiverse/nyx/.github/actions/setup-go@main
+      uses: mooltiverse/nyx/.github/actions/setup-go@ghwfcache
       with:
         verbosity: ${{ inputs.verbosity }}
         cache-mode: ${{ inputs.cache-mode }}
@@ -313,7 +313,7 @@ jobs:
         cache-name-restore-suffix: ${{ inputs.go-cache-name-restore-suffix }}
     - id: java
       if: steps.nyx.outputs.newRelease == 'true' && inputs.java-cache-name-restore-suffix != ''
-      uses: mooltiverse/nyx/.github/actions/setup-java@main
+      uses: mooltiverse/nyx/.github/actions/setup-java@ghwfcache
       with:
         verbosity: ${{ inputs.verbosity }}
         cache-mode: ${{ inputs.cache-mode }}
@@ -321,7 +321,7 @@ jobs:
         cache-name-restore-suffix: ${{ inputs.java-cache-name-restore-suffix }}
     - id: docker
       if: steps.nyx.outputs.newRelease == 'true' && inputs.docker-cache-name-restore-suffix != ''
-      uses: mooltiverse/nyx/.github/actions/setup-docker@main
+      uses: mooltiverse/nyx/.github/actions/setup-docker@ghwfcache
       with:
         verbosity: ${{ inputs.verbosity }}
         cache-mode: ${{ inputs.cache-mode }}
@@ -340,7 +340,7 @@ jobs:
         aws-secret-access-key: ${{ secrets.aws-secret-access-key }}
     - id: docusaurus
       if: steps.nyx.outputs.newRelease == 'true' && inputs.docusaurus-cache-name-restore-suffix != ''
-      uses: mooltiverse/nyx/.github/actions/setup-docusaurus@main
+      uses: mooltiverse/nyx/.github/actions/setup-docusaurus@ghwfcache
       with:
         verbosity: ${{ inputs.verbosity }}
         install-node: ${{ inputs.install-node }}
@@ -350,7 +350,7 @@ jobs:
         cache-name-restore-suffix: ${{ inputs.docusaurus-cache-name-restore-suffix }}
     - id: gradle
       if: steps.nyx.outputs.newRelease == 'true'
-      uses: mooltiverse/nyx/.github/actions/setup-gradle@main
+      uses: mooltiverse/nyx/.github/actions/setup-gradle@ghwfcache
       with:
         verbosity: ${{ inputs.verbosity }}
         install-jdk: ${{ inputs.install-jdk }}

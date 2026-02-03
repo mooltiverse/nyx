@@ -286,11 +286,11 @@ jobs:
     #  name: github-pages
     #  url: ${{ steps.github-pages-deploy.outputs.page_url }}
     steps:
-    - uses: mooltiverse/nyx/.github/actions/setup-git@main
+    - uses: mooltiverse/nyx/.github/actions/setup-git@ghwfcache
       with:
         verbosity: ${{ inputs.verbosity }}
     - id: nyx
-      uses: mooltiverse/nyx/.github/actions/setup-nyx@main
+      uses: mooltiverse/nyx/.github/actions/setup-nyx@ghwfcache
       with:
         # Just restore the cache
         enable-action: false
@@ -298,7 +298,7 @@ jobs:
         cache-mode: ${{ inputs.cache-mode }}
         cache-name-restore-suffix: ${{ inputs.nyx-cache-name-restore-suffix }}
     - id: docusaurus
-      uses: mooltiverse/nyx/.github/actions/setup-docusaurus@main
+      uses: mooltiverse/nyx/.github/actions/setup-docusaurus@ghwfcache
       with:
         verbosity: ${{ inputs.verbosity }}
         install-node: ${{ inputs.install-node }}
@@ -307,7 +307,7 @@ jobs:
         # Restore the cache from the previous job to 'chain' the two caches
         cache-name-restore-suffix: ${{ inputs.docusaurus-cache-name-restore-suffix }}
     - id: gradle
-      uses: mooltiverse/nyx/.github/actions/setup-gradle@main
+      uses: mooltiverse/nyx/.github/actions/setup-gradle@ghwfcache
       with:
         verbosity: ${{ inputs.verbosity }}
         install-jdk: ${{ inputs.install-jdk }}

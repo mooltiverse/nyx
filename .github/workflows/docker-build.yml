@@ -442,11 +442,11 @@ jobs:
       if: runner.os != 'Linux' && (inputs.delete-tool-cache || inputs.delete-android || inputs.delete-dotnet || inputs.delete-haskell || inputs.delete-large-packages || inputs.delete-docker-images || inputs.delete-swap-storage)
       shell: bash
       run: echo "::warning title=Unable to free disk space on ${{ runner.os }}::The job has been configured to delete preconfigured packages to free disk space but that feature is only supported on Linux (Ubuntu) runners, while this instance runs on ${{ runner.os }}."
-    - uses: mooltiverse/nyx/.github/actions/setup-git@main
+    - uses: mooltiverse/nyx/.github/actions/setup-git@ghwfcache
       with:
         verbosity: ${{ inputs.verbosity }}
     - id: nyx
-      uses: mooltiverse/nyx/.github/actions/setup-nyx@main
+      uses: mooltiverse/nyx/.github/actions/setup-nyx@ghwfcache
       with:
         # Just restore the cache
         enable-action: false
@@ -455,7 +455,7 @@ jobs:
         cache-name-restore-suffix: ${{ inputs.nyx-cache-name-restore-suffix }}
     - id: go
       if: inputs.go-cache-name-restore-suffix != ''
-      uses: mooltiverse/nyx/.github/actions/setup-go@main
+      uses: mooltiverse/nyx/.github/actions/setup-go@ghwfcache
       with:
         verbosity: ${{ inputs.verbosity }}
         cache-mode: ${{ inputs.cache-mode }}
@@ -463,14 +463,14 @@ jobs:
         cache-name-restore-suffix: ${{ inputs.go-cache-name-restore-suffix }}
     - id: java
       if: inputs.java-cache-name-restore-suffix != ''
-      uses: mooltiverse/nyx/.github/actions/setup-java@main
+      uses: mooltiverse/nyx/.github/actions/setup-java@ghwfcache
       with:
         verbosity: ${{ inputs.verbosity }}
         cache-mode: ${{ inputs.cache-mode }}
         # Restore the cache from the previous job to 'chain' the two caches
         cache-name-restore-suffix: ${{ inputs.java-cache-name-restore-suffix }}
     - id: docker
-      uses: mooltiverse/nyx/.github/actions/setup-docker@main
+      uses: mooltiverse/nyx/.github/actions/setup-docker@ghwfcache
       with:
         verbosity: ${{ inputs.verbosity }}
         cache-mode: ${{ inputs.cache-mode }}
@@ -488,7 +488,7 @@ jobs:
         aws-access-key-id: ${{ inputs.aws-access-key-id }}
         aws-secret-access-key: ${{ secrets.aws-secret-access-key }}
     - id: gradle
-      uses: mooltiverse/nyx/.github/actions/setup-gradle@main
+      uses: mooltiverse/nyx/.github/actions/setup-gradle@ghwfcache
       with:
         verbosity: ${{ inputs.verbosity }}
         install-jdk: ${{ inputs.install-jdk || inputs.delete-tool-cache }}
