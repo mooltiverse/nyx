@@ -118,14 +118,32 @@ on:
         type: string
         required: false
         default: 'latest'
-      cache-mode:
+      nyx-cache-mode:
         description: |-
           Whether to enable the cache and, if enabled, how to use it.
+          Consider that disabling the cache or making it read only may help speeding
+          up the workflow and not incurring in cache size limits.
           Allowed values are: 'read-write', 'read-only', 'write-only', 'disabled'.
-          Default: read-write
         type: string
         required: false
-        default: 'read-write'
+        default: 'read-only'
+      nyx-cache-name:
+        description: |-
+          The prefix to use for the cache that will be used by this workflow.
+          This is useful to 'chain' caches, so here you can pass a previous cache
+          to make this workflow start from that one cache.
+          This is useful to 'chain' caches, so here you can pass a previous cache
+          to make this workflow start from that one cache.
+          When setting this prefix to some specific feature you won't be able to
+          merge the caches and in case you 'chain' them you can only use one
+          upstream cache for each downstream job.
+          If the cache to read does not exists a new one will be created from
+          scratch without errors.
+          Default: nyx-\$\{\{ github.job \}\} (reuse the same cache for the entire
+          workflow so Nyx is initialized once and its outputs are reused).
+        type: string
+        required: false
+        default: "nyx-${{ github.run_id }}"
       nyx-cache-from:
         description: |-
           The name of cache this Action will read from to initialize Action cache.
@@ -139,6 +157,15 @@ on:
         type: string
         required: false
         default: ""
+      gradle-cache-mode:
+        description: |-
+          Whether to enable the cache and, if enabled, how to use it.
+          Consider that disabling the cache or making it read only may help speeding
+          up the workflow and not incurring in cache size limits.
+          Allowed values are: 'read-write', 'read-only', 'write-only', 'disabled'.
+        type: string
+        required: false
+        default: 'read-write'
       gradle-cache-name:
         description: |-
           The prefix to use for the cache that will be used by this workflow.
@@ -151,11 +178,9 @@ on:
           upstream cache for each downstream job.
           If the cache to read does not exists a new one will be created from
           scratch without errors.
-          Default: gradle-\$\{\{ github.job \}\}-docusaurus (isolate the cache for
-          the 'docusaurus' feature).
         type: string
         required: false
-        default: "gradle-${{ github.run_id }}-docusaurus"
+        default: "gradle-${{ github.run_id }}-docusaurus-build"
       gradle-cache-from:
         description: |-
           The name of cache this Action will read from to initialize Action cache.
@@ -169,6 +194,30 @@ on:
         type: string
         required: false
         default: ""
+      docusaurus-cache-mode:
+        description: |-
+          Whether to enable the cache and, if enabled, how to use it.
+          Consider that disabling the cache or making it read only may help speeding
+          up the workflow and not incurring in cache size limits.
+          Allowed values are: 'read-write', 'read-only', 'write-only', 'disabled'.
+        type: string
+        required: false
+        default: 'read-write'
+      docusaurus-cache-name:
+        description: |-
+          The prefix to use for the cache that will be used by this workflow.
+          This is useful to 'chain' caches, so here you can pass a previous cache
+          to make this workflow start from that one cache.
+          This is useful to 'chain' caches, so here you can pass a previous cache
+          to make this workflow start from that one cache.
+          When setting this prefix to some specific feature you won't be able to
+          merge the caches and in case you 'chain' them you can only use one
+          upstream cache for each downstream job.
+          If the cache to read does not exists a new one will be created from
+          scratch without errors.
+        type: string
+        required: false
+        default: "docusaurus-${{ github.run_id }}-build"
       docusaurus-cache-from:
         description: |-
           The name of cache this Action will read from to initialize Action cache.
@@ -178,10 +227,9 @@ on:
           to make this workflow start from that.
           If the cache to read does not exists a new one will be created from
           scratch without errors.
-          Default: \$\{\{ github.job \}\}
         type: string
         required: false
-        default: "${{ github.job }}"
+        default: ""
       google-client-id:
         description: |-
           The client ID issued by Google to protect the site with Single Sign On
@@ -239,7 +287,8 @@ jobs:
         # Just restore the cache
         enable-action: false
         verbosity: ${{ inputs.verbosity }}
-        cache-mode: ${{ inputs.cache-mode }}
+        cache-mode: ${{ inputs.nyx-cache-mode }}
+        cache-name: ${{ inputs.nyx-cache-name }}
         cache-from: ${{ inputs.nyx-cache-from }}
     - id: docusaurus
       uses: mooltiverse/nyx/.github/actions/setup-docusaurus@ghwfcache
@@ -247,7 +296,8 @@ jobs:
         verbosity: ${{ inputs.verbosity }}
         install-node: ${{ inputs.install-node }}
         install-node-version: ${{ inputs.install-node-version }}
-        cache-mode: ${{ inputs.cache-mode }}
+        cache-mode: ${{ inputs.docusaurus-cache-mode }}
+        cache-name: ${{ inputs.docusaurus-cache-name }}
         cache-from: ${{ inputs.docusaurus-cache-from }}
     - id: gradle
       uses: mooltiverse/nyx/.github/actions/setup-gradle@ghwfcache
@@ -258,7 +308,7 @@ jobs:
         install-jdk-distribution: ${{ inputs.install-jdk-distribution }}
         install-gradle: ${{ inputs.install-gradle }}
         install-gradle-version: ${{ inputs.install-gradle-version }}
-        cache-mode: ${{ inputs.cache-mode }}
+        cache-mode: ${{ inputs.gradle-cache-mode }}
         cache-name: ${{ inputs.gradle-cache-name }}
         cache-from: ${{ inputs.gradle-cache-from }}
     - name: Build the Docusaurus sites

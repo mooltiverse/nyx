@@ -21,14 +21,6 @@ on:
         type: string
         required: false
         default: 'quiet'
-      cache-mode:
-        description: |-
-          Whether to enable the cache and, if enabled, how to use it.
-          Allowed values are: 'read-write', 'read-only', 'write-only', 'disabled'.
-          Default: read-write
-        type: string
-        required: false
-        default: 'read-write'
     outputs:
       # Version attributes
       isCoreVersion:
@@ -105,7 +97,7 @@ jobs:
       uses: mooltiverse/nyx/.github/actions/setup-nyx@ghwfcache
       with:
         verbosity: ${{ inputs.verbosity }}
-        cache-mode: ${{ inputs.cache-mode }}
+        cache-mode: read-write
         enable-artifacts: true
     - id: go
       uses: mooltiverse/nyx/.github/actions/setup-go@ghwfcache

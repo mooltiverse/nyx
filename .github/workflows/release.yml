@@ -123,14 +123,32 @@ on:
         type: string
         required: false
         default: 'latest'
-      cache-mode:
+      nyx-cache-mode:
         description: |-
           Whether to enable the cache and, if enabled, how to use it.
+          Consider that disabling the cache or making it read only may help speeding
+          up the workflow and not incurring in cache size limits.
           Allowed values are: 'read-write', 'read-only', 'write-only', 'disabled'.
-          Default: read-write
         type: string
         required: false
         default: 'read-write'
+      nyx-cache-name:
+        description: |-
+          The prefix to use for the cache that will be used by this workflow.
+          This is useful to 'chain' caches, so here you can pass a previous cache
+          to make this workflow start from that one cache.
+          This is useful to 'chain' caches, so here you can pass a previous cache
+          to make this workflow start from that one cache.
+          When setting this prefix to some specific feature you won't be able to
+          merge the caches and in case you 'chain' them you can only use one
+          upstream cache for each downstream job.
+          If the cache to read does not exists a new one will be created from
+          scratch without errors.
+          Default: nyx-\$\{\{ github.job \}\} (reuse the same cache for the entire
+          workflow so Nyx is initialized once and its outputs are reused).
+        type: string
+        required: false
+        default: "nyx-${{ github.run_id }}"
       nyx-cache-from:
         description: |-
           The name of cache this Action will read from to initialize Action cache.
@@ -144,6 +162,30 @@ on:
         type: string
         required: false
         default: "infer"
+      go-cache-mode:
+        description: |-
+          Whether to enable the cache and, if enabled, how to use it.
+          Consider that disabling the cache or making it read only may help speeding
+          up the workflow and not incurring in cache size limits.
+          Allowed values are: 'read-write', 'read-only', 'write-only', 'disabled'.
+        type: string
+        required: false
+        default: 'read-only'
+      go-cache-name:
+        description: |-
+          The prefix to use for the cache that will be used by this workflow.
+          This is useful to 'chain' caches, so here you can pass a previous cache
+          to make this workflow start from that one cache.
+          This is useful to 'chain' caches, so here you can pass a previous cache
+          to make this workflow start from that one cache.
+          When setting this prefix to some specific feature you won't be able to
+          merge the caches and in case you 'chain' them you can only use one
+          upstream cache for each downstream job.
+          If the cache to read does not exists a new one will be created from
+          scratch without errors.
+        type: string
+        required: false
+        default: "go-${{ github.run_id }}-build"
       go-cache-from:
         description: |-
           The name of cache this Action will read from to initialize Action cache.
@@ -155,10 +197,33 @@ on:
           scratch without errors.
           If this value is empty (by default) this workflow assumes this
           feature is not used therefore no cache will be restored.
-          Default: none
         type: string
         required: false
-        default: ""
+        default: "go-${{ github.run_id }}-build"
+      java-cache-mode:
+        description: |-
+          Whether to enable the cache and, if enabled, how to use it.
+          Consider that disabling the cache or making it read only may help speeding
+          up the workflow and not incurring in cache size limits.
+          Allowed values are: 'read-write', 'read-only', 'write-only', 'disabled'.
+        type: string
+        required: false
+        default: 'read-only'
+      java-cache-name:
+        description: |-
+          The prefix to use for the cache that will be used by this workflow.
+          This is useful to 'chain' caches, so here you can pass a previous cache
+          to make this workflow start from that one cache.
+          This is useful to 'chain' caches, so here you can pass a previous cache
+          to make this workflow start from that one cache.
+          When setting this prefix to some specific feature you won't be able to
+          merge the caches and in case you 'chain' them you can only use one
+          upstream cache for each downstream job.
+          If the cache to read does not exists a new one will be created from
+          scratch without errors.
+        type: string
+        required: false
+        default: "java-${{ github.run_id }}-build"
       java-cache-from:
         description: |-
           The name of cache this Action will read from to initialize Action cache.
@@ -170,10 +235,33 @@ on:
           scratch without errors.
           If this value is empty (by default) this workflow assumes this
           feature is not used therefore no cache will be restored.
-          Default: none
         type: string
         required: false
-        default: ""
+        default: "java-${{ github.run_id }}-build"
+      docker-cache-mode:
+        description: |-
+          Whether to enable the cache and, if enabled, how to use it.
+          Consider that disabling the cache or making it read only may help speeding
+          up the workflow and not incurring in cache size limits.
+          Allowed values are: 'read-write', 'read-only', 'write-only', 'disabled'.
+        type: string
+        required: false
+        default: 'read-only'
+      docker-cache-name:
+        description: |-
+          The prefix to use for the cache that will be used by this workflow.
+          This is useful to 'chain' caches, so here you can pass a previous cache
+          to make this workflow start from that one cache.
+          This is useful to 'chain' caches, so here you can pass a previous cache
+          to make this workflow start from that one cache.
+          When setting this prefix to some specific feature you won't be able to
+          merge the caches and in case you 'chain' them you can only use one
+          upstream cache for each downstream job.
+          If the cache to read does not exists a new one will be created from
+          scratch without errors.
+        type: string
+        required: false
+        default: "docker-${{ github.run_id }}-build"
       docker-cache-from:
         description: |-
           The name of cache this Action will read from to initialize Action cache.
@@ -188,7 +276,31 @@ on:
           Default: none
         type: string
         required: false
-        default: ""
+        default: "docker-${{ github.run_id }}-build"
+      docusaurus-cache-mode:
+        description: |-
+          Whether to enable the cache and, if enabled, how to use it.
+          Consider that disabling the cache or making it read only may help speeding
+          up the workflow and not incurring in cache size limits.
+          Allowed values are: 'read-write', 'read-only', 'write-only', 'disabled'.
+        type: string
+        required: false
+        default: 'read-only'
+      docusaurus-cache-name:
+        description: |-
+          The prefix to use for the cache that will be used by this workflow.
+          This is useful to 'chain' caches, so here you can pass a previous cache
+          to make this workflow start from that one cache.
+          This is useful to 'chain' caches, so here you can pass a previous cache
+          to make this workflow start from that one cache.
+          When setting this prefix to some specific feature you won't be able to
+          merge the caches and in case you 'chain' them you can only use one
+          upstream cache for each downstream job.
+          If the cache to read does not exists a new one will be created from
+          scratch without errors.
+        type: string
+        required: false
+        default: "docusaurus-${{ github.run_id }}-build"
       docusaurus-cache-from:
         description: |-
           The name of cache this Action will read from to initialize Action cache.
@@ -198,12 +310,9 @@ on:
           to make this workflow start from that.
           If the cache to read does not exists a new one will be created from
           scratch without errors.
-          If this value is empty (by default) this workflow assumes this
-          feature is not used therefore no cache will be restored.
-          Default: none
         type: string
         required: false
-        default: ""
+        default: "docusaurus-${{ github.run_id }}-build"
       enable-dockerhub-container-registry:
         description: |-
           Whether or not authentication to the Docker Hub Container Registry must
@@ -305,28 +414,32 @@ jobs:
       uses: mooltiverse/nyx/.github/actions/setup-nyx@ghwfcache
       with:
         verbosity: ${{ inputs.verbosity }}
-        cache-mode: ${{ inputs.cache-mode }}
+        cache-mode: ${{ inputs.nyx-cache-mode }}
+        cache-name: ${{ inputs.nyx-cache-name }}
         cache-from: ${{ inputs.nyx-cache-from }}
     - id: go
       if: steps.nyx.outputs.newRelease == 'true' && inputs.go-cache-from != ''
       uses: mooltiverse/nyx/.github/actions/setup-go@ghwfcache
       with:
         verbosity: ${{ inputs.verbosity }}
-        cache-mode: ${{ inputs.cache-mode }}
+        cache-mode: ${{ inputs.go-cache-mode }}
+        cache-name: ${{ inputs.go-cache-name }}
         cache-from: ${{ inputs.go-cache-from }}
     - id: java
       if: steps.nyx.outputs.newRelease == 'true' && inputs.java-cache-from != ''
       uses: mooltiverse/nyx/.github/actions/setup-java@ghwfcache
       with:
         verbosity: ${{ inputs.verbosity }}
-        cache-mode: ${{ inputs.cache-mode }}
+        cache-mode: ${{ inputs.java-cache-mode }}
+        cache-name: ${{ inputs.java-cache-name }}
         cache-from: ${{ inputs.java-cache-from }}
     - id: docker
       if: steps.nyx.outputs.newRelease == 'true' && inputs.docker-cache-from != ''
       uses: mooltiverse/nyx/.github/actions/setup-docker@ghwfcache
       with:
         verbosity: ${{ inputs.verbosity }}
-        cache-mode: ${{ inputs.cache-mode }}
+        cache-mode: ${{ inputs.docker-cache-mode }}
+        cache-name: ${{ inputs.docker-cache-name }}
         cache-from: ${{ inputs.docker-cache-from }}
         enable-dockerhub-container-registry: ${{ inputs.enable-dockerhub-container-registry }}
         dockerhub-user: ${{ inputs.dockerhub-user }}
@@ -346,7 +459,8 @@ jobs:
         verbosity: ${{ inputs.verbosity }}
         install-node: ${{ inputs.install-node }}
         install-node-version: ${{ inputs.install-node-version }}
-        cache-mode: ${{ inputs.cache-mode }}
+        cache-mode: ${{ inputs.docusaurus-cache-mode }}
+        cache-name: ${{ inputs.docusaurus-cache-name }}
         cache-from: ${{ inputs.docusaurus-cache-from }}
     - id: gradle
       if: steps.nyx.outputs.newRelease == 'true'
