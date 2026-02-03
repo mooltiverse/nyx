@@ -592,7 +592,6 @@ jobs:
       with:
         verbosity: ${{ inputs.verbosity }}
         cache-mode: ${{ inputs.cache-mode }}
-        # Restore the cache from the previous job to 'chain' the two caches
         cache-from: ${{ inputs.go-cache-from }}
     - id: java
       if: inputs.java-cache-from != ''
@@ -600,14 +599,12 @@ jobs:
       with:
         verbosity: ${{ inputs.verbosity }}
         cache-mode: ${{ inputs.cache-mode }}
-        # Restore the cache from the previous job to 'chain' the two caches
         cache-from: ${{ inputs.java-cache-from }}
     - id: docker
       uses: mooltiverse/nyx/.github/actions/setup-docker@ghwfcache
       with:
         verbosity: ${{ inputs.verbosity }}
         cache-mode: ${{ inputs.cache-mode }}
-        # Restore the cache from the previous job to 'chain' the two caches
         cache-from: ${{ inputs.docker-cache-from }}
         enable-dockerhub-container-registry: ${{ inputs.enable-dockerhub-container-registry }}
         dockerhub-user: ${{ inputs.dockerhub-user }}
@@ -629,7 +626,6 @@ jobs:
         install-node-version: ${{ inputs.install-node-version }}
         install-newman: ${{ inputs.install-newman }}
         cache-mode: ${{ inputs.cache-mode }}
-        # Restore the cache from the previous job to 'chain' the two caches
         cache-from: ${{ inputs.node-cache-from }}
     - id: gradle
       uses: mooltiverse/nyx/.github/actions/setup-gradle@ghwfcache
@@ -642,7 +638,6 @@ jobs:
         install-gradle-version: ${{ inputs.install-gradle-version }}
         cache-mode: ${{ inputs.cache-mode }}
         cache-name: ${{ inputs.gradle-cache-name }}
-        # Restore the cache from the previous job to 'chain' the two caches
         cache-from: ${{ inputs.gradle-cache-from }}
     - name: Run All Tests the on the Docker images
       shell: bash

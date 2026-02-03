@@ -313,7 +313,6 @@ jobs:
       with:
         verbosity: ${{ inputs.verbosity }}
         cache-mode: ${{ inputs.cache-mode }}
-        # Restore the cache from the previous job to 'chain' the two caches
         cache-from: ${{ inputs.go-cache-from }}
     - id: java
       if: steps.nyx.outputs.newRelease == 'true' && inputs.java-cache-from != ''
@@ -321,7 +320,6 @@ jobs:
       with:
         verbosity: ${{ inputs.verbosity }}
         cache-mode: ${{ inputs.cache-mode }}
-        # Restore the cache from the previous job to 'chain' the two caches
         cache-from: ${{ inputs.java-cache-from }}
     - id: docker
       if: steps.nyx.outputs.newRelease == 'true' && inputs.docker-cache-from != ''
@@ -329,7 +327,6 @@ jobs:
       with:
         verbosity: ${{ inputs.verbosity }}
         cache-mode: ${{ inputs.cache-mode }}
-        # Restore the cache from the previous job to 'chain' the two caches
         cache-from: ${{ inputs.docker-cache-from }}
         enable-dockerhub-container-registry: ${{ inputs.enable-dockerhub-container-registry }}
         dockerhub-user: ${{ inputs.dockerhub-user }}
@@ -350,7 +347,6 @@ jobs:
         install-node: ${{ inputs.install-node }}
         install-node-version: ${{ inputs.install-node-version }}
         cache-mode: ${{ inputs.cache-mode }}
-        # Restore the cache from the previous job to 'chain' the two caches
         cache-from: ${{ inputs.docusaurus-cache-from }}
     - id: gradle
       if: steps.nyx.outputs.newRelease == 'true'

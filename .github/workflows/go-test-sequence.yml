@@ -296,7 +296,6 @@ jobs:
         install-go: ${{ inputs.install-go }}
         install-go-version: ${{ inputs.install-go-version }}
         cache-mode: ${{ inputs.cache-mode }}
-        # Restore the cache from the previous job to 'chain' the two caches
         cache-from: ${{ inputs.go-cache-from }}
     - id: node
       if: inputs.node-cache-from != ''
@@ -307,7 +306,6 @@ jobs:
         install-node-version: ${{ inputs.install-node-version }}
         install-newman: ${{ inputs.install-newman }}
         cache-mode: ${{ inputs.cache-mode }}
-        # Restore the cache from the previous job to 'chain' the two caches
         cache-from: ${{ inputs.node-cache-from }}
     - id: gradle
       uses: mooltiverse/nyx/.github/actions/setup-gradle@ghwfcache
@@ -320,7 +318,6 @@ jobs:
         install-gradle-version: ${{ inputs.install-gradle-version }}
         cache-mode: ${{ inputs.cache-mode }}
         cache-name: ${{ inputs.gradle-cache-name }}
-        # Restore the cache from the previous job to 'chain' the two caches
         cache-from: ${{ inputs.gradle-cache-from }}
     - name: Run Unit Tests the on Go code
       shell: bash
@@ -365,7 +362,6 @@ jobs:
         install-go: ${{ inputs.install-go }}
         install-go-version: ${{ inputs.install-go-version }}
         cache-mode: ${{ inputs.cache-mode }}
-        # Restore the cache from the previous job to 'chain' the two caches
         cache-from: ${{ needs.test-unit.outputs.go-cache-name }}
     - id: gradle
       uses: mooltiverse/nyx/.github/actions/setup-gradle@ghwfcache
@@ -378,7 +374,6 @@ jobs:
         install-gradle-version: ${{ inputs.install-gradle-version }}
         cache-mode: ${{ inputs.cache-mode }}
         cache-name: ${{ inputs.gradle-cache-name }}
-        # Restore the cache from the previous job to 'chain' the two caches
         cache-from: ${{ needs.test-unit.outputs.gradle-cache-name }}
     - name: Run Integration Tests on Go code
       shell: bash
@@ -423,7 +418,6 @@ jobs:
         install-go: ${{ inputs.install-go }}
         install-go-version: ${{ inputs.install-go-version }}
         cache-mode: ${{ inputs.cache-mode }}
-        # Restore the cache from the previous job to 'chain' the two caches
         cache-from: ${{ needs.test-integration.outputs.go-cache-name }}
     - id: gradle
       uses: mooltiverse/nyx/.github/actions/setup-gradle@ghwfcache
@@ -436,7 +430,6 @@ jobs:
         install-gradle-version: ${{ inputs.install-gradle-version }}
         cache-mode: ${{ inputs.cache-mode }}
         cache-name: ${{ inputs.gradle-cache-name }}
-        # Restore the cache from the previous job to 'chain' the two caches
         cache-from: ${{ needs.test-integration.outputs.gradle-cache-name }}
     - name: Run Functional Tests on Go code
       shell: bash

@@ -243,7 +243,6 @@ jobs:
         install-go: ${{ inputs.install-go }}
         install-go-version: ${{ inputs.install-go-version }}
         cache-mode: ${{ inputs.cache-mode }}
-        # Restore the cache from the previous job to 'chain' the two caches
         cache-from: ${{ inputs.go-cache-from }}
     - id: gradle
       uses: mooltiverse/nyx/.github/actions/setup-gradle@ghwfcache
@@ -256,7 +255,6 @@ jobs:
         install-gradle-version: ${{ inputs.install-gradle-version }}
         cache-mode: ${{ inputs.cache-mode }}
         cache-name: ${{ inputs.gradle-cache-name }}
-        # Restore the cache from the previous job to 'chain' the two caches
         cache-from: ${{ inputs.gradle-cache-from }}
     - name: Build the Go code
       shell: bash
