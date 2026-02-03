@@ -133,7 +133,9 @@ on:
         default: 'read-write'
       nyx-cache-from:
         description: |-
-          The name of the cache that will be read by this workflow.
+          The name of cache this Action will read from to initialize Action cache.
+          The contents of this cache, when it exists, will be imported into the
+          Action cache.
           This is useful to 'chain' caches, so here you can pass a previous cache
           to make this workflow start from that.
           If the cache to read does not exists a new one will be created from
@@ -144,7 +146,9 @@ on:
         default: "infer"
       go-cache-from:
         description: |-
-          The name of the cache that will be read by this workflow.
+          The name of cache this Action will read from to initialize Action cache.
+          The contents of this cache, when it exists, will be imported into the
+          Action cache.
           This is useful to 'chain' caches, so here you can pass a previous cache
           to make this workflow start from that.
           If the cache to read does not exists a new one will be created from
@@ -157,7 +161,9 @@ on:
         default: ""
       java-cache-from:
         description: |-
-          The name of the cache that will be read by this workflow.
+          The name of cache this Action will read from to initialize Action cache.
+          The contents of this cache, when it exists, will be imported into the
+          Action cache.
           This is useful to 'chain' caches, so here you can pass a previous cache
           to make this workflow start from that.
           If the cache to read does not exists a new one will be created from
@@ -170,7 +176,9 @@ on:
         default: ""
       docker-cache-from:
         description: |-
-          The name of the cache that will be read by this workflow.
+          The name of cache this Action will read from to initialize Action cache.
+          The contents of this cache, when it exists, will be imported into the
+          Action cache.
           This is useful to 'chain' caches, so here you can pass a previous cache
           to make this workflow start from that.
           If the cache to read does not exists a new one will be created from
@@ -183,7 +191,9 @@ on:
         default: ""
       docusaurus-cache-from:
         description: |-
-          The name of the cache that will be read by this workflow.
+          The name of cache this Action will read from to initialize Action cache.
+          The contents of this cache, when it exists, will be imported into the
+          Action cache.
           This is useful to 'chain' caches, so here you can pass a previous cache
           to make this workflow start from that.
           If the cache to read does not exists a new one will be created from
