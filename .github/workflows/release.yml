@@ -1,11 +1,10 @@
 # Publishes a new release.
 #
 # This job restores the caches from previous jobs and uses the
-# '*-cache-name-restore-suffix' values also as flags to enable or
-# disable certain features. This means that for any feature named
-# 'feature', if the 'feature-cache-name-restore-suffix' is not set,
-# the workflow assumes the 'feature' is not used and no cache is
-# restored for that specific feature.
+# '*-cache-from' values also as flags to enable or disable certain features.
+# This means that for any feature named 'feature', if the
+# 'feature-cache-from' is not set, the workflow assumes the 'feature'
+# is not used and no cache is restored for that specific feature.
 
 name: Publish and Release
 
@@ -132,24 +131,22 @@ on:
         type: string
         required: false
         default: 'read-write'
-      nyx-cache-name-restore-suffix:
+      nyx-cache-from:
         description: |-
-          The suffix of the name to use for the cache that will be read by this
-          workflow. This is useful to 'chain' caches, so here you can pass the
-          suffix from a previous cache to make this workflow start from that
-          one cache.
+          The name of the cache that will be read by this workflow.
+          This is useful to 'chain' caches, so here you can pass a previous cache
+          to make this workflow start from that.
           If the cache to read does not exists a new one will be created from
           scratch without errors.
           Default: infer (matches the job from the Initialize workflow)
         type: string
         required: false
         default: "infer"
-      go-cache-name-restore-suffix:
+      go-cache-from:
         description: |-
-          The suffix of the name to use for the cache that will be read by this
-          workflow. This is useful to 'chain' caches, so here you can pass the
-          suffix from a previous cache to make this workflow start from that
-          one cache.
+          The name of the cache that will be read by this workflow.
+          This is useful to 'chain' caches, so here you can pass a previous cache
+          to make this workflow start from that.
           If the cache to read does not exists a new one will be created from
           scratch without errors.
           If this value is empty (by default) this workflow assumes this
@@ -158,12 +155,11 @@ on:
         type: string
         required: false
         default: ""
-      java-cache-name-restore-suffix:
+      java-cache-from:
         description: |-
-          The suffix of the name to use for the cache that will be read by this
-          workflow. This is useful to 'chain' caches, so here you can pass the
-          suffix from a previous cache to make this workflow start from that
-          one cache.
+          The name of the cache that will be read by this workflow.
+          This is useful to 'chain' caches, so here you can pass a previous cache
+          to make this workflow start from that.
           If the cache to read does not exists a new one will be created from
           scratch without errors.
           If this value is empty (by default) this workflow assumes this
@@ -172,12 +168,11 @@ on:
         type: string
         required: false
         default: ""
-      docker-cache-name-restore-suffix:
+      docker-cache-from:
         description: |-
-          The suffix of the name to use for the cache that will be read by this
-          workflow. This is useful to 'chain' caches, so here you can pass the
-          suffix from a previous cache to make this workflow start from that
-          one cache.
+          The name of the cache that will be read by this workflow.
+          This is useful to 'chain' caches, so here you can pass a previous cache
+          to make this workflow start from that.
           If the cache to read does not exists a new one will be created from
           scratch without errors.
           If this value is empty (by default) this workflow assumes this
@@ -186,12 +181,11 @@ on:
         type: string
         required: false
         default: ""
-      docusaurus-cache-name-restore-suffix:
+      docusaurus-cache-from:
         description: |-
-          The suffix of the name to use for the cache that will be read by this
-          workflow. This is useful to 'chain' caches, so here you can pass the
-          suffix from a previous cache to make this workflow start from that
-          one cache.
+          The name of the cache that will be read by this workflow.
+          This is useful to 'chain' caches, so here you can pass a previous cache
+          to make this workflow start from that.
           If the cache to read does not exists a new one will be created from
           scratch without errors.
           If this value is empty (by default) this workflow assumes this
@@ -302,31 +296,31 @@ jobs:
       with:
         verbosity: ${{ inputs.verbosity }}
         cache-mode: ${{ inputs.cache-mode }}
-        cache-name-restore-suffix: ${{ inputs.nyx-cache-name-restore-suffix }}
+        cache-from: ${{ inputs.nyx-cache-from }}
     - id: go
-      if: steps.nyx.outputs.newRelease == 'true' && inputs.go-cache-name-restore-suffix != ''
+      if: steps.nyx.outputs.newRelease == 'true' && inputs.go-cache-from != ''
       uses: mooltiverse/nyx/.github/actions/setup-go@ghwfcache
       with:
         verbosity: ${{ inputs.verbosity }}
         cache-mode: ${{ inputs.cache-mode }}
         # Restore the cache from the previous job to 'chain' the two caches
-        cache-name-restore-suffix: ${{ inputs.go-cache-name-restore-suffix }}
+        cache-from: ${{ inputs.go-cache-from }}
     - id: java
-      if: steps.nyx.outputs.newRelease == 'true' && inputs.java-cache-name-restore-suffix != ''
+      if: steps.nyx.outputs.newRelease == 'true' && inputs.java-cache-from != ''
       uses: mooltiverse/nyx/.github/actions/setup-java@ghwfcache
       with:
         verbosity: ${{ inputs.verbosity }}
         cache-mode: ${{ inputs.cache-mode }}
         # Restore the cache from the previous job to 'chain' the two caches
-        cache-name-restore-suffix: ${{ inputs.java-cache-name-restore-suffix }}
+        cache-from: ${{ inputs.java-cache-from }}
     - id: docker
-      if: steps.nyx.outputs.newRelease == 'true' && inputs.docker-cache-name-restore-suffix != ''
+      if: steps.nyx.outputs.newRelease == 'true' && inputs.docker-cache-from != ''
       uses: mooltiverse/nyx/.github/actions/setup-docker@ghwfcache
       with:
         verbosity: ${{ inputs.verbosity }}
         cache-mode: ${{ inputs.cache-mode }}
         # Restore the cache from the previous job to 'chain' the two caches
-        cache-name-restore-suffix: ${{ inputs.docker-cache-name-restore-suffix }}
+        cache-from: ${{ inputs.docker-cache-from }}
         enable-dockerhub-container-registry: ${{ inputs.enable-dockerhub-container-registry }}
         dockerhub-user: ${{ inputs.dockerhub-user }}
         dockerhub-token: ${{ secrets.dockerhub-token }}
@@ -339,7 +333,7 @@ jobs:
         aws-access-key-id: ${{ inputs.aws-access-key-id }}
         aws-secret-access-key: ${{ secrets.aws-secret-access-key }}
     - id: docusaurus
-      if: steps.nyx.outputs.newRelease == 'true' && inputs.docusaurus-cache-name-restore-suffix != ''
+      if: steps.nyx.outputs.newRelease == 'true' && inputs.docusaurus-cache-from != ''
       uses: mooltiverse/nyx/.github/actions/setup-docusaurus@ghwfcache
       with:
         verbosity: ${{ inputs.verbosity }}
@@ -347,7 +341,7 @@ jobs:
         install-node-version: ${{ inputs.install-node-version }}
         cache-mode: ${{ inputs.cache-mode }}
         # Restore the cache from the previous job to 'chain' the two caches
-        cache-name-restore-suffix: ${{ inputs.docusaurus-cache-name-restore-suffix }}
+        cache-from: ${{ inputs.docusaurus-cache-from }}
     - id: gradle
       if: steps.nyx.outputs.newRelease == 'true'
       uses: mooltiverse/nyx/.github/actions/setup-gradle@ghwfcache

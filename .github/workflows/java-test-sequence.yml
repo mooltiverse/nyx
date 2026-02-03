@@ -167,29 +167,27 @@ on:
         type: string
         required: false
         default: 'read-write'
-      nyx-cache-name-restore-suffix:
+      nyx-cache-from:
         description: |-
-          The suffix of the name to use for the cache that will be read by this
-          workflow. This is useful to 'chain' caches, so here you can pass the
-          suffix from a previous cache to make this workflow start from that
-          one cache.
+          The name of the cache that will be read by this workflow.
+          This is useful to 'chain' caches, so here you can pass a previous cache
+          to make this workflow start from that.
           If the cache to read does not exists a new one will be created from
           scratch without errors.
           Default: none
         type: string
         required: false
         default: ""
-      gradle-cache-name-prefix:
+      gradle-cache-name:
         description: |-
-          The prefix to use for the cache that will be read by this workflow.
-          This is useful to 'chain' caches, so here you can pass the suffix
-          from a previous cache to make this workflow start from that one cache.
-          Moreover, this can be used to override the default Gradle action's
-          cache prefix to make all jobs within the same stream (i.e. a feature)
-          share the same prefix and not overlap with other streams. However,
-          when setting this prefix to some specific feature you won't be
-          able to merge the caches and in case you 'chain' them you can only
-          use one upstream cache for each downstream job.
+          The prefix to use for the cache that will be used by this workflow.
+          This is useful to 'chain' caches, so here you can pass a previous cache
+          to make this workflow start from that one cache.
+          This is useful to 'chain' caches, so here you can pass a previous cache
+          to make this workflow start from that one cache.
+          When setting this prefix to some specific feature you won't be able to
+          merge the caches and in case you 'chain' them you can only use one
+          upstream cache for each downstream job.
           If the cache to read does not exists a new one will be created from
           scratch without errors.
           Default: gradle-\$\{\{ github.job \}\}-java (isolate the cache for
@@ -197,24 +195,22 @@ on:
         type: string
         required: false
         default: "gradle-${{ github.run_id }}-java"
-      gradle-cache-name-restore-suffix:
+      gradle-cache-from:
         description: |-
-          The suffix of the name to use for the cache that will be read by this
-          workflow. This is useful to 'chain' caches, so here you can pass the
-          suffix from a previous cache to make this workflow start from that
-          one cache.
+          The name of the cache that will be read by this workflow.
+          This is useful to 'chain' caches, so here you can pass a previous cache
+          to make this workflow start from that.
           If the cache to read does not exists a new one will be created from
           scratch without errors.
           Default: \$\{\{ github.job \}\}
         type: string
         required: false
         default: "${{ github.job }}"
-      java-cache-name-restore-suffix:
+      java-cache-from:
         description: |-
-          The suffix of the name to use for the cache that will be read by this
-          workflow. This is useful to 'chain' caches, so here you can pass the
-          suffix from a previous cache to make this workflow start from that
-          one cache.
+          The name of the cache that will be read by this workflow.
+          This is useful to 'chain' caches, so here you can pass a previous cache
+          to make this workflow start from that.
           If the cache to read does not exists a new one will be created from
           scratch without errors.
           Default: \$\{\{ github.job \}\}
@@ -232,12 +228,12 @@ on:
           For more see: https://docs.gradle.org/current/userguide/command_line_interface.html.
         required: false
     outputs:
-      gradle-cache-name-suffix:
+      gradle-cache-name:
         description: "The suffix of the name used by the last cache in this workflow. This is useful to 'chain' caches, so you can pass this value as input for other actions or workflows."
-        value: ${{ jobs.test-functional.outputs.gradle-cache-name-suffix }}
-      java-cache-name-suffix:
+        value: ${{ jobs.test-functional.outputs.gradle-cache-name }}
+      java-cache-name:
         description: "The suffix of the name used by the last cache in this workflow. This is useful to 'chain' caches, so you can pass this value as input for other actions or workflows."
-        value: ${{ jobs.test-functional.outputs.java-cache-name-suffix }}
+        value: ${{ jobs.test-functional.outputs.java-cache-name }}
 
 env:
   # Compute the extra Gradle properties to use for Gradle commands.
@@ -264,16 +260,16 @@ jobs:
         enable-action: false
         verbosity: ${{ inputs.verbosity }}
         cache-mode: ${{ inputs.cache-mode }}
-        cache-name-restore-suffix: ${{ inputs.nyx-cache-name-restore-suffix }}
+        cache-from: ${{ inputs.nyx-cache-from }}
     - id: java
       uses: mooltiverse/nyx/.github/actions/setup-java@ghwfcache
       with:
         verbosity: ${{ inputs.verbosity }}
         cache-mode: ${{ inputs.cache-mode }}
         # Restore the cache from the previous job to 'chain' the two caches
-        cache-name-restore-suffix: ${{ inputs.java-cache-name-restore-suffix }}
+        cache-from: ${{ inputs.java-cache-from }}
     - id: node
-      if: inputs.node-cache-name-restore-suffix != ''
+      if: inputs.node-cache-from != ''
       uses: mooltiverse/nyx/.github/actions/setup-node@ghwfcache
       with:
         verbosity: ${{ inputs.verbosity }}
@@ -282,7 +278,7 @@ jobs:
         install-newman: ${{ inputs.install-newman }}
         cache-mode: ${{ inputs.cache-mode }}
         # Restore the cache from the previous job to 'chain' the two caches
-        cache-name-restore-suffix: ${{ inputs.node-cache-name-restore-suffix }}
+        cache-from: ${{ inputs.node-cache-from }}
     - id: gradle
       uses: mooltiverse/nyx/.github/actions/setup-gradle@ghwfcache
       with:
@@ -293,9 +289,9 @@ jobs:
         install-gradle: ${{ inputs.install-gradle }}
         install-gradle-version: ${{ inputs.install-gradle-version }}
         cache-mode: ${{ inputs.cache-mode }}
-        cache-name-prefix: ${{ inputs.gradle-cache-name-prefix }}
+        cache-name: ${{ inputs.gradle-cache-name }}
         # Restore the cache from the previous job to 'chain' the two caches
-        cache-name-restore-suffix: ${{ inputs.gradle-cache-name-restore-suffix }}
+        cache-from: ${{ inputs.gradle-cache-from }}
     - name: Run Unit Tests the on Java code
       shell: bash
       run: ./gradlew ${{ inputs.gradle-arguments }} ${{ secrets.gradle-secret-arguments }} ${{ env.GRADLE_EXTRA_OPTS }} ${{ inputs.gradle-unit-test-tasks }}
@@ -306,8 +302,8 @@ jobs:
         name: ${{ inputs.artifacts-name-prefix }}-${{ github.job }}-reports
         path: src/java/**/build/test/unit/
     outputs:
-      java-cache-name-suffix: ${{ steps.java.outputs.cache-name-suffix }}
-      gradle-cache-name-suffix: ${{ steps.gradle.outputs.cache-name-suffix }}
+      java-cache-name: ${{ steps.java.outputs.cache-name }}
+      gradle-cache-name: ${{ steps.gradle.outputs.cache-name }}
 
   test-integration:
     name: Integration Test
@@ -331,14 +327,14 @@ jobs:
         enable-action: false
         verbosity: ${{ inputs.verbosity }}
         cache-mode: ${{ inputs.cache-mode }}
-        cache-name-restore-suffix: ${{ inputs.nyx-cache-name-restore-suffix }}
+        cache-from: ${{ inputs.nyx-cache-from }}
     - id: java
       uses: mooltiverse/nyx/.github/actions/setup-java@ghwfcache
       with:
         verbosity: ${{ inputs.verbosity }}
         cache-mode: ${{ inputs.cache-mode }}
         # Restore the cache from the previous job to 'chain' the two caches
-        cache-name-restore-suffix: ${{ needs.test-unit.outputs.java-cache-name-suffix }}
+        cache-from: ${{ needs.test-unit.outputs.java-cache-name }}
     - id: gradle
       uses: mooltiverse/nyx/.github/actions/setup-gradle@ghwfcache
       with:
@@ -349,9 +345,9 @@ jobs:
         install-gradle: ${{ inputs.install-gradle }}
         install-gradle-version: ${{ inputs.install-gradle-version }}
         cache-mode: ${{ inputs.cache-mode }}
-        cache-name-prefix: ${{ inputs.gradle-cache-name-prefix }}
+        cache-name: ${{ inputs.gradle-cache-name }}
         # Restore the cache from the previous job to 'chain' the two caches
-        cache-name-restore-suffix: ${{ needs.test-unit.outputs.gradle-cache-name-suffix }}
+        cache-from: ${{ needs.test-unit.outputs.gradle-cache-name }}
     - name: Run Integration Tests on Java code
       shell: bash
       run: ./gradlew ${{ inputs.gradle-arguments }} ${{ secrets.gradle-secret-arguments }} ${{ env.GRADLE_EXTRA_OPTS }} ${{ inputs.gradle-integration-test-tasks }}
@@ -362,8 +358,8 @@ jobs:
         name: ${{ inputs.artifacts-name-prefix }}-${{ github.job }}-reports
         path: src/java/**/build/test/integration/
     outputs:
-      java-cache-name-suffix: ${{ steps.java.outputs.cache-name-suffix }}
-      gradle-cache-name-suffix: ${{ steps.gradle.outputs.cache-name-suffix }}
+      java-cache-name: ${{ steps.java.outputs.cache-name }}
+      gradle-cache-name: ${{ steps.gradle.outputs.cache-name }}
 
   test-functional:
     name: Functional Test
@@ -387,14 +383,14 @@ jobs:
         enable-action: false
         verbosity: ${{ inputs.verbosity }}
         cache-mode: ${{ inputs.cache-mode }}
-        cache-name-restore-suffix: ${{ inputs.nyx-cache-name-restore-suffix }}
+        cache-from: ${{ inputs.nyx-cache-from }}
     - id: java
       uses: mooltiverse/nyx/.github/actions/setup-java@ghwfcache
       with:
         verbosity: ${{ inputs.verbosity }}
         cache-mode: ${{ inputs.cache-mode }}
         # Restore the cache from the previous job to 'chain' the two caches
-        cache-name-restore-suffix: ${{ needs.test-integration.outputs.java-cache-name-suffix }}
+        cache-from: ${{ needs.test-integration.outputs.java-cache-name }}
     - id: gradle
       uses: mooltiverse/nyx/.github/actions/setup-gradle@ghwfcache
       with:
@@ -405,9 +401,9 @@ jobs:
         install-gradle: ${{ inputs.install-gradle }}
         install-gradle-version: ${{ inputs.install-gradle-version }}
         cache-mode: ${{ inputs.cache-mode }}
-        cache-name-prefix: ${{ inputs.gradle-cache-name-prefix }}
+        cache-name: ${{ inputs.gradle-cache-name }}
         # Restore the cache from the previous job to 'chain' the two caches
-        cache-name-restore-suffix: ${{ needs.test-integration.outputs.gradle-cache-name-suffix }}
+        cache-from: ${{ needs.test-integration.outputs.gradle-cache-name }}
     - name: Run Functional Tests on Java code
       shell: bash
       run: ./gradlew ${{ inputs.gradle-arguments }} ${{ secrets.gradle-secret-arguments }} ${{ env.GRADLE_EXTRA_OPTS }} ${{ inputs.gradle-functional-test-tasks }}
@@ -418,5 +414,5 @@ jobs:
         name: ${{ inputs.artifacts-name-prefix }}-${{ github.job }}-reports
         path: src/java/**/build/test/functional/
     outputs:
-      java-cache-name-suffix: ${{ steps.java.outputs.cache-name-suffix }}
-      gradle-cache-name-suffix: ${{ steps.gradle.outputs.cache-name-suffix }}
+      java-cache-name: ${{ steps.java.outputs.cache-name }}
+      gradle-cache-name: ${{ steps.gradle.outputs.cache-name }}

@@ -62,7 +62,7 @@ jobs:
       install-jdk: true
       install-jdk-version: 20
       # Restore the cache from the previous job to 'chain' caches
-      nyx-cache-name-restore-suffix: ${{ needs.initialize.outputs.nyx-cache-name-suffix }}
+      nyx-cache-from: ${{ needs.initialize.outputs.nyx-cache-name }}
   
   docusaurus-publish:
     name: Docusaurus Publish
@@ -75,8 +75,8 @@ jobs:
       install-jdk: true
       install-jdk-version: 20
       # Restore the cache from the previous job to 'chain' caches
-      nyx-cache-name-restore-suffix: ${{ needs.initialize.outputs.nyx-cache-name-suffix }}
-      gradle-cache-name-restore-suffix: ${{ needs.docusaurus-build.outputs.gradle-cache-name-suffix }}
-      docusaurus-cache-name-restore-suffix: ${{ needs.docusaurus-build.outputs.docusaurus-cache-name-suffix }}
+      nyx-cache-from: ${{ needs.initialize.outputs.nyx-cache-name }}
+      gradle-cache-from: ${{ needs.docusaurus-build.outputs.gradle-cache-name }}
+      docusaurus-cache-from: ${{ needs.docusaurus-build.outputs.docusaurus-cache-name }}
       path: 'docs/main/build'
       enable-github-pages: true
