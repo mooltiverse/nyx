@@ -128,68 +128,120 @@ on:
         type: string
         required: false
         default: 'stable'
-      cache-mode:
+      nyx-cache-mode:
         description: |-
           Whether to enable the cache and, if enabled, how to use it.
+          Consider that disabling the cache or making it read only may help speeding
+          up the workflow and not incurring in cache size limits.
           Allowed values are: 'read-write', 'read-only', 'write-only', 'disabled'.
-          Default: read-write
         type: string
         required: false
-        default: 'read-write'
-      nyx-cache-name-restore-suffix:
+        default: 'read-only'
+      nyx-cache-name:
         description: |-
-          The suffix of the name to use for the cache that will be read by this
-          workflow. This is useful to 'chain' caches, so here you can pass the
-          suffix from a previous cache to make this workflow start from that
-          one cache.
+          The prefix to use for the cache that will be used by this workflow.
+          This is useful to 'chain' caches, so here you can pass a previous cache
+          to make this workflow start from that one cache.
+          This is useful to 'chain' caches, so here you can pass a previous cache
+          to make this workflow start from that one cache.
+          When setting this prefix to some specific feature you won't be able to
+          merge the caches and in case you 'chain' them you can only use one
+          upstream cache for each downstream job.
+          If the cache to read does not exists a new one will be created from
+          scratch without errors.
+          Default: nyx-\$\{\{ github.job \}\} (reuse the same cache for the entire
+          workflow so Nyx is initialized once and its outputs are reused).
+        type: string
+        required: false
+        default: "nyx-${{ github.run_id }}"
+      nyx-cache-from:
+        description: |-
+          The name of cache this Action will read from to initialize Action cache.
+          The contents of this cache, when it exists, will be imported into the
+          Action cache.
+          This is useful to 'chain' caches, so here you can pass a previous cache
+          to make this workflow start from that.
           If the cache to read does not exists a new one will be created from
           scratch without errors.
           Default: none
         type: string
         required: false
         default: ""
-      gradle-cache-name-prefix:
+      gradle-cache-mode:
         description: |-
-          The prefix to use for the cache that will be read by this workflow.
-          This is useful to 'chain' caches, so here you can pass the suffix
-          from a previous cache to make this workflow start from that one cache.
-          Moreover, this can be used to override the default Gradle action's
-          cache prefix to make all jobs within the same stream (i.e. a feature)
-          share the same prefix and not overlap with other streams. However,
-          when setting this prefix to some specific feature you won't be
-          able to merge the caches and in case you 'chain' them you can only
-          use one upstream cache for each downstream job.
-          If the cache to read does not exists a new one will be created from
-          scratch without errors.
-          Default: gradle-\$\{\{ github.job \}\}-go (isolate the cache for
-          the 'go' feature).
+          Whether to enable the cache and, if enabled, how to use it.
+          Consider that disabling the cache or making it read only may help speeding
+          up the workflow and not incurring in cache size limits.
+          Allowed values are: 'read-write', 'read-only', 'write-only', 'disabled'.
         type: string
         required: false
-        default: "gradle-${{ github.run_id }}-go"
-      gradle-cache-name-restore-suffix:
+        default: 'read-write'
+      gradle-cache-name:
         description: |-
-          The suffix of the name to use for the cache that will be read by this
-          workflow. This is useful to 'chain' caches, so here you can pass the
-          suffix from a previous cache to make this workflow start from that
-          one cache.
+          The prefix to use for the cache that will be used by this workflow.
+          This is useful to 'chain' caches, so here you can pass a previous cache
+          to make this workflow start from that one cache.
+          This is useful to 'chain' caches, so here you can pass a previous cache
+          to make this workflow start from that one cache.
+          When setting this prefix to some specific feature you won't be able to
+          merge the caches and in case you 'chain' them you can only use one
+          upstream cache for each downstream job.
           If the cache to read does not exists a new one will be created from
           scratch without errors.
-          Default: \$\{\{ github.job \}\}
         type: string
         required: false
-        default: "${{ github.job }}"
-      go-cache-name-restore-suffix:
+        default: "gradle-${{ github.run_id }}-go-build"
+      gradle-cache-from:
         description: |-
-          The suffix of the name to use for the cache that will be read by this
-          workflow. This is useful to 'chain' caches, so here you can pass the
-          suffix from a previous cache to make this workflow start from that
-          one cache.
+          The name of cache this Action will read from to initialize Action cache.
+          The contents of this cache, when it exists, will be imported into the
+          Action cache.
+          This is useful to 'chain' caches, so here you can pass a previous cache
+          to make this workflow start from that.
           If the cache to read does not exists a new one will be created from
           scratch without errors.
-          Default: \$\{\{ github.job \}\}
+          Default: none
         type: string
         required: false
-        default: "${{ github.job }}"
+        default: ""
+      go-cache-mode:
+        description: |-
+          Whether to enable the cache and, if enabled, how to use it.
+          Consider that disabling the cache or making it read only may help speeding
+          up the workflow and not incurring in cache size limits.
+          Allowed values are: 'read-write', 'read-only', 'write-only', 'disabled'.
+        type: string
+        required: false
+        default: 'read-write'
+      go-cache-name:
+        description: |-
+          The prefix to use for the cache that will be used by this workflow.
+          This is useful to 'chain' caches, so here you can pass a previous cache
+          to make this workflow start from that one cache.
+          This is useful to 'chain' caches, so here you can pass a previous cache
+          to make this workflow start from that one cache.
+          When setting this prefix to some specific feature you won't be able to
+          merge the caches and in case you 'chain' them you can only use one
+          upstream cache for each downstream job.
+          If the cache to read does not exists a new one will be created from
+          scratch without errors.
+        type: string
+        required: false
+        default: "go-${{ github.run_id }}-build"
+      go-cache-from:
+        description: |-
+          The name of cache this Action will read from to initialize Action cache.
+          The contents of this cache, when it exists, will be imported into the
+          Action cache.
+          This is useful to 'chain' caches, so here you can pass a previous cache
+          to make this workflow start from that.
+          If the cache to read does not exists a new one will be created from
+          scratch without errors.
+          If this value is empty (by default) this workflow assumes this
+          feature is not used therefore no cache will be restored.
+        type: string
+        required: false
+        default: ""
     secrets:
       gradle-secret-arguments:
         description: |-
@@ -201,12 +253,12 @@ on:
           For more see: https://docs.gradle.org/current/userguide/command_line_interface.html.
         required: false
     outputs:
-      gradle-cache-name-suffix:
+      gradle-cache-name:
         description: "The suffix of the name used by the last cache in this workflow. This is useful to 'chain' caches, so you can pass this value as input for other actions or workflows."
-        value: ${{ jobs.build.outputs.gradle-cache-name-suffix }}
-      go-cache-name-suffix:
+        value: ${{ jobs.build.outputs.gradle-cache-name }}
+      go-cache-name:
         description: "The suffix of the name used by the last cache in this workflow. This is useful to 'chain' caches, so you can pass this value as input for other actions or workflows."
-        value: ${{ jobs.build.outputs.go-cache-name-suffix }}
+        value: ${{ jobs.build.outputs.go-cache-name }}
 
 env:
   # Compute the extra Gradle properties to use for Gradle commands.
@@ -232,17 +284,18 @@ jobs:
         # Just restore the cache
         enable-action: false
         verbosity: ${{ inputs.verbosity }}
-        cache-mode: ${{ inputs.cache-mode }}
-        cache-name-restore-suffix: ${{ inputs.nyx-cache-name-restore-suffix }}
+        cache-mode: ${{ inputs.nyx-cache-mode }}
+        cache-name: ${{ inputs.nyx-cache-name }}
+        cache-from: ${{ inputs.nyx-cache-from }}
     - id: go
       uses: mooltiverse/nyx/.github/actions/setup-go@main
       with:
         verbosity: ${{ inputs.verbosity }}
         install-go: ${{ inputs.install-go }}
         install-go-version: ${{ inputs.install-go-version }}
-        cache-mode: ${{ inputs.cache-mode }}
-        # Restore the cache from the previous job to 'chain' the two caches
-        cache-name-restore-suffix: ${{ inputs.go-cache-name-restore-suffix }}
+        cache-mode: ${{ inputs.go-cache-mode }}
+        cache-name: ${{ inputs.go-cache-name }}
+        cache-from: ${{ inputs.go-cache-from }}
     - id: gradle
       uses: mooltiverse/nyx/.github/actions/setup-gradle@main
       with:
@@ -252,10 +305,9 @@ jobs:
         install-jdk-distribution: ${{ inputs.install-jdk-distribution }}
         install-gradle: ${{ inputs.install-gradle }}
         install-gradle-version: ${{ inputs.install-gradle-version }}
-        cache-mode: ${{ inputs.cache-mode }}
-        cache-name-prefix: ${{ inputs.gradle-cache-name-prefix }}
-        # Restore the cache from the previous job to 'chain' the two caches
-        cache-name-restore-suffix: ${{ inputs.gradle-cache-name-restore-suffix }}
+        cache-mode: ${{ inputs.gradle-cache-mode }}
+        cache-name: ${{ inputs.gradle-cache-name }}
+        cache-from: ${{ inputs.gradle-cache-from }}
     - name: Build the Go code
       shell: bash
       run: ./gradlew ${{ inputs.gradle-arguments }} ${{ secrets.gradle-secret-arguments }} ${{ env.GRADLE_EXTRA_OPTS }} ${{ inputs.gradle-tasks }}
@@ -272,5 +324,5 @@ jobs:
         name: ${{ inputs.artifacts-name-prefix }}-${{ github.job }}-documentation
         path: src/go/**/build/api/docs/
     outputs:
-      go-cache-name-suffix: ${{ steps.go.outputs.cache-name-suffix }}
-      gradle-cache-name-suffix: ${{ steps.gradle.outputs.cache-name-suffix }}
+      go-cache-name: ${{ steps.go.outputs.cache-name }}
+      gradle-cache-name: ${{ steps.gradle.outputs.cache-name }}

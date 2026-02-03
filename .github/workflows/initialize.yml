@@ -21,14 +21,6 @@ on:
         type: string
         required: false
         default: 'quiet'
-      cache-mode:
-        description: |-
-          Whether to enable the cache and, if enabled, how to use it.
-          Allowed values are: 'read-write', 'read-only', 'write-only', 'disabled'.
-          Default: read-write
-        type: string
-        required: false
-        default: 'read-write'
     outputs:
       # Version attributes
       isCoreVersion:
@@ -84,9 +76,9 @@ on:
         description: "This flag is true when Docusaurus contents have been detected within the project and they have changed"
         value: ${{ jobs.infer.outputs.docusaurusChanged }}
       # Cache attributes
-      nyx-cache-name-suffix:
+      nyx-cache-name:
         description: "The suffix of the name used by the last cache in this workflow. This is useful to 'chain' caches, so you can pass this value as input for other actions or workflows."
-        value: ${{ jobs.infer.outputs.nyx-cache-name-suffix }}
+        value: ${{ jobs.infer.outputs.nyx-cache-name }}
 
 jobs:
   infer:
@@ -105,7 +97,7 @@ jobs:
       uses: mooltiverse/nyx/.github/actions/setup-nyx@main
       with:
         verbosity: ${{ inputs.verbosity }}
-        cache-mode: ${{ inputs.cache-mode }}
+        cache-mode: read-write
         enable-artifacts: true
     - id: go
       uses: mooltiverse/nyx/.github/actions/setup-go@main
@@ -197,4 +189,4 @@ jobs:
       docusaurusProbed: ${{ steps.docusaurus.outputs.probed }}
       docusaurusChanged: ${{ steps.docusaurus.outputs.changed }}
       # Expose the cache attributes
-      nyx-cache-name-suffix: ${{ steps.nyx.outputs.cache-name-suffix }}
+      nyx-cache-name: ${{ steps.nyx.outputs.cache-name }}

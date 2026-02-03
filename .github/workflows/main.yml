@@ -100,17 +100,17 @@ jobs:
       install-jdk: true
       install-jdk-version: 20
       # Restore the cache from the previous job to 'chain' caches
-      nyx-cache-name-restore-suffix: ${{ needs.initialize.outputs.nyx-cache-name-suffix }}
+      nyx-cache-from: ${{ needs.initialize.outputs.nyx-cache-name }}
       # The cache from 'java-publish' and 'go-publish' may be evicted because it's too large and
       # what we actually need here is the cache from the build jobs in order to retrieve the artifacts
       # to be published.
-      #java-cache-name-restore-suffix: ${{ needs.java-publish.outputs.java-cache-name-suffix }}
-      #go-cache-name-restore-suffix: ${{ needs.go-publish.outputs.go-cache-name-suffix }}
-      #docker-cache-name-restore-suffix: ${{ needs.docker-publish.outputs.docker-cache-name-suffix }}
-      java-cache-name-restore-suffix: ${{ needs.java-build.outputs.java-cache-name-suffix }}
-      go-cache-name-restore-suffix: ${{ needs.go-build.outputs.go-cache-name-suffix }}
-      docker-cache-name-restore-suffix: ${{ needs.docker-build.outputs.docker-cache-name-suffix }}
-      docusaurus-cache-name-restore-suffix: ${{ needs.docusaurus-publish.outputs.docusaurus-cache-name-suffix }}
+      #java-cache-from: ${{ needs.java-publish.outputs.java-cache-name }}
+      #go-cache-from: ${{ needs.go-publish.outputs.go-cache-name }}
+      #docker-cache-from: ${{ needs.docker-publish.outputs.docker-cache-name }}
+      java-cache-from: ${{ needs.java-build.outputs.java-cache-name }}
+      go-cache-from: ${{ needs.go-build.outputs.go-cache-name }}
+      docker-cache-from: ${{ needs.docker-build.outputs.docker-cache-name }}
+      docusaurus-cache-from: ${{ needs.docusaurus-publish.outputs.docusaurus-cache-name }}
 
   #############################################################################
   # Java Jobs
@@ -127,7 +127,7 @@ jobs:
       install-jdk: true
       install-jdk-version: 20
       # Restore the cache from the previous job to 'chain' caches
-      nyx-cache-name-restore-suffix: ${{ needs.initialize.outputs.nyx-cache-name-suffix }}
+      nyx-cache-from: ${{ needs.initialize.outputs.nyx-cache-name }}
 
   java-test:
     name: Java ${{ matrix.java }} Test
@@ -158,14 +158,15 @@ jobs:
     with:
       verbosity: info
       # Avoid hitting the 10GB limit for GitHub Actions cache by using read-only mode on this job
-      cache-mode: read-only
+      gradle-cache-mode: read-only
+      java-cache-mode: read-only
       artifacts-name-prefix: java-${{ matrix.java }}
       install-jdk: true
       install-jdk-version: ${{ matrix.java }}
       # Restore the cache from the previous job to 'chain' caches
-      nyx-cache-name-restore-suffix: ${{ needs.initialize.outputs.nyx-cache-name-suffix }}
-      gradle-cache-name-restore-suffix: ${{ needs.java-build.outputs.gradle-cache-name-suffix }}
-      java-cache-name-restore-suffix: ${{ needs.java-build.outputs.java-cache-name-suffix }}
+      nyx-cache-from: ${{ needs.initialize.outputs.nyx-cache-name }}
+      gradle-cache-from: ${{ needs.java-build.outputs.gradle-cache-name }}
+      java-cache-from: ${{ needs.java-build.outputs.java-cache-name }}
       install-node: false
       install-newman: false
       # Reduce the number of test cases to speed up the build.
@@ -202,13 +203,14 @@ jobs:
     with:
       verbosity: info
       # Avoid hitting the 10GB limit for GitHub Actions cache by using read-only mode on this job
-      cache-mode: read-only
+      gradle-cache-mode: read-only
+      java-cache-mode: read-only
       install-jdk: true
       install-jdk-version: 20
       # Restore the cache from the previous job to 'chain' caches
-      nyx-cache-name-restore-suffix: ${{ needs.initialize.outputs.nyx-cache-name-suffix }}
-      gradle-cache-name-restore-suffix: ${{ needs.java-build.outputs.gradle-cache-name-suffix }}
-      java-cache-name-restore-suffix: ${{ needs.java-build.outputs.java-cache-name-suffix }}
+      nyx-cache-from: ${{ needs.initialize.outputs.nyx-cache-name }}
+      gradle-cache-from: ${{ needs.java-build.outputs.gradle-cache-name }}
+      java-cache-from: ${{ needs.java-build.outputs.java-cache-name }}
       gradle-tasks: src:java:publish src:java:gradle:publish
     secrets:
       # Pass extra properties used by the Gradle scripts to run tests.
@@ -240,7 +242,7 @@ jobs:
       install-jdk: true
       install-jdk-version: 20
       # Restore the cache from the previous job to 'chain' caches
-      nyx-cache-name-restore-suffix: ${{ needs.initialize.outputs.nyx-cache-name-suffix }}
+      nyx-cache-from: ${{ needs.initialize.outputs.nyx-cache-name }}
 
   go-test:
     name: Go Test ${{ matrix.os }}
@@ -268,7 +270,8 @@ jobs:
     with:
       verbosity: info
       # Avoid hitting the 10GB limit for GitHub Actions cache by using read-only mode on this job
-      cache-mode: read-only
+      gradle-cache-mode: read-only
+      go-cache-mode: read-only
       runs-on: ${{ matrix.os }}
       artifacts-name-prefix: go-${{ matrix.os }}
       install-go: true
@@ -276,9 +279,9 @@ jobs:
       install-jdk: true
       install-jdk-version: 20
       # Restore the cache from the previous job to 'chain' caches
-      nyx-cache-name-restore-suffix: ${{ needs.initialize.outputs.nyx-cache-name-suffix }}
-      gradle-cache-name-restore-suffix: ${{ needs.go-build.outputs.gradle-cache-name-suffix }}
-      go-cache-name-restore-suffix: ${{ needs.go-build.outputs.go-cache-name-suffix }}
+      nyx-cache-from: ${{ needs.initialize.outputs.nyx-cache-name }}
+      gradle-cache-from: ${{ needs.go-build.outputs.gradle-cache-name }}
+      go-cache-from: ${{ needs.go-build.outputs.go-cache-name }}
       install-node: false
       install-newman: false
       # Reduce the number of test cases to speed up the build.
@@ -315,15 +318,16 @@ jobs:
     with:
       verbosity: info
       # Avoid hitting the 10GB limit for GitHub Actions cache by using read-only mode on this job
-      cache-mode: read-only
+      gradle-cache-mode: read-only
+      go-cache-mode: read-only
       install-go: true
       install-go-version: 1.22.4
       install-jdk: true
       install-jdk-version: 20
       # Restore the cache from the previous job to 'chain' caches
-      nyx-cache-name-restore-suffix: ${{ needs.initialize.outputs.nyx-cache-name-suffix }}
-      gradle-cache-name-restore-suffix: ${{ needs.go-build.outputs.gradle-cache-name-suffix }}
-      go-cache-name-restore-suffix: ${{ needs.go-build.outputs.go-cache-name-suffix }}
+      nyx-cache-from: ${{ needs.initialize.outputs.nyx-cache-name }}
+      gradle-cache-from: ${{ needs.go-build.outputs.gradle-cache-name }}
+      go-cache-from: ${{ needs.go-build.outputs.go-cache-name }}
 
   #############################################################################
   # Docker Jobs
@@ -341,8 +345,8 @@ jobs:
       install-jdk: true
       install-jdk-version: 20
       # Restore the cache from the previous job to 'chain' caches
-      nyx-cache-name-restore-suffix: ${{ needs.initialize.outputs.nyx-cache-name-suffix }}
-      go-cache-name-restore-suffix: ${{ needs.go-build.outputs.go-cache-name-suffix }}
+      nyx-cache-from: ${{ needs.initialize.outputs.nyx-cache-name }}
+      go-cache-from: ${{ needs.go-build.outputs.go-cache-name }}
 
   docker-test:
     name: Docker Test
@@ -355,14 +359,15 @@ jobs:
     with:
       verbosity: info
       # Avoid hitting the 10GB limit for GitHub Actions cache by using read-only mode on this job
-      cache-mode: read-only
+      gradle-cache-mode: read-only
+      docker-cache-mode: read-only
       install-jdk: true
       install-jdk-version: 20
       # Restore the cache from the previous job to 'chain' caches
-      nyx-cache-name-restore-suffix: ${{ needs.initialize.outputs.nyx-cache-name-suffix }}
-      go-cache-name-restore-suffix: ${{ needs.go-build.outputs.go-cache-name-suffix }}
-      gradle-cache-name-restore-suffix: ${{ needs.docker-build.outputs.gradle-cache-name-suffix }}
-      docker-cache-name-restore-suffix: ${{ needs.docker-build.outputs.docker-cache-name-suffix }}
+      nyx-cache-from: ${{ needs.initialize.outputs.nyx-cache-name }}
+      go-cache-from: ${{ needs.go-build.outputs.go-cache-name }}
+      gradle-cache-from: ${{ needs.docker-build.outputs.gradle-cache-name }}
+      docker-cache-from: ${{ needs.docker-build.outputs.docker-cache-name }}
       install-node: false
       install-newman: false
     secrets:
@@ -397,14 +402,15 @@ jobs:
     with:
       verbosity: info
       # Avoid hitting the 10GB limit for GitHub Actions cache by using read-only mode on this job
-      cache-mode: read-only
+      gradle-cache-mode: read-only
+      docker-cache-mode: read-only
       install-jdk: true
       install-jdk-version: 20
       # Restore the cache from the previous job to 'chain' caches
-      nyx-cache-name-restore-suffix: ${{ needs.initialize.outputs.nyx-cache-name-suffix }}
-      gradle-cache-name-restore-suffix: ${{ needs.docker-build.outputs.gradle-cache-name-suffix }}
-      go-cache-name-restore-suffix: ${{ needs.go-build.outputs.go-cache-name-suffix }}
-      docker-cache-name-restore-suffix: ${{ needs.docker-build.outputs.docker-cache-name-suffix }}
+      nyx-cache-from: ${{ needs.initialize.outputs.nyx-cache-name }}
+      gradle-cache-from: ${{ needs.docker-build.outputs.gradle-cache-name }}
+      go-cache-from: ${{ needs.go-build.outputs.go-cache-name }}
+      docker-cache-from: ${{ needs.docker-build.outputs.docker-cache-name }}
       enable-dockerhub-container-registry: true
       enable-github-container-registry: true
       dockerhub-user: ${{ vars.DOCKER_HUB_USERNAME }}
@@ -425,7 +431,7 @@ jobs:
       install-jdk: true
       install-jdk-version: 20
       # Restore the cache from the previous job to 'chain' caches
-      nyx-cache-name-restore-suffix: ${{ needs.initialize.outputs.nyx-cache-name-suffix }}
+      nyx-cache-from: ${{ needs.initialize.outputs.nyx-cache-name }}
   
   docusaurus-publish:
     name: Docusaurus Publish
@@ -440,8 +446,8 @@ jobs:
       install-jdk: true
       install-jdk-version: 20
       # Restore the cache from the previous job to 'chain' caches
-      nyx-cache-name-restore-suffix: ${{ needs.initialize.outputs.nyx-cache-name-suffix }}
-      gradle-cache-name-restore-suffix: ${{ needs.docusaurus-build.outputs.gradle-cache-name-suffix }}
-      docusaurus-cache-name-restore-suffix: ${{ needs.docusaurus-build.outputs.docusaurus-cache-name-suffix }}
+      nyx-cache-from: ${{ needs.initialize.outputs.nyx-cache-name }}
+      gradle-cache-from: ${{ needs.docusaurus-build.outputs.gradle-cache-name }}
+      docusaurus-cache-from: ${{ needs.docusaurus-build.outputs.docusaurus-cache-name }}
       path: 'docs/main/build'
       enable-github-pages: ${{ github.ref == 'refs/heads/main' }}

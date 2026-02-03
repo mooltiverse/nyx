@@ -51,7 +51,7 @@ on:
           when you need a specific version.
           To check out if it's already installed see:
           - https://docs.github.com/en/actions/using-github-hosted-runners/using-github-hosted-runners/about-github-hosted-runners#preinstalled-software
-          Default: false
+          Default: true
         type: boolean
         required: false
         default: true
@@ -118,68 +118,118 @@ on:
         type: string
         required: false
         default: 'latest'
-      cache-mode:
+      nyx-cache-mode:
         description: |-
           Whether to enable the cache and, if enabled, how to use it.
+          Consider that disabling the cache or making it read only may help speeding
+          up the workflow and not incurring in cache size limits.
           Allowed values are: 'read-write', 'read-only', 'write-only', 'disabled'.
-          Default: read-write
         type: string
         required: false
-        default: 'read-write'
-      nyx-cache-name-restore-suffix:
+        default: 'read-only'
+      nyx-cache-name:
         description: |-
-          The suffix of the name to use for the cache that will be read by this
-          workflow. This is useful to 'chain' caches, so here you can pass the
-          suffix from a previous cache to make this workflow start from that
-          one cache.
+          The prefix to use for the cache that will be used by this workflow.
+          This is useful to 'chain' caches, so here you can pass a previous cache
+          to make this workflow start from that one cache.
+          This is useful to 'chain' caches, so here you can pass a previous cache
+          to make this workflow start from that one cache.
+          When setting this prefix to some specific feature you won't be able to
+          merge the caches and in case you 'chain' them you can only use one
+          upstream cache for each downstream job.
+          If the cache to read does not exists a new one will be created from
+          scratch without errors.
+          Default: nyx-\$\{\{ github.job \}\} (reuse the same cache for the entire
+          workflow so Nyx is initialized once and its outputs are reused).
+        type: string
+        required: false
+        default: "nyx-${{ github.run_id }}"
+      nyx-cache-from:
+        description: |-
+          The name of cache this Action will read from to initialize Action cache.
+          The contents of this cache, when it exists, will be imported into the
+          Action cache.
+          This is useful to 'chain' caches, so here you can pass a previous cache
+          to make this workflow start from that.
           If the cache to read does not exists a new one will be created from
           scratch without errors.
           Default: none
         type: string
         required: false
         default: ""
-      gradle-cache-name-prefix:
+      gradle-cache-mode:
         description: |-
-          The prefix to use for the cache that will be read by this workflow.
-          This is useful to 'chain' caches, so here you can pass the suffix
-          from a previous cache to make this workflow start from that one cache.
-          Moreover, this can be used to override the default Gradle action's
-          cache prefix to make all jobs within the same stream (i.e. a feature)
-          share the same prefix and not overlap with other streams. However,
-          when setting this prefix to some specific feature you won't be
-          able to merge the caches and in case you 'chain' them you can only
-          use one upstream cache for each downstream job.
-          If the cache to read does not exists a new one will be created from
-          scratch without errors.
-          Default: gradle-\$\{\{ github.job \}\}-docusaurus (isolate the cache for
-          the 'docusaurus' feature).
+          Whether to enable the cache and, if enabled, how to use it.
+          Consider that disabling the cache or making it read only may help speeding
+          up the workflow and not incurring in cache size limits.
+          Allowed values are: 'read-write', 'read-only', 'write-only', 'disabled'.
         type: string
         required: false
-        default: "gradle-${{ github.run_id }}-docusaurus"
-      gradle-cache-name-restore-suffix:
+        default: 'read-write'
+      gradle-cache-name:
         description: |-
-          The suffix of the name to use for the cache that will be read by this
-          workflow. This is useful to 'chain' caches, so here you can pass the
-          suffix from a previous cache to make this workflow start from that
-          one cache.
+          The prefix to use for the cache that will be used by this workflow.
+          This is useful to 'chain' caches, so here you can pass a previous cache
+          to make this workflow start from that one cache.
+          This is useful to 'chain' caches, so here you can pass a previous cache
+          to make this workflow start from that one cache.
+          When setting this prefix to some specific feature you won't be able to
+          merge the caches and in case you 'chain' them you can only use one
+          upstream cache for each downstream job.
           If the cache to read does not exists a new one will be created from
           scratch without errors.
-          Default: \$\{\{ github.job \}\}
         type: string
         required: false
-        default: "${{ github.job }}"
-      docusaurus-cache-name-restore-suffix:
+        default: "gradle-${{ github.run_id }}-docusaurus-build"
+      gradle-cache-from:
         description: |-
-          The suffix of the name to use for the cache that will be read by this
-          workflow. This is useful to 'chain' caches, so here you can pass the
-          suffix from a previous cache to make this workflow start from that
-          one cache.
+          The name of cache this Action will read from to initialize Action cache.
+          The contents of this cache, when it exists, will be imported into the
+          Action cache.
+          This is useful to 'chain' caches, so here you can pass a previous cache
+          to make this workflow start from that.
           If the cache to read does not exists a new one will be created from
           scratch without errors.
-          Default: \$\{\{ github.job \}\}
+          Default: none
         type: string
         required: false
-        default: "${{ github.job }}"
+        default: ""
+      docusaurus-cache-mode:
+        description: |-
+          Whether to enable the cache and, if enabled, how to use it.
+          Consider that disabling the cache or making it read only may help speeding
+          up the workflow and not incurring in cache size limits.
+          Allowed values are: 'read-write', 'read-only', 'write-only', 'disabled'.
+        type: string
+        required: false
+        default: 'read-write'
+      docusaurus-cache-name:
+        description: |-
+          The prefix to use for the cache that will be used by this workflow.
+          This is useful to 'chain' caches, so here you can pass a previous cache
+          to make this workflow start from that one cache.
+          This is useful to 'chain' caches, so here you can pass a previous cache
+          to make this workflow start from that one cache.
+          When setting this prefix to some specific feature you won't be able to
+          merge the caches and in case you 'chain' them you can only use one
+          upstream cache for each downstream job.
+          If the cache to read does not exists a new one will be created from
+          scratch without errors.
+        type: string
+        required: false
+        default: "docusaurus-${{ github.run_id }}-build"
+      docusaurus-cache-from:
+        description: |-
+          The name of cache this Action will read from to initialize Action cache.
+          The contents of this cache, when it exists, will be imported into the
+          Action cache.
+          This is useful to 'chain' caches, so here you can pass a previous cache
+          to make this workflow start from that.
+          If the cache to read does not exists a new one will be created from
+          scratch without errors.
+        type: string
+        required: false
+        default: ""
       google-client-id:
         description: |-
           The client ID issued by Google to protect the site with Single Sign On
@@ -206,12 +256,12 @@ on:
           For more see: https://docs.gradle.org/current/userguide/command_line_interface.html.
         required: false
     outputs:
-      gradle-cache-name-suffix:
+      gradle-cache-name:
         description: "The suffix of the name used by the last cache in this workflow. This is useful to 'chain' caches, so you can pass this value as input for other actions or workflows."
-        value: ${{ jobs.build.outputs.gradle-cache-name-suffix }}
-      docusaurus-cache-name-suffix:
+        value: ${{ jobs.build.outputs.gradle-cache-name }}
+      docusaurus-cache-name:
         description: "The suffix of the name used by the last cache in this workflow. This is useful to 'chain' caches, so you can pass this value as input for other actions or workflows."
-        value: ${{ jobs.build.outputs.docusaurus-cache-name-suffix }}
+        value: ${{ jobs.build.outputs.docusaurus-cache-name }}
 
 env:
   # Compute the extra Gradle properties to use for Gradle commands.
@@ -237,17 +287,18 @@ jobs:
         # Just restore the cache
         enable-action: false
         verbosity: ${{ inputs.verbosity }}
-        cache-mode: ${{ inputs.cache-mode }}
-        cache-name-restore-suffix: ${{ inputs.nyx-cache-name-restore-suffix }}
+        cache-mode: ${{ inputs.nyx-cache-mode }}
+        cache-name: ${{ inputs.nyx-cache-name }}
+        cache-from: ${{ inputs.nyx-cache-from }}
     - id: docusaurus
       uses: mooltiverse/nyx/.github/actions/setup-docusaurus@main
       with:
         verbosity: ${{ inputs.verbosity }}
         install-node: ${{ inputs.install-node }}
         install-node-version: ${{ inputs.install-node-version }}
-        cache-mode: ${{ inputs.cache-mode }}
-        # Restore the cache from the previous job to 'chain' the two caches
-        cache-name-restore-suffix: ${{ inputs.docusaurus-cache-name-restore-suffix }}
+        cache-mode: ${{ inputs.docusaurus-cache-mode }}
+        cache-name: ${{ inputs.docusaurus-cache-name }}
+        cache-from: ${{ inputs.docusaurus-cache-from }}
     - id: gradle
       uses: mooltiverse/nyx/.github/actions/setup-gradle@main
       with:
@@ -257,15 +308,14 @@ jobs:
         install-jdk-distribution: ${{ inputs.install-jdk-distribution }}
         install-gradle: ${{ inputs.install-gradle }}
         install-gradle-version: ${{ inputs.install-gradle-version }}
-        cache-mode: ${{ inputs.cache-mode }}
-        cache-name-prefix: ${{ inputs.gradle-cache-name-prefix }}
-        # Restore the cache from the previous job to 'chain' the two caches
-        cache-name-restore-suffix: ${{ inputs.gradle-cache-name-restore-suffix }}
+        cache-mode: ${{ inputs.gradle-cache-mode }}
+        cache-name: ${{ inputs.gradle-cache-name }}
+        cache-from: ${{ inputs.gradle-cache-from }}
     - name: Build the Docusaurus sites
       env:
         GOOGLE_CLIENT_ID: ${{ inputs.google-client-id }}
       shell: bash
       run: ./gradlew ${{ inputs.gradle-arguments }} ${{ secrets.gradle-secret-arguments }} ${{ env.GRADLE_EXTRA_OPTS }} ${{ inputs.gradle-tasks }}
     outputs:
-      docusaurus-cache-name-suffix: ${{ steps.docusaurus.outputs.cache-name-suffix }}
-      gradle-cache-name-suffix: ${{ steps.gradle.outputs.cache-name-suffix }}
+      docusaurus-cache-name: ${{ steps.docusaurus.outputs.cache-name }}
+      gradle-cache-name: ${{ steps.gradle.outputs.cache-name }}

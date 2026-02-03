@@ -18,6 +18,9 @@ jobs:
       uses: mooltiverse/nyx@main
     - name: Print version # This step uses the version inferred by Nyx
       run: echo the inferred version is ${{ steps.nyx.outputs.version }}
+    outputs:
+      # Expose the version attributes.
+      version: ${{ steps.nyx.outputs.coreVersion }}
 
   use-version:
     name: Print the version
