@@ -71,9 +71,6 @@ jobs:
     needs:
     - initialize
     - build
-    - java-test
-    - go-test
-    - docker-test
     uses: mooltiverse/nyx/.github/workflows/test.yml@ghwfcache
 
   #############################################################################
@@ -92,67 +89,6 @@ jobs:
       install-jdk-version: 20
       # Restore the cache from the previous job to 'chain' caches
       nyx-cache-from: ${{ needs.initialize.outputs.nyx-cache-name }}
-
-  java-test:
-    name: Java ${{ matrix.java }} Test
-    needs:
-    - initialize
-    - java-build
-    # Avoid jobs invoking remote services to run in parallel to avoid throttling
-    # down by those services (with consequent test failures).
-    # See https://github.com/mooltiverse/nyx/issues/206 for more
-    # Enabling this concurrency constraint at this level often causes an error like:
-    #   Canceling since a higher priority waiting request for 'access-to-rate-limited-remote-services' exists
-    # which prevents job to run even when manually restarting them so we need
-    # to keep it disabled, even if this causes us to re-run jobs multiple times
-    # when they fail due to rate limits.
-    # Instead, we have the same constraints applied in integration and functional
-    # tests inside the called reusable workflow.
-    #concurrency:
-    #  group: access-to-rate-limited-remote-services
-    #  cancel-in-progress: false
-    # The recommended JDK version is 17 or above but since we need to test for backward compatibility to JVMs 17 or newer we
-    # need a matrix here. Depending on the JDK version the set of Gradle version that the tests run on will change, according
-    # to the Gradle compatibility matrix. See CONTRIBUTING.md in the root directory or the Gradle functional test suites for more.
-    strategy:
-      matrix:
-        java: [ '17', '20' ]
-    uses: mooltiverse/nyx/.github/workflows/java-test-sequence.yml@ghwfcache
-    with:
-      gradle-tasks: tasks
-      verbosity: info
-      # Avoid hitting the 10GB limit for GitHub Actions cache by using read-only mode on this job
-      java-cache-mode: read-only
-      artifacts-name-prefix: java-${{ matrix.java }}
-      install-jdk: true
-      install-jdk-version: ${{ matrix.java }}
-      # Restore the cache from the previous job to 'chain' caches
-      nyx-cache-from: ${{ needs.initialize.outputs.nyx-cache-name }}
-      gradle-cache-from: ${{ needs.java-build.outputs.gradle-cache-name }}
-      java-cache-from: ${{ needs.java-build.outputs.java-cache-name }}
-      install-node: false
-      install-newman: false
-      # Reduce the number of test cases to speed up the build.
-      # Use the 'quickTests' for this purpose, which is a property parsed by the Gradle scripts
-      gradle-arguments: --build-cache --stacktrace '-PquickTests=true'
-    secrets:
-      # Pass extra properties used by the Gradle scripts to run tests.
-      # See the top level
-      #   https://github.com/mooltiverse/nyx/blob/main/CONTRIBUTING.md#contributing-code
-      # file for details about passing these values when testing locally.
-      # Also see:
-      # - https://docs.gradle.org/current/userguide/build_environment.html#setting_a_project_property
-      gradle-secret-arguments: >-
-        -Dorg.gradle.project.gitHubTestUserToken="${{ secrets.TEST_GITHUB_USER_TOKEN }}"
-        -Dorg.gradle.project.gitHubTestUserPublicKey="${{ secrets.TEST_GITHUB_USER_PUBLIC_KEY }}"
-        -Dorg.gradle.project.gitHubTestUserPrivateKeyPassphrase="${{ secrets.TEST_GITHUB_USER_PASSPHRASE }}"
-        -Dorg.gradle.project.gitHubTestUserPrivateKeyWithPassphrase="${{ secrets.TEST_GITHUB_USER_PRIVATE_KEY_WITH_PASSPHRASE }}"
-        -Dorg.gradle.project.gitHubTestUserPrivateKeyWithoutPassphrase="${{ secrets.TEST_GITHUB_USER_PRIVATE_KEY_WITHOUT_PASSPHRASE }}"
-        -Dorg.gradle.project.gitLabTestUserToken="${{ secrets.TEST_GITLAB_USER_TOKEN }}"
-        -Dorg.gradle.project.gitLabTestUserPublicKey="${{ secrets.TEST_GITLAB_USER_PUBLIC_KEY }}"
-        -Dorg.gradle.project.gitLabTestUserPrivateKeyPassphrase="${{ secrets.TEST_GITLAB_USER_PASSPHRASE }}"
-        -Dorg.gradle.project.gitLabTestUserPrivateKeyWithPassphrase="${{ secrets.TEST_GITLAB_USER_PRIVATE_KEY_WITH_PASSPHRASE }}"
-        -Dorg.gradle.project.gitLabTestUserPrivateKeyWithoutPassphrase="${{ secrets.TEST_GITLAB_USER_PRIVATE_KEY_WITHOUT_PASSPHRASE }}"
   
   java-publish:
     name: Java Publish
@@ -160,7 +96,6 @@ jobs:
     - initialize
     - test
     - java-build
-    - java-test
     uses: mooltiverse/nyx/.github/workflows/java-publish.yml@ghwfcache
     with:
       gradle-tasks: tasks
@@ -205,74 +140,12 @@ jobs:
       # Restore the cache from the previous job to 'chain' caches
       nyx-cache-from: ${{ needs.initialize.outputs.nyx-cache-name }}
 
-  go-test:
-    name: Go Test ${{ matrix.os }}
-    needs:
-    - initialize
-    - go-build
-    # Avoid jobs invoking remote services to run in parallel to avoid throttling
-    # down by those services (with consequent test failures).
-    # See https://github.com/mooltiverse/nyx/issues/206 for more
-    # Enabling this concurrency constraint at this level often causes an error like:
-    #   Canceling since a higher priority waiting request for 'access-to-rate-limited-remote-services' exists
-    # which prevents job to run even when manually restarting them so we need
-    # to keep it disabled, even if this causes us to re-run jobs multiple times
-    # when they fail due to rate limits.
-    # Instead, we have the same constraints applied in integration and functional
-    # tests inside the called reusable workflow.
-    #concurrency:
-    #  group: access-to-rate-limited-remote-services
-    #  cancel-in-progress: false
-    strategy:
-      matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
-    uses: mooltiverse/nyx/.github/workflows/go-test-sequence.yml@ghwfcache
-    with:
-      gradle-tasks: tasks
-      verbosity: info
-      # Avoid hitting the 10GB limit for GitHub Actions cache by using read-only mode on this job
-      go-cache-mode: read-only
-      runs-on: ${{ matrix.os }}
-      artifacts-name-prefix: go-${{ matrix.os }}
-      install-go: true
-      install-go-version: 1.22.4
-      install-jdk: true
-      install-jdk-version: 20
-      # Restore the cache from the previous job to 'chain' caches
-      nyx-cache-from: ${{ needs.initialize.outputs.nyx-cache-name }}
-      gradle-cache-from: ${{ needs.go-build.outputs.gradle-cache-name }}
-      go-cache-from: ${{ needs.go-build.outputs.go-cache-name }}
-      install-node: false
-      install-newman: false
-      # Reduce the number of test cases to speed up the build.
-      # Use the 'quickTests' for this purpose, which is a property parsed by the Gradle scripts
-      gradle-arguments: --build-cache --stacktrace '-PquickTests=true'
-    secrets:
-      # Pass extra properties used by the Gradle scripts to run tests.
-      # See the top level
-      #   https://github.com/mooltiverse/nyx/blob/main/CONTRIBUTING.md#contributing-code
-      # file for details about passing these values when testing locally.
-      # Also see:
-      # - https://docs.gradle.org/current/userguide/build_environment.html#setting_a_project_property
-      gradle-secret-arguments: >-
-        -Dorg.gradle.project.gitHubTestUserToken="${{ secrets.TEST_GITHUB_USER_TOKEN }}"
-        -Dorg.gradle.project.gitHubTestUserPublicKey="${{ secrets.TEST_GITHUB_USER_PUBLIC_KEY }}"
-        -Dorg.gradle.project.gitHubTestUserPrivateKeyPassphrase="${{ secrets.TEST_GITHUB_USER_PASSPHRASE }}"
-        -Dorg.gradle.project.gitHubTestUserPrivateKeyWithPassphrase="${{ secrets.TEST_GITHUB_USER_PRIVATE_KEY_WITH_PASSPHRASE }}"
-        -Dorg.gradle.project.gitHubTestUserPrivateKeyWithoutPassphrase="${{ secrets.TEST_GITHUB_USER_PRIVATE_KEY_WITHOUT_PASSPHRASE }}"
-        -Dorg.gradle.project.gitLabTestUserToken="${{ secrets.TEST_GITLAB_USER_TOKEN }}"
-        -Dorg.gradle.project.gitLabTestUserPublicKey="${{ secrets.TEST_GITLAB_USER_PUBLIC_KEY }}"
-        -Dorg.gradle.project.gitLabTestUserPrivateKeyPassphrase="${{ secrets.TEST_GITLAB_USER_PASSPHRASE }}"
-        -Dorg.gradle.project.gitLabTestUserPrivateKeyWithPassphrase="${{ secrets.TEST_GITLAB_USER_PRIVATE_KEY_WITH_PASSPHRASE }}"
-        -Dorg.gradle.project.gitLabTestUserPrivateKeyWithoutPassphrase="${{ secrets.TEST_GITLAB_USER_PRIVATE_KEY_WITHOUT_PASSPHRASE }}"
-  
   go-publish:
     name: Go Publish
     needs:
     - initialize
     - test
     - go-build
-    - go-test
     uses: mooltiverse/nyx/.github/workflows/go-publish.yml@ghwfcache
     with:
       gradle-tasks: tasks
@@ -307,46 +180,6 @@ jobs:
       nyx-cache-from: ${{ needs.initialize.outputs.nyx-cache-name }}
       go-cache-from: ${{ needs.go-build.outputs.go-cache-name }}
 
-  docker-test:
-    name: Docker Test
-    needs:
-    - initialize
-    - go-build
-    - docker-build
-    uses: mooltiverse/nyx/.github/workflows/docker-test-compact.yml@ghwfcache
-    with:
-      gradle-tasks: tasks
-      verbosity: info
-      # Avoid hitting the 10GB limit for GitHub Actions cache by using read-only mode on this job
-      docker-cache-mode: read-only
-      install-jdk: true
-      install-jdk-version: 20
-      # Restore the cache from the previous job to 'chain' caches
-      nyx-cache-from: ${{ needs.initialize.outputs.nyx-cache-name }}
-      go-cache-from: ${{ needs.go-build.outputs.go-cache-name }}
-      gradle-cache-from: ${{ needs.docker-build.outputs.gradle-cache-name }}
-      docker-cache-from: ${{ needs.docker-build.outputs.docker-cache-name }}
-      install-node: false
-      install-newman: false
-    secrets:
-      # Pass extra properties used by the Gradle scripts to run tests.
-      # See the top level
-      #   https://github.com/mooltiverse/nyx/blob/main/CONTRIBUTING.md#contributing-code
-      # file for details about passing these values when testing locally.
-      # Also see:
-      # - https://docs.gradle.org/current/userguide/build_environment.html#setting_a_project_property
-      gradle-secret-arguments: >-
-        -Dorg.gradle.project.gitHubTestUserToken="${{ secrets.TEST_GITHUB_USER_TOKEN }}"
-        -Dorg.gradle.project.gitHubTestUserPublicKey="${{ secrets.TEST_GITHUB_USER_PUBLIC_KEY }}"
-        -Dorg.gradle.project.gitHubTestUserPrivateKeyPassphrase="${{ secrets.TEST_GITHUB_USER_PASSPHRASE }}"
-        -Dorg.gradle.project.gitHubTestUserPrivateKeyWithPassphrase="${{ secrets.TEST_GITHUB_USER_PRIVATE_KEY_WITH_PASSPHRASE }}"
-        -Dorg.gradle.project.gitHubTestUserPrivateKeyWithoutPassphrase="${{ secrets.TEST_GITHUB_USER_PRIVATE_KEY_WITHOUT_PASSPHRASE }}"
-        -Dorg.gradle.project.gitLabTestUserToken="${{ secrets.TEST_GITLAB_USER_TOKEN }}"
-        -Dorg.gradle.project.gitLabTestUserPublicKey="${{ secrets.TEST_GITLAB_USER_PUBLIC_KEY }}"
-        -Dorg.gradle.project.gitLabTestUserPrivateKeyPassphrase="${{ secrets.TEST_GITLAB_USER_PASSPHRASE }}"
-        -Dorg.gradle.project.gitLabTestUserPrivateKeyWithPassphrase="${{ secrets.TEST_GITLAB_USER_PRIVATE_KEY_WITH_PASSPHRASE }}"
-        -Dorg.gradle.project.gitLabTestUserPrivateKeyWithoutPassphrase="${{ secrets.TEST_GITLAB_USER_PRIVATE_KEY_WITHOUT_PASSPHRASE }}"
-
   docker-publish:
     name: Docker Publish
     needs:
@@ -354,7 +187,6 @@ jobs:
     - test
     - go-build
     - docker-build
-    - docker-test
     uses: mooltiverse/nyx/.github/workflows/docker-publish.yml@ghwfcache
     with:
       gradle-tasks: tasks
