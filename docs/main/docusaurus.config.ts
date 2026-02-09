@@ -84,13 +84,6 @@ export default {
     },
   },
 
-  // Non Docusaurus fields
-  customFields: {
-    // When the GOOGLE_CLIENT_ID environment variable is set authentication
-    // will be enabled using Google SSO.
-    googleClientId: process.env.GOOGLE_CLIENT_ID,
-  },
-
   // This is the configuration for themes.
   themes: [
     [
