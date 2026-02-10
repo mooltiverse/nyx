@@ -12,7 +12,7 @@ require (
 	github.com/aymerick/raymond v2.0.2+incompatible
 	github.com/bmatcuk/doublestar/v4 v4.9.1
 	github.com/dlclark/regexp2 v1.11.5
-	github.com/go-git/go-git/v5 v5.16.4
+	github.com/go-git/go-git/v5 v5.16.5
 	github.com/google/go-github v17.0.0+incompatible
 	github.com/mooltiverse/nyx/src/go/errors v0.0.0-20250610122554-971889b3ff00
 	github.com/mooltiverse/nyx/src/go/utils v0.0.0-20250610122554-971889b3ff00
