@@ -23,6 +23,9 @@ import (
 	"path/filepath" // https://pkg.go.dev/path/filepath
 	"strings"       // https://pkg.go.dev/strings
 
+	// TODO: remove the import once it's been debugged
+	log "github.com/sirupsen/logrus" // https://pkg.go.dev/github.com/sirupsen/logrus
+
 	ggit "github.com/go-git/go-git/v5"                             // https://pkg.go.dev/github.com/go-git/go-git/v5
 	ggitconfig "github.com/go-git/go-git/v5/config"                // https://pkg.go.dev/github.com/go-git/go-git/v5
 	ggitplumbing "github.com/go-git/go-git/v5/plumbing"            // https://pkg.go.dev/github.com/go-git/go-git/v5
@@ -360,6 +363,9 @@ func (w Workbench) Checkout(name string) {
 	// try to check it out if it already exists
 	err = worktree.Checkout(&ggit.CheckoutOptions{Branch: ggitplumbing.NewBranchReferenceName(name), Create: false})
 	if err != nil {
+		// TODO: remove this statement when done with the debugging
+		log.Errorf("**** %s ****", err)
+
 		// the branch does not exist yet, create it
 		err = worktree.Checkout(&ggit.CheckoutOptions{Branch: ggitplumbing.NewBranchReferenceName(name), Create: true})
 		if err != nil {
