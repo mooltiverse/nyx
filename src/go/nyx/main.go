@@ -36,7 +36,7 @@ import (
 )
 
 const (
-	// the default command to run when no command is set on the command line
+	// the  default command to run when no command is set on the command line
 	DEFAULT_COMMAND = cmd.INFER
 )
 
