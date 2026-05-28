@@ -23,9 +23,6 @@ import (
 	"path/filepath" // https://pkg.go.dev/path/filepath
 	"strings"       // https://pkg.go.dev/strings
 
-	// TODO: remove the import once it's been debugged
-	log "github.com/sirupsen/logrus" // https://pkg.go.dev/github.com/sirupsen/logrus
-
 	ggit "github.com/go-git/go-git/v5"                             // https://pkg.go.dev/github.com/go-git/go-git/v5
 	ggitconfig "github.com/go-git/go-git/v5/config"                // https://pkg.go.dev/github.com/go-git/go-git/v5
 	ggitplumbing "github.com/go-git/go-git/v5/plumbing"            // https://pkg.go.dev/github.com/go-git/go-git/v5
@@ -355,21 +352,38 @@ Arguments are as follows:
 
 -name the branch name
 */
-func (w Workbench) Checkout(name string) {
+func (w *Workbench) Checkout(name string) {
 	worktree, err := w.Repository.Worktree()
 	if err != nil {
 		panic(err)
 	}
-	// try to check it out if it already exists
-	err = worktree.Checkout(&ggit.CheckoutOptions{Branch: ggitplumbing.NewBranchReferenceName(name), Create: false})
-	if err != nil {
-		// TODO: remove this statement when done with the debugging
-		log.Errorf("**** %s ****", err)
 
-		// the branch does not exist yet, create it
-		err = worktree.Checkout(&ggit.CheckoutOptions{Branch: ggitplumbing.NewBranchReferenceName(name), Create: true})
+	branchRef := ggitplumbing.NewBranchReferenceName(name)
+
+	// try to check it out if it already exists
+	err = worktree.Checkout(&ggit.CheckoutOptions{Branch: branchRef, Create: false})
+	if err != nil {
+		// In go-git v5.19.1+, an "object not found" error means the reference pointer exists
+		// but the object caching layer is stale. We catch that and refresh.
+		if err.Error() == "object not found" {
+			w.RefreshState()
+			worktree, _ = w.Repository.Worktree()
+			err = worktree.Checkout(&ggit.CheckoutOptions{Branch: branchRef, Create: false})
+			if err == nil {
+				return
+			}
+		}
+
+		// The branch truly does not exist yet, create it safely
+		err = worktree.Checkout(&ggit.CheckoutOptions{Branch: branchRef, Create: true})
 		if err != nil {
-			panic(err)
+			// If it still fails because it already exists, force a state sync and try one last time
+			w.RefreshState()
+			worktree, _ = w.Repository.Worktree()
+			err = worktree.Checkout(&ggit.CheckoutOptions{Branch: branchRef, Create: false})
+			if err != nil {
+				panic(err)
+			}
 		}
 	}
 }
@@ -792,4 +806,16 @@ func (w Workbench) UpdateWorkbenchFiles(files []string) {
 			panic(err)
 		}
 	}
+}
+
+/*
+Forces the workbench to drop its internal object and filesystem caches, re-opening
+the repository from disk. Essential for go-git v5.19.1+ compliance during rapid testing mutations.
+*/
+func (w *Workbench) RefreshState() {
+	repo, err := ggit.PlainOpen(w.Directory)
+	if err != nil {
+		panic(err)
+	}
+	w.Repository = *repo
 }
