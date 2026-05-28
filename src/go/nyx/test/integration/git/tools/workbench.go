@@ -352,7 +352,7 @@ Arguments are as follows:
 
 -name the branch name
 */
-func (w *Workbench) Checkout(name string) {
+func (w Workbench) Checkout(name string) {
 	worktree, err := w.Repository.Worktree()
 	if err != nil {
 		panic(err)
@@ -812,10 +812,14 @@ func (w Workbench) UpdateWorkbenchFiles(files []string) {
 Forces the workbench to drop its internal object and filesystem caches, re-opening
 the repository from disk. Essential for go-git v5.19.1+ compliance during rapid testing mutations.
 */
-func (w *Workbench) RefreshState() {
+func (w Workbench) RefreshState() {
+	// ggit.PlainOpen returns (*ggit.Repository, error)
 	repo, err := ggit.PlainOpen(w.Directory)
 	if err != nil {
 		panic(err)
 	}
+
+	// FIX: By assigning the dereferenced value to the existing struct field,
+	// we overwrite the shared instance data instead of replacing a copy of the pointer.
 	w.Repository = *repo
 }
