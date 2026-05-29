@@ -44,7 +44,7 @@ type Workbench struct {
 	Directory string
 
 	// The backing Git repository.
-	Repository ggit.Repository
+	Repository *ggit.Repository
 }
 
 /*
@@ -54,7 +54,7 @@ Arguments are as follows:
 
   - repo the repository to configure
 */
-func configureRepository(repo ggit.Repository) ggit.Repository {
+func configureRepository(repo *ggit.Repository) *ggit.Repository {
 	// set the repository configuration
 	cfg, err := repo.Config()
 	if err != nil {
@@ -82,25 +82,21 @@ Arguments are as follows:
     If initialize is false this parameter is ignored.
   - initialize if true the repository has to be initialized, otherwise false.
 */
-func newRepositoryWithInitializationAndSettings(directory string, bare bool, initialize bool) ggit.Repository {
+func newRepositoryWithInitializationAndSettings(directory string, bare bool, initialize bool) *ggit.Repository {
 	if initialize {
 		repo, err := ggit.PlainInit(directory, bare)
 		if err != nil {
 			panic(err)
 		}
 		// set the repository configuration
-		configureRepository(*repo)
-
-		return *repo
+		return configureRepository(repo)
 	} else {
 		repo, err := ggit.PlainOpen(directory)
 		if err != nil {
 			panic(err)
 		}
 		// set the repository configuration
-		configureRepository(*repo)
-
-		return *repo
+		return configureRepository(repo)
 	}
 }
 
@@ -112,7 +108,7 @@ Arguments are as follows:
 - dir the directory where the repository lives
 - repo the backing git repository instance
 */
-func newWorkbenchUsing(dir string, repo ggit.Repository) Workbench {
+func newWorkbenchUsing(dir string, repo *ggit.Repository) Workbench {
 	return Workbench{Directory: dir, Repository: repo}
 }
 
@@ -247,7 +243,7 @@ func CloneIntoWithUserNameAndPassword(uri string, directory string, user *string
 	if err != nil {
 		panic(err)
 	}
-	return newWorkbenchUsing(directory, *repo)
+	return newWorkbenchUsing(directory, repo)
 }
 
 /*
@@ -275,7 +271,7 @@ func CloneIntoWithPublicKey(uri string, directory string, privateKey *string, pa
 	if err != nil {
 		panic(err)
 	}
-	return newWorkbenchUsing(directory, *repo)
+	return newWorkbenchUsing(directory, repo)
 }
 
 /*
@@ -360,7 +356,7 @@ func (w Workbench) Checkout(name string) {
 
 	branchRef := ggitplumbing.NewBranchReferenceName(name)
 
-	// try to check it out if it already exists
+	// Try to check it out if it already exists
 	err = worktree.Checkout(&ggit.CheckoutOptions{Branch: branchRef, Create: false})
 	if err != nil {
 		// In go-git v5.19.1+, an "object not found" error means the reference pointer exists
@@ -377,7 +373,7 @@ func (w Workbench) Checkout(name string) {
 		// The branch truly does not exist yet, create it safely
 		err = worktree.Checkout(&ggit.CheckoutOptions{Branch: branchRef, Create: true})
 		if err != nil {
-			// If it still fails because it already exists, force a state sync and try one last time
+			// If creation fails because it already exists due to a race, sync state one last time and target it
 			w.RefreshState()
 			worktree, _ = w.Repository.Worktree()
 			err = worktree.Checkout(&ggit.CheckoutOptions{Branch: branchRef, Create: false})
@@ -644,7 +640,7 @@ func (w Workbench) Merge(fromBranch string, message string) ggitobject.Commit {
 	if err != nil {
 		panic(err)
 	}
-	w.Repository = *repo
+	*w.Repository = *repo
 
 	// now return the latest commit, which is the one made by the merge
 	return w.GetLastCommit()
@@ -813,13 +809,10 @@ Forces the workbench to drop its internal object and filesystem caches, re-openi
 the repository from disk. Essential for go-git v5.19.1+ compliance during rapid testing mutations.
 */
 func (w Workbench) RefreshState() {
-	// ggit.PlainOpen returns (*ggit.Repository, error)
 	repo, err := ggit.PlainOpen(w.Directory)
 	if err != nil {
 		panic(err)
 	}
-
-	// FIX: By assigning the dereferenced value to the existing struct field,
-	// we overwrite the shared instance data instead of replacing a copy of the pointer.
-	w.Repository = *repo
+	// This updates the shared pointer reference across all value copies
+	*w.Repository = *repo
 }

@@ -40,7 +40,7 @@ Arguments are as follows:
 - dir the directory where the repository lives
 - repo the backing git repository instance
 */
-func newScriptUsing(dir string, repo ggit.Repository) Script {
+func newScriptUsing(dir string, repo *ggit.Repository) Script {
 	script := Script{}
 
 	script.Workbench.Directory = dir
