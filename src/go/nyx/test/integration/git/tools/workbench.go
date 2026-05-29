@@ -813,6 +813,7 @@ func (w Workbench) RefreshState() {
 	if err != nil {
 		panic(err)
 	}
+
 	// This updates the shared pointer reference across all value copies
 	*w.Repository = *repo
 }
