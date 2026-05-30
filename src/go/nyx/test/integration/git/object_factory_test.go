@@ -111,7 +111,7 @@ func TestObjectFactoryTagFrom(t *testing.T) {
 
 	// test a lightweight tag
 	refTag1 := script.Tag("t1", nil)
-	tag1 := TagFrom(&script.Repository, refTag1)
+	tag1 := TagFrom(script.Repository, refTag1)
 	assert.Equal(t, "t1", tag1.Name)
 	assert.Equal(t, commit.Hash.String(), tag1.Target)
 	assert.Equal(t, false, tag1.Annotated)
@@ -119,7 +119,7 @@ func TestObjectFactoryTagFrom(t *testing.T) {
 	// test an annotated tag
 	msg := "Tag message"
 	refTag2 := script.Tag("t2", &msg)
-	tag2 := TagFrom(&script.Repository, refTag2)
+	tag2 := TagFrom(script.Repository, refTag2)
 	assert.Equal(t, "t2", tag2.Name)
 	assert.Equal(t, commit.Hash.String(), tag2.Target)
 	assert.Equal(t, true, tag2.Annotated)
@@ -131,7 +131,7 @@ func TestObjectFactoryCommitFrom(t *testing.T) {
 
 	revCommit1 := script.AndAddFiles().Commit("Commit 1")
 	refTag1 := script.Tag("t1", nil)
-	tag1 := TagFrom(&script.Repository, refTag1)
+	tag1 := TagFrom(script.Repository, refTag1)
 	commit1 := CommitFrom(revCommit1, []gitent.Tag{tag1})
 
 	assert.Equal(t, revCommit1.Hash.String(), commit1.GetSHA())
@@ -149,7 +149,7 @@ func TestObjectFactoryCommitFrom(t *testing.T) {
 	revCommit2 := script.AndAddFiles().Commit("Commit 2")
 	msg := "Tag message"
 	refTag2 := script.Tag("t2", &msg)
-	tag2 := TagFrom(&script.Repository, refTag2)
+	tag2 := TagFrom(script.Repository, refTag2)
 	commit2 := CommitFrom(revCommit2, []gitent.Tag{tag2})
 
 	assert.Equal(t, revCommit2.Hash.String(), commit2.GetSHA())
