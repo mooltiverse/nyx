@@ -148,7 +148,7 @@ runs:
     with:
       files: "${{ inputs.directory }}/**/*.js ${{ inputs.directory }}/**/package.json"
   - name: Set up the ${{ inputs.cache-name }} read-write cache
-    uses: actions/cache@v4
+    uses: actions/cache@v5
     if: ${{ inputs.cache-mode == 'read-write' }}
     with:
       key: ${{ inputs.cache-name }}
@@ -181,7 +181,7 @@ runs:
       ls -alR ${{ inputs.cache-contents }}
       echo "::endgroup::"
   - name: Detect file changes
-    uses: tj-actions/changed-files@v45
+    uses: tj-actions/changed-files@v47
     if: ${{ inputs.enable-changed-files-detection == 'true' }}
     id: changes
     with:

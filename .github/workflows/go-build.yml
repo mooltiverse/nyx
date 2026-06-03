@@ -312,13 +312,13 @@ jobs:
       shell: bash
       run: ./gradlew ${{ inputs.gradle-arguments }} ${{ secrets.gradle-secret-arguments }} ${{ env.GRADLE_EXTRA_OPTS }} ${{ inputs.gradle-tasks }}
     - name: Publish the Go binary artifacts
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       if: ${{ always() }}
       with:
         name: ${{ inputs.artifacts-name-prefix }}-${{ github.job }}-binaries
         path: src/go/**/build/bin/
     - name: Publish the Go documentation artifacts
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       if: ${{ always() }}
       with:
         name: ${{ inputs.artifacts-name-prefix }}-${{ github.job }}-documentation

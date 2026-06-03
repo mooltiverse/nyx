@@ -73,7 +73,7 @@ jobs:
     steps:
     # Checkout the entire repository and tags to let Nyx inspect the whole repository
     - name: Git checkout
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
       with:
         fetch-depth: 0
     # Java is required for Gradle, don't pay attention to the version
@@ -121,7 +121,7 @@ jobs:
     steps:
     # Checkout the entire repository and tags to let Nyx inspect the whole repository
     - name: Git checkout
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
       with:
         fetch-depth: 0
     # Java is required for Gradle, don't pay attention to the version
@@ -132,7 +132,7 @@ jobs:
         java-version: 20
     # Set up a cache that stores the Nyx state so that other jobs can retrieve it
     - name: Set up the Nyx state cache
-      uses: actions/cache@v4
+      uses: actions/cache@v5
       with:
         path: |
           build/
@@ -161,7 +161,7 @@ jobs:
     steps:
     # Checkout the entire repository and tags to let Nyx inspect the whole repository
     - name: Git checkout
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
       with:
         fetch-depth: 0
     # Java is required for Gradle, don't pay attention to the version
@@ -172,7 +172,7 @@ jobs:
         java-version: 20
     # Set up a cache that stores the Nyx state so that other jobs can retrieve it
     - name: Set up the Nyx state cache
-      uses: actions/cache@v4
+      uses: actions/cache@v5
       with:
         path: |
           build/

@@ -144,7 +144,7 @@ runs:
     with:
       files: "${{ inputs.directory }}/gradlew ${{ inputs.directory }}/*.gradle ${{ inputs.directory }}/gradle.*"
   - name: Set up the ${{ inputs.cache-name }} read-write cache
-    uses: actions/cache@v4
+    uses: actions/cache@v5
     if: ${{ inputs.cache-mode == 'read-write' }}
     with:
       key: ${{ inputs.cache-name }}
