@@ -221,7 +221,7 @@ runs:
       path: ${{ inputs.cache-contents }}
       enableCrossOsArchive: true
   - name: Set up the ${{ inputs.cache-name }} read-only cache
-    uses: actions/cache/restore@v4
+    uses: actions/cache/restore@v5
     if: ${{ inputs.cache-mode == 'read-only' }}
     with:
       key: ${{ inputs.cache-name }}

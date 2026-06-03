@@ -381,7 +381,7 @@ jobs:
     - id: github-pages-deploy
       name: Deploy the Docusaurus site to GitHub Pages
       if: ${{ inputs.enable-github-pages }}
-      uses: actions/deploy-pages@v4
+      uses: actions/deploy-pages@v5
     - name: Authenticating to AWS in region ${{ inputs.aws-region }} with access key ${{ inputs.aws-access-key-id }}
       uses: aws-actions/configure-aws-credentials@v4
       if: ${{ inputs.enable-s3-bucket }}
