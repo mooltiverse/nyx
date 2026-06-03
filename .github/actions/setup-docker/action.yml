@@ -262,7 +262,7 @@ runs:
         echo "$file"
       done
   - name: Enable the containerd image store
-    uses: docker/setup-docker-action@v4
+    uses: docker/setup-docker-action@v5
     if: ${{ inputs.enable-containerd-image-store == 'true' }}
     with:
       daemon-config: |-
@@ -279,27 +279,27 @@ runs:
     continue-on-error: true
     run: docker info -f '{{ .DriverStatus }}'
   - name: Log in to the Docker Hub Container Registry
-    uses: docker/login-action@v3
+    uses: docker/login-action@v4
     if: ${{ inputs.enable-dockerhub-container-registry == 'true' }}
     with:
       username: ${{ inputs.dockerhub-user }}
       password: ${{ inputs.dockerhub-token }}
   - name: Log in to the GitHub Container Registry
-    uses: docker/login-action@v3
+    uses: docker/login-action@v4
     if: ${{ inputs.enable-github-container-registry == 'true' }}
     with:
       registry: ghcr.io
       username: ${{ inputs.github-user }}
       password: ${{ inputs.github-token }}
   - name: Authenticating to AWS in region ${{ inputs.aws-region }} with access key ${{ inputs.aws-access-key-id }}
-    uses: aws-actions/configure-aws-credentials@v4
+    uses: aws-actions/configure-aws-credentials@v6
     if: ${{ inputs.enable-elastic-container-registry == 'true' }}
     with:
       aws-region: ${{ inputs.aws-region }}
       aws-access-key-id: ${{ inputs.aws-access-key-id }}
       aws-secret-access-key: ${{ inputs.aws-secret-access-key }}
   - name: Log in to the AWS Elastic Container Registry
-    uses: docker/login-action@v3
+    uses: docker/login-action@v4
     if: ${{ inputs.enable-elastic-container-registry == 'true' }}
     with:
       registry: ${{ inputs.aws-container-registry }}

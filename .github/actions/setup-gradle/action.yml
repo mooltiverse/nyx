@@ -237,7 +237,7 @@ runs:
     # - https://github.com/gradle/actions/blob/main/docs/setup-gradle.md
     # - https://github.com/gradle/actions/blob/main/docs/setup-gradle.md#cache-keys
     # - https://github.com/gradle/actions/blob/main/docs/setup-gradle.md#finding-a-matching-cache-entry
-    uses: gradle/actions/setup-gradle@v4
+    uses: gradle/actions/setup-gradle@v6
     if: ${{ inputs.install-gradle == 'true' }}
     with:
       gradle-version: ${{ inputs.install-gradle-version }}

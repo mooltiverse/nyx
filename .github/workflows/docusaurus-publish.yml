@@ -383,7 +383,7 @@ jobs:
       if: ${{ inputs.enable-github-pages }}
       uses: actions/deploy-pages@v5
     - name: Authenticating to AWS in region ${{ inputs.aws-region }} with access key ${{ inputs.aws-access-key-id }}
-      uses: aws-actions/configure-aws-credentials@v4
+      uses: aws-actions/configure-aws-credentials@v6
       if: ${{ inputs.enable-s3-bucket }}
       with:
         aws-region: ${{ inputs.aws-region }}
