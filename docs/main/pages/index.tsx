@@ -180,6 +180,7 @@ const FEATURES: FeatureItem[] = [
       width: 100.00,
       height: 50.00,
       color: 'OrangeRed',
+      link: '',
     },
     description: (
       <>
@@ -194,6 +195,7 @@ const FEATURES: FeatureItem[] = [
       width: 100.00,
       height: 50.00,
       color: 'DodgerBlue',
+      link: '',
     },
     description: (
       <>
@@ -208,6 +210,7 @@ const FEATURES: FeatureItem[] = [
       width: 100.00,
       height: 50.00,
       color: 'Green',
+      link: '',
     },
     description: (
       <>
@@ -222,6 +225,7 @@ const FEATURES: FeatureItem[] = [
       width: 100.00,
       height: 50.00,
       color: 'Orange',
+      link: '',
     },
     description: (
       <>
@@ -236,6 +240,7 @@ const FEATURES: FeatureItem[] = [
       width: 100.00,
       height: 50.00,
       color: '',
+      link: '',
     },
     description: (
       <>
@@ -250,6 +255,7 @@ const FEATURES: FeatureItem[] = [
       width: 100.00,
       height: 50.00,
       color: 'Cyan',
+      link: '',
     },
     description: (
       <>
@@ -264,6 +270,7 @@ const FEATURES: FeatureItem[] = [
       width: 100.00,
       height: 50.00,
       color: '',
+      link: '',
     },
     description: (
       <>
@@ -278,6 +285,7 @@ const FEATURES: FeatureItem[] = [
       width: 100.00,
       height: 50.00,
       color: '',
+      link: '',
     },
     description: (
       <>

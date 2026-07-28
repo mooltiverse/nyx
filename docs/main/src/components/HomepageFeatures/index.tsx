@@ -18,14 +18,16 @@ function Feature({title, image, description}: FeatureItem) {
   return (
     <div className={clsx('col')}>
       <div className="text--center">
-        <Icon 
-            icon={image.src}
-            alt={title}
-            width={Math.floor(image.width)}
-            height={Math.floor(image.height)}
-            color={image.color}
-            className={styles.featureIcon}
+        <a href={image.link && image.link || null} target="_blank">
+          <Icon 
+              icon={image.src}
+              alt={title}
+              width={Math.floor(image.width)}
+              height={Math.floor(image.height)}
+              color={image.color}
+              className={styles.featureIcon}
           />
+        </a>
       </div>
       <div className="text--center padding-horiz--md">
         <Heading as="h3">{title}</Heading>
