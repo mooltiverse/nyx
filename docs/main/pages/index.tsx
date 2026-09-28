@@ -329,7 +329,7 @@ export default function Home(): JSX.Element {
   return (
     <Layout
       title={`${siteConfig.title}`}
-      description="Documentation site  for ${siteConfig.title}">
+      description="Documentation site for ${siteConfig.title}">
       <HomepageHeader />
       <main>
         <HomepageFeatures features={FEATURES} />
