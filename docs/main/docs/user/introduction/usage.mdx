@@ -68,9 +68,6 @@ Commit Message Conventions arguments are:
 Git arguments are:
     [...]
 
-Git arguments are:
-    [...]
-
 Release Type arguments are:
     [...]
 
@@ -462,7 +459,7 @@ The entire State is bound to the project *extra properties* with the `nyxState` 
 The `nyxState` property is only available after at least one [core task](#core-tasks) has executed. When using the [settings plugin](#apply-the-plugin) this is not an issue as the tasks run automatically in the early phases. Not all State properties are available at the same type (after the same task execution), please check out the [reference](../state-reference/index.md) for each property to know when it's available.
 :::
 
-This way you can have all the Nyx properties handy without even [storing the State file](../configuration-reference/global-options.mdx#state-file) on disk. For example, to only run a task if the [release scope](../state-reference/release-scope.mdx) contains [significant changes](../state-reference/release-scope.mdx#significant-commits) you can check the `project.nyxState.releaseScope.significantCommits` list property while to reuse the same timestamp used by Nyx you can read the [`project.nyxState.significant`](../state-reference/global-attributes.mdx#timestamp).
+This way you can have all the Nyx properties handy without even [storing the State file](../configuration-reference/global-options.mdx#state-file) on disk. For example, to only run a task if the [release scope](../state-reference/release-scope.mdx) contains [significant changes](../state-reference/release-scope.mdx#significant-commits) you can check the `project.nyxState.releaseScope.significantCommits` list property while to reuse the same timestamp used by Nyx you can read the [`project.nyxState.timestamp`](../state-reference/global-attributes.mdx#timestamp).
 
 Example:
 
@@ -484,7 +481,7 @@ In this example `dumpSomeDiagnostics` represents some arbitrary task that depend
 ## Using the GitHub Action
 
 :::tip
-Check out [this section](../quick-start/docker-container.mdx) for a quick introduction on the GitHub Action.
+Check out [this section](../quick-start/github-action.mdx) for a quick introduction on the GitHub Action.
 :::
 
 To use the GitHub Ation just configure it as a job in your workflow, like:
