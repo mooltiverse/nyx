@@ -680,3 +680,59 @@ jobs:
 ```
 
 Using separate jobs may also come very useful when using [matrix builds](https://docs.github.com/en/actions/using-jobs/using-a-matrix-for-your-jobs).
+
+## Using the AI agent skill
+
+Nyx comes with an [Agent Skill](https://agentskills.io/) that gives AI coding agents what they need to work with Nyx effectively. The skill follows the open Agent Skills specification so the same skill works with [Claude Code](https://code.claude.com/), [OpenAI Codex CLI](https://developers.openai.com/codex), [Gemini CLI](https://geminicli.com/), [GitHub Copilot](https://docs.github.com/en/copilot) and any other agent supporting the specification.
+
+The agent doesn't need the skill just to run Nyx: any agent can already run `nyx infer`. The skill gives the agent the knowledge it would otherwise lack, so it doesn't make the mistakes that are easy to make with Nyx.
+
+### What the skill does
+
+With the skill installed, you can ask your agent to:
+
+* **configure Nyx** from a description of your branching model and release policy. The agent starts from a [preset](../configuration-presets/index.md), overrides only what's needed and checks the result against the resolved configuration in the [state file](../state-reference/index.md)
+* **explain an unexpected version**, by running [`infer`](how-nyx-works.mdx#infer) with a state file and reading the [release scope](../state-reference/release-scope.mdx), the bump and the matched release type
+* **write commit messages** that comply with the [commit message conventions](../configuration-reference/commit-message-conventions.mdx) configured for your project and bump the version as intended
+* **set up CI/CD pipelines**, the [Gradle plugin](usage.mdx#using-the-gradle-plugin) or the [GitHub Action](usage.mdx#using-the-github-action), and migrate from other release tools like *semantic-release*, *release-please* or *standard-version*
+* **run releases safely**
+
+The skill also lists the pitfalls that cause most unexpected results, such as shallow clones on [CI/CD platforms](ci-cd.mdx), redefined items [replacing inherited ones as a whole](configuration-methods.mdx#evaluation-order), release prefixes and tag filters, merge commits and the workspace status.
+
+:::info
+The skill instructs agents to:
+
+* never run commands that change the repository or publish releases (`mark`, `publish` and their Gradle counterparts) without your explicit confirmation, and to always do a [dry run](../configuration-reference/global-options.mdx#dry-run) first
+* never pass tokens or other secrets on the command line or in configuration files, but read them from environment variables using [templates](../configuration-reference/templates.mdx#environmentvariable)
+:::
+
+### Install the skill
+
+The skill lives in the [`src/ai/skills/nyx`](https://github.com/mooltiverse/nyx/tree/main/src/ai/skills/nyx) directory of the Nyx repository.
+
+Install the skill version matching the Nyx version you use, as the skill documents the behavior of that release. Installation is as simple as copying the skill folder to the right location for your agent. The skill is a single folder with a `SKILL.md` file and a `references/` folder with the skill extra contents. You can ignore other folders like `evals/`, used to test the skill.
+
+The folders where agents look for skills are:
+
+| Agent | Project folder | User folder |
+| ----- | -------------- | ----------- |
+| Claude Code | `.claude/skills/` | `~/.claude/skills/` |
+| Codex CLI | `.agents/skills/` | `~/.agents/skills/` |
+| Gemini CLI | `.gemini/skills/` | `~/.gemini/skills/` |
+| GitHub Copilot | `.github/skills/`, `.claude/skills/` or `.agents/skills/` | `~/.copilot/skills/` or `~/.agents/skills/` |
+
+Use the project folder to share the skill with everyone working on a repository (commit it along with the code), or the user folder to have it available in all your projects. Check your agent's documentation for other options, as folders may change over time.
+
+### Use the skill
+
+Agents load the skill automatically when the task relates to Nyx, for example when the repository contains a `.nyx.yaml` file or you mention semantic releases. Some agents also let you invoke the skill explicitly, i.e. `/nyx` in Claude Code.
+
+Some example requests:
+
+* *Configure Nyx for this repository: we release from `main` only on CI, publish pre-releases from `alpha` and `beta` branches and publish to GitHub.*
+* *Why did Nyx infer version `0.1.1` on the CI pipeline while I get `2.4.0` locally?*
+* *Write the commit message for these changes.*
+* *Add a GitHub Actions workflow that builds with the inferred version and publishes the release.*
+* *Migrate this project from semantic-release to Nyx.*
+
+The agent works best when Nyx is available locally, so it can check its work by running `nyx --dry-run infer`. When the command line tool is not installed, the agent can use the [Docker image](usage.mdx#using-the-docker-image) or the [Gradle plugin](usage.mdx#using-the-gradle-plugin), or reason about your configuration without running Nyx.

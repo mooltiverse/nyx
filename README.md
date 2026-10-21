@@ -25,6 +25,7 @@ Nyx is the *all in one* tool that gives you integrated support for:
 * custom or standard workflows (a.k.a. *branching models*) like [GitFlow](https://nvie.com/posts/a-successful-git-branching-model/), [GitHub Flow](https://help.github.com/en/github/collaborating-with-issues-and-pull-requests/github-flow), [GitLab Flow](https://docs.gitlab.com/ee/topics/gitlab_flow.html), [OneFlow](https://www.endoflineblog.com/oneflow-a-git-branching-model-and-workflow)
 * changelog generation
 * any (combination of) configuration means like command line arguments, local or remote files, environment variables and build tools extensions
+* AI coding agents like [Claude Code](https://code.claude.com/), [Codex CLI](https://developers.openai.com/codex), [Gemini CLI](https://geminicli.com/) and [GitHub Copilot](https://docs.github.com/en/copilot) through an [Agent Skill](https://agentskills.io/home)
 
 Want to embed the libraries into your own project instead? You're covered as they are published just for that. See the [available libraries](#libraries) for more.
 
@@ -115,6 +116,12 @@ Available for all platforms in the [latest release](https://github.com/mooltiver
 * [Semantic Version](https://semver.org/) library:
   * [for Go](https://mooltiverse.github.io/nyx/docs/developer/go/semantic-version)
   * [for Java](https://mooltiverse.github.io/nyx/docs/developer/java/semantic-version)
+
+### Agent skill
+
+* the [`src/ai/skills/nyx/`](src/ai/skills/nyx/) skill directory, including
+  * [`SKILL.md`](src/ai/skills/nyx/SKILL.md) (the actual skill file)
+  * the [`src/ai/skills/nyx/references`](src/ai/skills/nyx/references/) directory, containing additional references
 
 ## Documentation
 
