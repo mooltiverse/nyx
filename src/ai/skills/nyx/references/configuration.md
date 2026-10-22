@@ -112,7 +112,7 @@ These names are derived from the configuration path:
 
 Neither preset lists any `publicationServices`, so nothing is published until you set that list.
 
-In Nyx 3.1.x the preset release types have an empty `gitTagNames` list, so `mark` creates **no tag** for them. Redefine every release type that must tag in your configuration file. A user-defined item gets the default `gitTagNames: [ "{{version}}" ]`, as in the [verified example](#verified-example).
+From Nyx 2.5.0 to 3.1.x, the preset release types used by the command line tool, the Docker image and the GitHub Action have an empty `gitTagNames` list, so `mark` creates **no tag** for them. The Gradle plugin is not affected. Redefine every release type that must tag in your configuration file. A user-defined item gets the default `gitTagNames: [ "{{version}}" ]`, as in the [verified example](#verified-example).
 
 ## Release types
 
@@ -149,7 +149,7 @@ Boolean-like attributes that accept templates (`gitTag`, `gitPush`, `gitCommit`,
 
 Pick only the release types the user's branches need. Each type must have a `filterTags` regex that accepts the tags it creates. Shapes that work:
 
-- **Mainline only** (trunk based): the `simple` preset with the `mainline` item redefined in full (needed for tagging in 3.1.x, see above). Add `matchEnvironmentVariables: { CI: "^true$" }` to it if only CI may release.
+- **Mainline only** (trunk based): the `simple` preset with the `mainline` item redefined in full (needed for tagging up to 3.1.x, see above). Add `matchEnvironmentVariables: { CI: "^true$" }` to it if only CI may release.
 - **Mainline plus pre-release branches**: add types with `collapseVersions: true` and a branch-derived `collapsedVersionQualifier`. Tag and push them when users consume the pre-releases, and set `publishPreRelease: "true"` if they are published.
 - **Release and maintenance branches**: use `versionRangeFromBranchName: true` so a `release-1.2` or `1.x` branch can never issue versions outside its line.
 - **Feature branches**: usually no tag or push, just a collapsed version for build artifacts.

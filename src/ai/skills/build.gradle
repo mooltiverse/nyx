@@ -1,0 +1,289 @@
+/* Add support to inject the ExecOperations object in order to run exec commands.
+ * See: https://docs.gradle.org/current/userguide/service_injection.html#execoperations
+ */
+import org.gradle.process.ExecOperations
+import javax.inject.Inject
+interface InjectedExec {
+  @Inject ExecOperations getExecOps()
+}
+
+/*------------------------------------------------------------------------------
+  Plugins DSL block
+  https://docs.gradle.org/current/userguide/plugins.html#sec:plugins_block
+------------------------------------------------------------------------------*/
+plugins {
+}
+
+/*------------------------------------------------------------------------------
+  Local sub-project properties
+------------------------------------------------------------------------------*/
+description = 'Agent skills'
+
+/*------------------------------------------------------------------------------
+  This is the configuration for all sub-projects, but not this project
+------------------------------------------------------------------------------*/
+subprojects {
+  /*----------------------------------------------------------------------------
+    Configurations and Dependencies
+  ----------------------------------------------------------------------------*/
+  // For more on Configurations, Dependencies and Artifacts see:
+  // - https://docs.gradle.org/current/userguide/declaring_dependencies_adv.html
+  // - https://docs.gradle.org/current/userguide/cross_project_publications.html
+  configurations {
+    // Here we define the configurations to:
+    // - define dependencies to other projects so this project can use their
+    //   artifacts
+    // - expose artifacts produced by this project that can be used by others as
+    //  dependencies
+    // Configurations can extend other configurations from within the same
+    // project by means of 'extendsFrom'.
+    // To add artifacts to configurations use the 'artifacts' section.
+    documentation {
+      // The 'documentation' configuration exposes the generated
+      // documentation. This configuration is 'consumable' so it can be used
+      // by other 'consumer' projects.
+      // Artifacts are added to this configuration by means of the
+      // 'documentation' artifact in the 'artifacts' section.
+      canBeConsumed = true
+      canBeResolved = false
+    }
+    binaries {
+      // The 'binaries' configuration depends on the binary files generated
+      // by other projects to make them available into one local configuration
+      // used to import them to the Docker images.
+      canBeConsumed = false
+      canBeResolved = true
+    }
+  }
+
+  dependencies {
+    // Here we define the static dependencies on other projects' configurations.
+
+    // For all projects listed in the 'importBinariesFrom' property add a
+    // dependency to their 'binaries' configuration to the local 'binaries'
+    // configuration.
+    if (project.hasProperty("importBinariesFrom") && !project.getProperty("importBinariesFrom").isBlank()) {
+      project.getProperty("importBinariesFrom").split(',').each { p -> 
+        binaries (project(path: p, configuration: 'binaries'))
+      }
+    }
+  }
+
+  /*----------------------------------------------------------------------------
+    Additional properties
+  ----------------------------------------------------------------------------*/
+  // The Python interpreter used to create the virtual environment hosting the
+  // validation tools listed in 'pythonTools'.
+  ext.python = 'python3'
+
+  // The comma separated list of Python packages (in pip requirement format)
+  // installed in the skill's tools virtual environment. Keep versions pinned
+  // so that builds are reproducible.
+  // - skills-ref: the Agent Skills reference validator (provides the
+  //   'agentskills' command). See https://agentskills.io/specification#validation
+  ext.pythonTools = 'skills-ref==0.1.1'
+
+  // The directory where built archives are stored
+  ext.archivesDir = new File(buildDir, 'archives')
+
+  // The directory where built packages are stored
+  ext.packagesDir = new File(buildDir, 'packages')
+
+  // The directory hosting the Python virtual environments with the tools, one
+  // for each skill as each skill may use different tools
+  ext.pythonToolsDir = new File(buildDir, 'tools')
+
+  // The Python virtual environment directory
+  def pythonVenvDir = new File(pythonToolsDir, 'venv')
+
+  // The comma separated list of glob patterns, relative to the skill
+  // directory, excluded from published artifacts. Use it to keep tests, eval
+  // suites and their results out of the release archives. The skill's
+  // 'gradle.properties' is always excluded.
+  ext.excludePatterns = '**/build/**,**/test/**,**/evals/**,**/results/**,**/.DS_Store,**/gradle.properties'
+
+  /*----------------------------------------------------------------------------
+    Additional tasks
+  ----------------------------------------------------------------------------*/
+  task setUpTools(group: 'build setup', description: 'Creates the Python virtual environment with the tools used to validate the skill') {
+    def tools = pythonTools.split(',')
+
+    // Declare inputs and outputs of this task
+    inputs.property('python', python)
+    inputs.property('pythonTools', tools)
+    outputs.dir(pythonVenvDir)
+
+    // Inject the ExecOperations service to run exec commands (see imports on top of the file)
+    def injectedExecOps = project.objects.newInstance(InjectedExec)
+    doLast {
+      pythonVenvDir.deleteDir()
+      logger.quiet("Creating the tools virtual environment in ${pythonVenvDir}")
+      // Create the virtual environment
+      injectedExecOps.execOps.exec {
+        workingDir projectDir
+        commandLine python, '-m', 'venv', pythonVenvDir.absolutePath
+      }
+      def argsList = ['install', '--disable-pip-version-check', '--quiet']
+      argsList.addAll(tools)
+      logger.quiet("Installing the tools [${tools.join(', ')}] in the virtual environment ${pythonVenvDir}")
+      // Install the tools in the virtual environment
+      injectedExecOps.execOps.exec {
+        workingDir projectDir
+        executable new File(pythonVenvDir, 'bin/pip').absolutePath
+        args argsList
+      }
+    }
+  }
+
+  task skillPackage(type: Zip, group: 'build', description: 'Packages the skill into a tar,gz archive') {
+    archiveBaseName = "agent-skill-${project.name}"
+    //archiveAppendix = 
+    archiveVersion = '' // project.version
+    archiveClassifier = null
+    archiveExtension = 'zip'
+    destinationDirectory = packagesDir
+
+    from(projectDir) {
+      exclude excludePatterns.split(',')
+      //into("skills/${project.name}/")
+    }
+  }
+
+  // This is a lifecycle task that will depend on other dynamically created
+  // tasks.
+  task skillClean(group: 'build', description: 'Cleans binaries and cached files') {
+    doLast {
+      pythonVenvDir.deleteDir()
+      archivesDir.deleteDir()
+      packagesDir.deleteDir()
+    }
+  }
+
+  task unitTest(group: 'verification', description: 'Runs the unit tests for the skill') {
+    dependsOn setUpTools
+
+    // Inject the ExecOperations service to run exec commands (see imports on top of the file)
+    def injectedExecOps = project.objects.newInstance(InjectedExec)
+    doLast {
+      logger.quiet("Validating the '${project.name}'' skill")
+      def argsList = ['validate', projectDir.absolutePath]
+      injectedExecOps.execOps.exec {
+        workingDir projectDir
+        executable new File(pythonVenvDir, 'bin/agentskills').absolutePath
+        args argsList
+      }
+    }
+  }
+
+  task integrationTest(group: 'verification', description: 'Runs the integration tests for the skill') {
+    // When they are all in the execution plan, run faster tests first.
+    mustRunAfter unitTest
+
+    // TODO: implement the integration test task
+  }
+
+  task functionalTest(group: 'verification', description: 'Runs the functional tests for the skill') {
+    // When they are all in the execution plan, run faster tests first.
+    mustRunAfter unitTest
+    mustRunAfter integrationTest
+
+    // TODO: implement the functional test task
+  }
+
+  // This is a lifecycle task that will depend on other specific test tasks.
+  task test(group: 'verification', description: 'Runs all the tests for the skill') {
+    dependsOn unitTest
+    dependsOn integrationTest
+    dependsOn functionalTest
+  }
+
+  // This is a lifecycle task that will depend on other specific tasks.
+  task documentation(group: 'build', description: 'Builds the documentation for this project') {
+    //dependsOn exportDocumentationArchive
+  }
+
+  task exportBinariesArchive(type: Tar, group: 'build', description: 'Creates the archive containing the binaries for this project') {
+    // Task dependencies
+    dependsOn skillPackage
+
+    archiveBaseName = "agent-skill-${project.name}"
+    //archiveAppendix = 
+    archiveVersion = '' // project.version
+    archiveClassifier = null
+    archiveExtension = 'tar.gz'
+    destinationDirectory = archivesDir
+    compression = Compression.GZIP
+
+    from(projectDir) {
+      exclude excludePatterns.split(',')
+      //into("skills/${project.name}/")
+    }
+  }
+
+  /*----------------------------------------------------------------------------
+    Additional task dependencies
+    ----------------------------------------------------------------------------*/
+  tasks.assemble.dependsOn skillPackage
+  tasks.build.dependsOn documentation
+  tasks.check.dependsOn test
+  tasks.clean.dependsOn skillClean
+
+  /*----------------------------------------------------------------------------
+    Artifacts published by this project
+  ----------------------------------------------------------------------------*/
+  // For more on Configurations, Dependencies and Artifacts see:
+  // - https://docs.gradle.org/current/userguide/declaring_dependencies_adv.html
+  // - https://docs.gradle.org/current/userguide/cross_project_publications.html
+  artifacts {
+    // Here we associate artifacts produced by this project to the
+    // configurations so that they can be consumed by other projects.
+
+    // Expose the documentation.
+    // Here we associate the outputs from the 'exportDocumentationArchive'
+    // task to the 'documentation' configuration.
+    //documentation tasks.exportDocumentationArchive
+
+    // Expose the binaries.
+    // Here we associate the outputs from the 'exportBinariesArchive'
+    // task to the 'binaries' configuration.
+    binaries tasks.skillPackage //tasks.exportBinariesArchive
+  }
+}
+
+/*------------------------------------------------------------------------------
+  Additional tasks
+  ------------------------------------------------------------------------------*/
+// This is just a lifecycle task
+task unitTest(group: 'verification', description: 'Runs the unit tests for the skill') {
+  dependsOn subprojects*.unitTest
+}
+
+// This is just a lifecycle task
+task integrationTest(group: 'verification', description: 'Runs the integration tests for the skill') {
+  dependsOn subprojects*.integrationTest
+}
+
+// This is just a lifecycle task
+task functionalTest(group: 'verification', description: 'Runs the functional tests for the skill') {
+  dependsOn subprojects*.functionalTest
+}
+
+// This is just a lifecycle task
+task test(group: 'verification', description: 'Runs all the tests for the skill') {
+  dependsOn subprojects*.test
+}
+
+// This is just a lifecycle task
+task documentation(group: 'build', description: 'Builds the documentation for this project') {
+  dependsOn subprojects*.documentation
+}
+
+task deepClean(group: 'build', description: 'Clean the reproducible and reusable artifacts including caches, dependencies etc') {
+  dependsOn clean
+}
+
+/*------------------------------------------------------------------------------
+  Additional task dependencies
+------------------------------------------------------------------------------*/
+tasks.assemble.dependsOn subprojects*.assemble
+tasks.check.dependsOn subprojects*.check

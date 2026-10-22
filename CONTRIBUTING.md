@@ -94,6 +94,7 @@ You can work on the project on any platform (Linux, Windows, Mac). You need to h
 * [Gradle](https://gradle.org/install/) 7.x or above
 * [Docker CE](https://docs.docker.com/install/)
 * [Node](https://nodejs.org/) 18.0 or above
+* [Python](https://www.python.org/) 3 (to validate the AI agent skills) and, to run the skills integration and functional tests, AI agent CLIs (Claude Code, ChatGPT Codex etc)
 
 You also need a local copy of the repository that you can get by running:
 
@@ -119,6 +120,8 @@ nyx
 |   \--- main                       # The documentation site
 +-- gradle                          # Gradle wrapper files
 +-- src                             # Project sources
+|   +--- ai                         # AI agent extensions
+|        \--- skills                # Agent Skills sub module (one directory per skill)
 |   +--- docker                     # Docker image sub module
 |   \--- go                         # Go sources
 |        +--- errors                # Go errors sub module
@@ -342,6 +345,12 @@ to:
 ###### Troubleshooting SSH authentication
 
 You can get the list of algorithms supported by the remote server running `nmap --script ssh2-enum-algos -sV -p <REMOTE_SERVER_PORT> <REMOTE_SERVER_ADDRESS>`.
+
+### Contributing AI agent skills
+
+[Agent Skills](https://agentskills.io/) for AI coding agents live in the `src/ai/skills` directory, one sub directory per skill, each with its own `SKILL.md`.
+
+All skills are built and tested by the same script, `src/ai/skills/build.gradle`, so new skills are picked up automatically with no change to the build scripts. Each skill can configure how it's built and tested with an optional `gradle.properties` file in its own directory (i.e. `src/ai/skills/nyx/gradle.properties`). The available properties and their defaults are listed in the build script.
 
 ### Build statistics
 
