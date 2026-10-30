@@ -29,18 +29,39 @@ links:
   - name: 'GitHub Issues'
     type: PROJECT
     url: 'https://github.com/mooltiverse/nyx/issues'
-  - name: 'Git Repository'
+  - name: 'GitHub Repository'
     type: REPOSITORY
     url: 'https://github.com/mooltiverse/nyx'
+  - name: 'GitHub Actions'
+    type: DASHBOARD
+    url: 'https://github.com/mooltiverse/nyx/actions'
+  - name: 'GitHub Code Insights'
+    type: DASHBOARD
+    url: 'https://github.com/mooltiverse/nyx/pulse'
+  - name: 'GitHub Releases'
+    type: REPOSITORY
+    url: 'https://github.com/mooltiverse/nyx/releases'
   - name: 'Documentation'
     type: DOCUMENT
     url: 'https://mooltiverse.github.io/nyx/'
-  - name: 'CI/CD'
-    type: DASHBOARD
-    url: 'https://github.com/mooltiverse/nyx/actions'
-  - name: 'Code Insights'
-    type: DASHBOARD
-    url: 'https://github.com/mooltiverse/nyx/pulse'
+  - name: 'Docker Repository on GitHub'
+    type: REPOSITORY
+    url: 'https://github.com/mooltiverse/nyx/pkgs/container/nyx'
+  - name: 'Docker Repository on DockerHub'
+    type: REPOSITORY
+    url: 'https://hub.docker.com/r/mooltiverse/nyx'
+  - name: 'Maven Repository on GitHub'
+    type: REPOSITORY
+    url: 'https://github.com/orgs/mooltiverse/packages?repo_name=nyx'
+  - name: 'Gradle Plugin Repository'
+    type: REPOSITORY
+    url: 'https://plugins.gradle.org/plugin/com.mooltiverse.oss.nyx'
+  - name: 'GoDoc Documentation'
+    type: DOCUMENT
+    url: 'https://godocs.io/github.com/mooltiverse/nyx/src/go/nyx'
+  - name: 'Javadoc Documentation'
+    type: DOCUMENT
+    url: 'https://javadoc.io/doc/com.mooltiverse.oss.nyx/java'
 fields:
   tier: 3
   lifecycle: Active

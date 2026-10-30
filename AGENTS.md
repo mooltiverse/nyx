@@ -80,6 +80,43 @@ The `docs/` sub-folder inside a Docusaurus microsite directory contains the actu
 - Java is used to build the project code
 - Docker is used to deliver containers as project artifacts
 
+### Services
+
+The [Atlassian Compass](https://developer.atlassian.com/cloud/compass/config-as-code/structure-and-contents-of-a-compass-yml-file/) descriptor `compass.yaml` in the repository root is the inventory of the external services and resources used by this project; mono-repos may have more in sub-directories. Read it before interacting with any external service:
+
+- `links`: one entry per service or resource, by `type`:
+  - `PROJECT`: issue tracker / board
+  - `REPOSITORY`: Git repository, artifact registries, release pages
+  - `DOCUMENT`: published documentation
+  - `DASHBOARD`: CI/CD, insights, hosting, cloud and monitoring consoles
+  - `CHAT_CHANNEL`, `ON_CALL`, `OTHER_LINK`: communication, on-call and anything else
+- `relationships.DEPENDS_ON`: Compass IDs of the components this project depends on (e.g. CI/CD workflows, build plugins), each with a comment naming the component
+- `ownerId`, `labels`, `fields`: owning team, technology stack, tier and lifecycle
+
+Derive identifiers (organization, repository, Jira site, cloud account, region, resource name/ID) from the link URLs and use the matching tool:
+
+| URL host | Service | Tool |
+| --- | --- | --- |
+| `github.com` | Git repository, Actions, releases, insights | `git`, `gh` |
+| `*.atlassian.net` | Jira, Confluence, Compass | Atlassian MCP server or REST API |
+| `*.console.aws.amazon.com`, `*.amazonaws.com` | AWS resources (ECR, S3, Amplify etc) | `aws`, `docker`, `helm` |
+
+Other sources of service information:
+
+- Jira issue keys (`[A-Z]+-[0-9]+`) in branch names and commit messages refer to issues on the Jira site found in `compass.yaml`, not necessarily in the project linked as `PROJECT`
+- CI/CD variables (`gh variable list`) hold the identifiers used by pipelines (e.g. registry URIs, bucket names, application IDs)
+- build and release configurations (`.nyx.yaml`, `configurations/`, `gradle.properties` files) define publication targets
+
+When a service is added or changes, update `compass.yaml`. Only services that can't be represented there (e.g. lacking a URL) go in the list below.
+
+Keep the footers of the Docusaurus microsites aligned with the `compass.yaml` links: developer sites (`docs/developer`) link all of them, public sites (`docs/main`) only those to public resources. Exceptions are documented in the footer configuration.
+
+Authenticate only with the credentials already available in the environment (environment variables, CLI configurations). Never print, log, persist or commit them. When access fails, report the service and the missing permission instead of working around it.
+
+Services not listed in `compass.yaml`:
+
+- none
+
 ## Behavior
 
 ### Branching
