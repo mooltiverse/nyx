@@ -98,7 +98,7 @@ Derive identifiers (organization, repository, Jira site, cloud account, region, 
 | URL host | Service | Tool |
 | --- | --- | --- |
 | `github.com` | Git repository, Actions, releases, insights | `git`, `gh` |
-| `*.atlassian.net` | Jira, Confluence, Compass | Atlassian MCP server or REST API |
+| `*.atlassian.net` | Jira, Confluence, Compass, organization administration | `acli` (Compass excluded), Atlassian MCP server or REST API |
 | `*.console.aws.amazon.com`, `*.amazonaws.com` | AWS resources (ECR, S3, Amplify etc) | `aws`, `docker`, `helm` |
 
 Other sources of service information:
