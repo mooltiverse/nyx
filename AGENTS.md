@@ -47,7 +47,7 @@ You are talking to expert engineers who already have a deep understanding of the
 
 ### Contents and Layout
 
-- `.ai/`: further instructions and configurations for AI agents
+- `.agents/`: further instructions and configurations for AI agents
 - `.github/`: GitHub Actions configurations and artifacts
 - `build/`: reproducible build artifacts, git-ignored (so are other `build/` directories); never edit by hand
 - `configurations/`: configuration files for this project and its external tools
@@ -117,6 +117,12 @@ Services not listed in `compass.yaml`:
 
 - none
 
+### Skills
+
+Skills you can use:
+
+- `mooltiverse-skills`: use it to check whether the project's skills are up to date and to find the skills the project is missing
+
 ## Behavior
 
 ### Branching
@@ -161,7 +167,7 @@ When applying changes make sure that no vulnerability is introduced. When possib
 
 ## References
 
-- [README.md](README.md), `.ai/`, `docs/main`
+- [README.md](README.md), `.agents/`, `docs/main`
 - [Semantic Versioning](https://semver.org), [Conventional Commits](https://www.conventionalcommits.org), [Nyx](https://mooltiverse.github.io/nyx/)
 
 ## Historical Decisions
