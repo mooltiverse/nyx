@@ -373,15 +373,15 @@ export default {
           items: [
             {
               label: 'Examples',
-              href: 'docs/resources/examples/',
+              href: '/docs/resources/examples/',
             },
             {
               label: 'FAQ',
-              href: 'docs/resources/faq/',
+              href: '/docs/resources/faq/',
             },
             {
               label: 'Troubleshooting',
-              href: 'docs/resources/troubleshooting/',
+              href: '/docs/resources/troubleshooting/',
             },
             {
               label: 'Discussions',
