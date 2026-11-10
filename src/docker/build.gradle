@@ -555,7 +555,7 @@ subprojects {
       configurations.binaries.getIncoming().getFiles().each { f -> 
         logger.debug("Extracting the binaries from ${f.name} to ${outputDir}")
         copy {
-          from tarTree(f)
+          from f
           into(outputDir)
         }
       }
@@ -1335,23 +1335,15 @@ subprojects {
     }
   }
 
-  task exportDocumentationArchive(type: Tar, group: 'build', description: 'Builds the documentation archive for this project') {
-    // This task is of type Tar so:
-    // - we can reuse its outputs for the project artifacts
-    // - we can inherit its copying features from its AbstractCopyTask
-    //   superclass
-    // - we can reuse implicit inputs and outputs
-
+  task exportDocumentation(type: Sync, group: 'build', description: 'Stages the documentation shared with other projects') {
     // Simply copy the README.md, just renaming it to the image name,
     // so when there are more than one they can be used as API docs
     // and stored together in the same directory.
-    archiveBaseName = project.name
-    archiveAppendix = 'docs'
-    archiveVersion = project.version
-    archiveClassifier = null
-    archiveExtension = 'tar.gz'
-    destinationDirectory = file("${buildDir}/archives")
-    compression = Compression.GZIP
+    // This task is of type Sync so the files shared with other projects are
+    // staged as they are, without packing them into an archive, and files no
+    // longer produced are removed. Other projects consume them through the
+    // 'documentation' configuration.
+    into(file("${buildDir}/shared/docs"))
 
     from(projectDir) {
       include 'README.md'
@@ -1361,7 +1353,7 @@ subprojects {
 
   // This is a lifecycle task that will depend on other specific tasks.
   task documentation(group: 'build', description: 'Builds the documentation for this project') {
-    dependsOn exportDocumentationArchive
+    dependsOn exportDocumentation
   }
 
   /*----------------------------------------------------------------------------
@@ -1383,9 +1375,9 @@ subprojects {
     // configurations so that they can be consumed by other projects.
 
     // Expose the documentation.
-    // Here we associate the outputs from the 'exportDocumentationArchive'
+    // Here we associate the outputs from the 'exportDocumentation'
     // task to the 'documentation' configuration.
-    documentation tasks.exportDocumentationArchive
+    documentation(tasks.exportDocumentation.destinationDir) { builtBy tasks.exportDocumentation }
   }
 }
 

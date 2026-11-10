@@ -87,7 +87,7 @@ subprojects {
       configurations.documentation.getIncoming().getFiles().each { f -> 
       logger.debug("Extracting the documentation from ${f.name} to ${outputDir.absolutePath}")
         copy {
-          from tarTree(f)
+          from f
           into(outputDir)
         }
       }
