@@ -84,12 +84,11 @@ subprojects {
 
     doLast {
       logger.quiet("Importing the documentation")
-      configurations.documentation.getIncoming().getFiles().each { f -> 
-      logger.debug("Extracting the documentation from ${f.name} to ${outputDir.absolutePath}")
-        copy {
-          from f
-          into(outputDir)
-        }
+      // Mirror the documentation shared by other projects, so that files they
+      // no longer share are removed
+      sync {
+        from(configurations.documentation.getIncoming().getFiles())
+        into(outputDir)
       }
 
       // Now use a copySpec to distribute the imported documentation to the microsite
