@@ -14,6 +14,7 @@ This release:
 
 * upgrades Go to version 1.27.3
 * updates all Go dependencies to the latest versions
+* updates all Java dependencies and gradle plugins to the latest versions
 * adds support for Gradle up to `9.9.0`
 * removes the publication of Go artifacts for 32 bit `windows/arm` as [support was removed from Go](https://github.com/golang/go/issues/71671)
 
