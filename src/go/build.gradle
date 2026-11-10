@@ -649,7 +649,7 @@ task publish(group: 'publishing', description: 'Publishes artifacts produced by 
 
 task deepClean(group: 'build', description: 'Clean the reproducible and reusable artifacts including caches, dependencies etc') {
   dependsOn clean
-  dependsOn subprojects*.clean
+  dependsOn subprojects*.deepClean
 }
 
 /*------------------------------------------------------------------------------
