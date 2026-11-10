@@ -514,13 +514,22 @@ subprojects {
 
   // This is a lifecycle task that will depend on other dynamically created
   // tasks.
+  // This is just a lifecycle task, depending on the finer grained publication
+  // tasks.
+  task goPublish(group: 'publishing', description: 'Publishes the Go module') {
+    dependsOn goPublishToGoPkg, goPublishToGoDocs
+
+    // Only perform publishing if the Nyx release type enables publishing
+    onlyIf { rootProject.nyxState.newRelease }
+  }
+
   task publish(group: 'publishing', description: 'Pushes the Go binaries to remote registries') {
     // Only perform publishing if the Nyx release type enables publishing
     onlyIf { rootProject.nyxState.newRelease }
 
     // Task dependencies
     // This is pretty much a lifecycle taks that only depends on other tasks
-    dependsOn goPublishToGoPkg, goPublishToGoDocs
+    dependsOn goPublish
   }
 
   task exportDocumentationArchive(type: Tar, group: 'build', description: 'Builds the documentation archive for this project') {

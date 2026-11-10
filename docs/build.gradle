@@ -246,6 +246,15 @@ subprojects {
   }
 
   task docusaurusClean(group: 'build', description: 'Deletes the local documentation site') {
+    // Delete what 'docusaurusBuild' renders
+    def siteDir = buildDir
+    doLast {
+      delete siteDir
+    }
+  }
+
+  // This is just a lifecycle task. It runs the tests of the documentation microsite, if any.
+  task test(group: 'verification', description: 'Runs the tests for the documentation microsite') {
   }
 
   task deepClean(group: 'build', description: 'Clean the reproducible and reusable artifacts including caches, dependencies etc') {
@@ -262,6 +271,7 @@ subprojects {
     Additional task dependencies
     ----------------------------------------------------------------------------*/
   tasks.assemble.dependsOn docusaurusBuild
+  tasks.check.dependsOn test
   tasks.clean.dependsOn docusaurusClean
 
   /*----------------------------------------------------------------------------
@@ -282,6 +292,11 @@ subprojects {
 // This is just a lifecycle task
 task publish(group: 'publishing', description: 'Publishes artifacts produced by this project') {
   dependsOn subprojects*.publish
+}
+
+// This is just a lifecycle task
+task test(group: 'verification', description: 'Runs the tests for the documentation microsites') {
+  dependsOn subprojects*.test
 }
 
 task deepClean(group: 'build', description: 'Clean the reproducible and reusable artifacts including caches, dependencies etc') {

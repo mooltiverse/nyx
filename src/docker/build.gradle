@@ -614,7 +614,17 @@ subprojects {
   // tasks. One task for each Dockerfile (plain or flavoured) is created below.
   // Since concrete tasks are not known in advance, the dependencies of this
   // task on others are defined when those tasks are created.
+  // This is a lifecycle task that will depend on the dynamically created
+  // 'dockerPush' tasks, one for each Dockerfile flavor. 'dockerPush' is the
+  // Docker nomenclature, while 'dockerPublish' is the standard name.
+  task dockerPublish(group: 'publishing', description: 'Publishes the Docker images to remote registries') {
+    // Only perform publishing if the Nyx release type enables publishing
+    onlyIf { rootProject.nyxState.newRelease }
+  }
+
   task publish(group: 'publishing', description: 'Pushes the Docker images to remote registries') {
+    dependsOn dockerPublish
+
     // Only perform publishing if the Nyx release type enables publishing
     onlyIf { rootProject.nyxState.newRelease }
   }
@@ -953,7 +963,7 @@ subprojects {
 
     // Make the overall lifecycle tasks depend on the flavor specific build tasks
     tasks.dockerBuild.dependsOn tasks.named("dockerImage${flavorSuffix}")
-    tasks.publish.dependsOn tasks.named("dockerPush${flavorSuffix}")
+    tasks.dockerPublish.dependsOn tasks.named("dockerPush${flavorSuffix}")
     tasks.dockerClean.dependsOn tasks.named("dockerCleanImage${flavorSuffix}")
   }
 
