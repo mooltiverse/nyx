@@ -647,6 +647,8 @@ subprojects {
       }
       logger.quiet("Removing the unused local Docker images labelled ${imageLabel}")
       injectedExecOps.execOps.exec {
+        // Cleaning must not fail when Docker can't prune, i.e. when the daemon
+        // isn't running
         ignoreExitValue true
         commandLine 'docker', 'image', 'prune', '--all', '--force', '--filter', "label=${projectLabel}", '--filter', "label=${imageLabel}"
       }
@@ -927,6 +929,7 @@ subprojects {
 
           logger.quiet("Deleting the local Docker image ${dockerfile} with tags ${String.join(', ', tagsList)}")
           injectedExecOps.execOps.exec {
+            // The image may not exist locally
             ignoreExitValue true
             executable 'docker'
             args argsList
@@ -935,10 +938,12 @@ subprojects {
         if (dockerStateBuilderFile(dockerfile) != null && dockerStateBuilderFile(dockerfile).exists()) {
           logger.quiet("Stopping and deleting the Docker BuildKit builder ${dockerStateBuilderFile(dockerfile).text}")
           injectedExecOps.execOps.exec {
+            // The builder may not exist or may be stopped already
             ignoreExitValue true
             commandLine 'docker', 'buildx', 'stop', dockerStateBuilderFile(dockerfile).text
           }
           injectedExecOps.execOps.exec {
+            // The builder may not exist
             ignoreExitValue true
             commandLine 'docker', 'buildx', 'rm', dockerStateBuilderFile(dockerfile).text
           }
