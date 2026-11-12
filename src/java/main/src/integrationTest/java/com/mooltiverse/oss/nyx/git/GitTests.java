@@ -27,8 +27,8 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import com.mooltiverse.oss.nyx.git.tools.Scenario;
-import com.mooltiverse.oss.nyx.git.util.RandomUtil;
 import com.mooltiverse.oss.nyx.services.github.GitHub;
+import com.mooltiverse.oss.nyx.services.github.GitHubRepositoryPool;
 import com.mooltiverse.oss.nyx.services.github.GitHubRepository;
 
 @DisplayName("Git")
@@ -196,138 +196,96 @@ public class GitTests {
         @Test
         public void cloneFileWithRequiredUserAndPasswordCredentialsTest()
             throws Exception {
-            String randomID = RandomUtil.randomAlphabeticString(5);
             // the 'gitHubTestUserToken' system property is set by the build script, which in turn reads it from an environment variable
             GitHub gitHub = GitHub.instance(Map.<String,String>of(GitHub.AUTHENTICATION_TOKEN_OPTION_NAME, System.getProperty("gitHubTestUserToken")));
-            // create a brand new test repository for this purpose
-            GitHubRepository gitHubRepository = gitHub.createGitRepository(randomID, "Test repository "+randomID, true, true);
-
-            // if we read too quickly we often get a 404 from the server so let's wait a short while
-            Thread.sleep(4000);
+            // use a pooled repository instead of creating a new one to avoid the hosting service rate limits on content creation
+            GitHubRepository gitHubRepository = GitHubRepositoryPool.instance(System.getProperty("gitHubTestUserToken")).acquire(0, true);
 
             File directory = Files.createTempDirectory("nyx-test-git-clone-test-").toFile();
             directory.deleteOnExit();
             assertFalse(new File(directory, "README.md").exists());
             assertNotNull(Git.instance().clone(directory, gitHubRepository.getHTTPURL(), System.getProperty("gitHubTestUserToken"), System.getProperty("gitHubTestUserToken")));
             assertTrue(new File(directory, "README.md").exists());
-
-            // now delete it
-            gitHub.deleteGitRepository(randomID);
         }
 
         @DisplayName("Git.instance().clone(File, String, null, byte[]) with required SSH unprotected credentials")
         @Test
         public void cloneFileWithRequiredSSHUnprotectedCredentialsTest()
             throws Exception {
-            String randomID = RandomUtil.randomAlphabeticString(5);
             // the 'gitHubTestUserPrivateKeyWithoutPassphrase' system property is set by the build script, which in turn reads it from an environment variable
             GitHub gitHub = GitHub.instance(Map.<String,String>of(GitHub.AUTHENTICATION_TOKEN_OPTION_NAME, System.getProperty("gitHubTestUserToken")));
-            // create a brand new test repository for this purpose
-            GitHubRepository gitHubRepository = gitHub.createGitRepository(randomID, "Test repository "+randomID, true, true);
-
-            // if we read too quickly we often get a 404 from the server so let's wait a short while
-            Thread.sleep(4000);
+            // use a pooled repository instead of creating a new one to avoid the hosting service rate limits on content creation
+            GitHubRepository gitHubRepository = GitHubRepositoryPool.instance(System.getProperty("gitHubTestUserToken")).acquire(0, true);
 
             File directory = Files.createTempDirectory("nyx-test-git-clone-test-").toFile();
             directory.deleteOnExit();
             assertFalse(new File(directory, "README.md").exists());
             assertNotNull(Git.instance().clone(directory, gitHubRepository.getSSHURL(), System.getProperty("gitHubTestUserPrivateKeyWithoutPassphrase"), (byte[])null));
             assertTrue(new File(directory, "README.md").exists());
-
-            // now delete it
-            gitHub.deleteGitRepository(randomID);
         }
 
         @DisplayName("Git.instance().clone(File, String, null, byte[]) with required SSH protected credentials")
         @Test
         public void cloneFileWithRequiredSSHProtectedCredentialsTest()
             throws Exception {
-            String randomID = RandomUtil.randomAlphabeticString(5);
             // the 'gitHubTestUserPrivateKeyWithoutPassphrase' system property is set by the build script, which in turn reads it from an environment variable
             GitHub gitHub = GitHub.instance(Map.<String,String>of(GitHub.AUTHENTICATION_TOKEN_OPTION_NAME, System.getProperty("gitHubTestUserToken")));
-            // create a brand new test repository for this purpose
-            GitHubRepository gitHubRepository = gitHub.createGitRepository(randomID, "Test repository "+randomID, true, true);
-
-            // if we read too quickly we often get a 404 from the server so let's wait a short while
-            Thread.sleep(4000);
+            // use a pooled repository instead of creating a new one to avoid the hosting service rate limits on content creation
+            GitHubRepository gitHubRepository = GitHubRepositoryPool.instance(System.getProperty("gitHubTestUserToken")).acquire(0, true);
 
             File directory = Files.createTempDirectory("nyx-test-git-clone-test-").toFile();
             directory.deleteOnExit();
             assertFalse(new File(directory, "README.md").exists());
             assertNotNull(Git.instance().clone(directory, gitHubRepository.getSSHURL(), System.getProperty("gitHubTestUserPrivateKeyWithPassphrase"), System.getProperty("gitHubTestUserPrivateKeyPassphrase").getBytes()));
             assertTrue(new File(directory, "README.md").exists());
-
-            // now delete it
-            gitHub.deleteGitRepository(randomID);
         }
 
         @DisplayName("Git.instance().clone(String, String, null, null) with required user and password credentials")
         @Test
         public void cloneStringWithRequiredUserAndPasswordCredentialsTest()
             throws Exception {
-            String randomID = RandomUtil.randomAlphabeticString(5);
             // the 'gitHubTestUserToken' system property is set by the build script, which in turn reads it from an environment variable
             GitHub gitHub = GitHub.instance(Map.<String,String>of(GitHub.AUTHENTICATION_TOKEN_OPTION_NAME, System.getProperty("gitHubTestUserToken")));
-            // create a brand new test repository for this purpose
-            GitHubRepository gitHubRepository = gitHub.createGitRepository(randomID, "Test repository "+randomID, true, true);
-
-            // if we read too quickly we often get a 404 from the server so let's wait a short while
-            Thread.sleep(4000);
+            // use a pooled repository instead of creating a new one to avoid the hosting service rate limits on content creation
+            GitHubRepository gitHubRepository = GitHubRepositoryPool.instance(System.getProperty("gitHubTestUserToken")).acquire(0, true);
 
             File directory = Files.createTempDirectory("nyx-test-git-clone-test-").toFile();
             directory.deleteOnExit();
             assertFalse(new File(directory, "README.md").exists());
             assertNotNull(Git.instance().clone(directory.getAbsolutePath(), gitHubRepository.getHTTPURL(), System.getProperty("gitHubTestUserToken"), System.getProperty("gitHubTestUserToken")));
             assertTrue(new File(directory, "README.md").exists());
-
-            // now delete it
-            gitHub.deleteGitRepository(randomID);
         }
 
         @DisplayName("Git.instance().clone(String, String, null, byte[]) with required SSH unprotected credentials")
         @Test
         public void cloneStringWithRequiredSSHUnprotectedCredentialsTest()
             throws Exception {
-            String randomID = RandomUtil.randomAlphabeticString(5);
             // the 'gitHubTestUserToken' system property is set by the build script, which in turn reads it from an environment variable
             GitHub gitHub = GitHub.instance(Map.<String,String>of(GitHub.AUTHENTICATION_TOKEN_OPTION_NAME, System.getProperty("gitHubTestUserToken")));
-            // create a brand new test repository for this purpose
-            GitHubRepository gitHubRepository = gitHub.createGitRepository(randomID, "Test repository "+randomID, true, true);
-
-            // if we read too quickly we often get a 404 from the server so let's wait a short while
-            Thread.sleep(4000);
+            // use a pooled repository instead of creating a new one to avoid the hosting service rate limits on content creation
+            GitHubRepository gitHubRepository = GitHubRepositoryPool.instance(System.getProperty("gitHubTestUserToken")).acquire(0, true);
 
             File directory = Files.createTempDirectory("nyx-test-git-clone-test-").toFile();
             directory.deleteOnExit();
             assertFalse(new File(directory, "README.md").exists());
             assertNotNull(Git.instance().clone(directory.getAbsolutePath(), gitHubRepository.getSSHURL(), System.getProperty("gitHubTestUserPrivateKeyWithoutPassphrase"), (byte[])null));
             assertTrue(new File(directory, "README.md").exists());
-
-            // now delete it
-            gitHub.deleteGitRepository(randomID);
         }
 
         @DisplayName("Git.instance().clone(String, String, null, byte[]) with required SSH protected credentials")
         @Test
         public void cloneStringWithRequiredSSHProtectedCredentialsTest()
             throws Exception {
-            String randomID = RandomUtil.randomAlphabeticString(5);
             // the 'gitHubTestUserToken' system property is set by the build script, which in turn reads it from an environment variable
             GitHub gitHub = GitHub.instance(Map.<String,String>of(GitHub.AUTHENTICATION_TOKEN_OPTION_NAME, System.getProperty("gitHubTestUserToken")));
-            // create a brand new test repository for this purpose
-            GitHubRepository gitHubRepository = gitHub.createGitRepository(randomID, "Test repository "+randomID, true, true);
-
-            // if we read too quickly we often get a 404 from the server so let's wait a short while
-            Thread.sleep(4000);
+            // use a pooled repository instead of creating a new one to avoid the hosting service rate limits on content creation
+            GitHubRepository gitHubRepository = GitHubRepositoryPool.instance(System.getProperty("gitHubTestUserToken")).acquire(0, true);
 
             File directory = Files.createTempDirectory("nyx-test-git-clone-test-").toFile();
             directory.deleteOnExit();
             assertFalse(new File(directory, "README.md").exists());
             assertNotNull(Git.instance().clone(directory.getAbsolutePath(), gitHubRepository.getSSHURL(), System.getProperty("gitHubTestUserPrivateKeyWithPassphrase"), System.getProperty("gitHubTestUserPrivateKeyPassphrase").getBytes()));
             assertTrue(new File(directory, "README.md").exists());
-
-            // now delete it
-            gitHub.deleteGitRepository(randomID);
         }
     }
 

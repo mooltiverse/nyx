@@ -27,8 +27,9 @@ import (
 	"testing"       // https://pkg.go.dev/testing
 	"time"          // https://pkg.go.dev/time
 
-	log "github.com/sirupsen/logrus"            // https://pkg.go.dev/github.com/sirupsen/logrus
-	assert "github.com/stretchr/testify/assert" // https://pkg.go.dev/github.com/stretchr/testify/assert
+	log "github.com/sirupsen/logrus"              // https://pkg.go.dev/github.com/sirupsen/logrus
+	assert "github.com/stretchr/testify/assert"   // https://pkg.go.dev/github.com/stretchr/testify/assert
+	require "github.com/stretchr/testify/require" // https://pkg.go.dev/github.com/stretchr/testify/require
 
 	ent "github.com/mooltiverse/nyx/src/go/nyx/entities"
 	svcapi "github.com/mooltiverse/nyx/src/go/nyx/services/api"
@@ -141,24 +142,23 @@ func TestGitLabReleaseServiceCreateRelease(t *testing.T) {
 	logLevel := log.GetLevel()   // save the previous logging level
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 
-	randomID := gitutil.RandomAlphabeticString(5, 81)
-
 	// the 'gitLabTestUserToken' environment variable is set by the build script
 	assert.NotEmpty(t, os.Getenv("gitLabTestUserToken"), "A GitLab authentication token must be passed to this test as an environment variable but it was not set")
 	gitLab, err := gitlab.Instance(map[string]string{gitlab.AUTHENTICATION_TOKEN_OPTION_NAME: os.Getenv("gitLabTestUserToken")})
 	assert.NoError(t, err)
 	user, err := gitLab.GetAuthenticatedUser()
 	assert.NoError(t, err)
-	gitLabRepository, err := gitLab.CreateGitRepository(randomID, utl.PointerToString("Test repository "+randomID), false, true)
+	// use a pooled repository instead of creating a new one to avoid the hosting service rate limits on content creation
+	gitLabRepositoryPool, err := gittools.GitLabRepositoryPoolInstance(os.Getenv("gitLabTestUserToken"))
+	assert.NoError(t, err)
+	gitLabRepository, err := gitLabRepositoryPool.Acquire(0)
+	require.NoError(t, err) // stop here if the pooled repository is not available, i.e. due to rate limits
 
 	ownerName := (*user).GetUserName()
 	repositoryName := (*gitLabRepository).GetName()
 	release, err := gitLab.GetReleaseByTag(&ownerName, &repositoryName, "1.0.0-alpha.1")
 	assert.NoError(t, err)
 	assert.Nil(t, release)
-
-	// if we clone too quickly next calls may fail
-	time.Sleep(4000 * time.Millisecond)
 
 	// when a token for user and password authentication for plain Git operations against a GitLab repository,
 	// the user is the "PRIVATE-TOKEN" string and the password is the token
@@ -214,10 +214,6 @@ func TestGitLabReleaseServiceCreateRelease(t *testing.T) {
 		//assert.True(t, *asset.GetType() == "text/plain" || *asset.GetType() == "application/octet-stream") // the content type is not available via this API
 		//assert.True(t, strings.HasPrefix(*asset.GetPath(), "https://api.github.com/repos/")) // as of now these URLS are like https://storage.googleapis.com...
 	}
-
-	// now delete it
-	err = gitLab.DeleteGitRepository(randomID)
-	assert.NoError(t, err)
 
 	log.SetLevel(logLevel) // restore the original logging level
 }

@@ -34,7 +34,6 @@ import (
 	github "github.com/mooltiverse/nyx/src/go/nyx/services/github"
 	gitlab "github.com/mooltiverse/nyx/src/go/nyx/services/gitlab"
 	gittools "github.com/mooltiverse/nyx/src/go/nyx/test/integration/git/tools"
-	gitutil "github.com/mooltiverse/nyx/src/go/nyx/test/integration/git/util"
 	utl "github.com/mooltiverse/nyx/src/go/utils"
 )
 
@@ -123,7 +122,6 @@ func (ts *TestSuite) Test(t *testing.T, context ExecutionContext) error {
 	var gitHostedRepository *svcapi.GitHostedRepository
 	var provider ent.Provider
 	if ts.HostingRepoService != nil {
-		randomID := gitutil.RandomAlphabeticString(5, 901)
 		provider, err = ent.ValueOfProvider(strings.ToUpper(*ts.HostingRepoService))
 		if err != nil {
 			panic(err)
@@ -157,10 +155,28 @@ func (ts *TestSuite) Test(t *testing.T, context ExecutionContext) error {
 		if err != nil {
 			panic(err)
 		}
-		gitHostedRepository, err = (*gitHostingService).CreateGitRepository(randomID, utl.PointerToString("Test repository "+randomID), false, true)
-
-		// if we clone too quickly next calls may fail
-		time.Sleep(4000 * time.Millisecond)
+		// use a pooled repository instead of creating a new one to avoid the hosting service rate limits on content creation.
+		// Functional tests run in their own package so they never share repositories with integration tests.
+		switch provider {
+		case ent.GITHUB:
+			pool, err := gittools.GitHubRepositoryPoolInstance(os.Getenv("gitHubTestUserToken"))
+			if err != nil {
+				panic(err)
+			}
+			if gitHostedRepository, err = pool.Acquire(0); err != nil {
+				panic(err)
+			}
+		case ent.GITLAB:
+			pool, err := gittools.GitLabRepositoryPoolInstance(os.Getenv("gitLabTestUserToken"))
+			if err != nil {
+				panic(err)
+			}
+			if gitHostedRepository, err = pool.Acquire(0); err != nil {
+				panic(err)
+			}
+		default:
+			panic("unknown provider")
+		}
 	}
 
 	// set up the Git repository
@@ -361,18 +377,6 @@ func (ts *TestSuite) Test(t *testing.T, context ExecutionContext) error {
 	}
 
 	log.Debugf("test complete")
-
-	// clean up
-	if gitHostedRepository != nil {
-		switch provider {
-		case ent.GITHUB:
-			defer (*gitHostingService).DeleteGitRepository((*gitHostedRepository).GetName())
-		case ent.GITLAB:
-			defer (*gitHostingService).DeleteGitRepository((*gitHostedRepository).GetID())
-		default:
-			panic("unknown provider")
-		}
-	}
 
 	log.Debugf("running the clean-up commands")
 	for _, cleanCmd := range context.GetCleanUpCommands(script.GetWorkingDirectory(), ts.Env, nil) {

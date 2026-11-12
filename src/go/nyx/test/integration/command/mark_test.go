@@ -26,8 +26,9 @@ import (
 	"testing" // https://pkg.go.dev/testing
 	"time"    // https://pkg.go.dev/time
 
-	log "github.com/sirupsen/logrus"            // https://pkg.go.dev/github.com/sirupsen/logrus
-	assert "github.com/stretchr/testify/assert" // https://pkg.go.dev/github.com/stretchr/testify/assert
+	log "github.com/sirupsen/logrus"              // https://pkg.go.dev/github.com/sirupsen/logrus
+	assert "github.com/stretchr/testify/assert"   // https://pkg.go.dev/github.com/stretchr/testify/assert
+	require "github.com/stretchr/testify/require" // https://pkg.go.dev/github.com/stretchr/testify/require
 
 	cmd "github.com/mooltiverse/nyx/src/go/nyx/command"
 	cnf "github.com/mooltiverse/nyx/src/go/nyx/configuration"
@@ -37,7 +38,6 @@ import (
 	gitlab "github.com/mooltiverse/nyx/src/go/nyx/services/gitlab"
 	cmdtpl "github.com/mooltiverse/nyx/src/go/nyx/test/integration/command/template"
 	gittools "github.com/mooltiverse/nyx/src/go/nyx/test/integration/git/tools"
-	gitutil "github.com/mooltiverse/nyx/src/go/nyx/test/integration/git/util"
 	utl "github.com/mooltiverse/nyx/src/go/utils"
 )
 
@@ -1486,16 +1486,13 @@ func TestMarkRunOnGitHubClonedWorkspaceWithAdditionalRemoteWithNewVersionOrNewRe
 	logLevel := log.GetLevel()   // save the previous logging level
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 
-	randomID := gitutil.RandomAlphabeticString(5, 101)
 	// the 'gitHubTestUserToken' environment variable is set by the build script
 	assert.NotEmpty(t, os.Getenv("gitHubTestUserToken"), "A GitHub authentication token must be passed to this test as an environment variable but it was not set")
-	gitHub, err := github.Instance(map[string]string{github.AUTHENTICATION_TOKEN_OPTION_NAME: os.Getenv("gitHubTestUserToken")})
+	// use a pooled repository instead of creating a new one to avoid the hosting service rate limits on content creation
+	gitHubRepositoryPool, err := gittools.GitHubRepositoryPoolInstance(os.Getenv("gitHubTestUserToken"))
 	assert.NoError(t, err)
-	gitHubRepository, err := gitHub.CreateGitRepository(randomID, utl.PointerToString("Test repository "+randomID), false, true)
-	assert.NoError(t, err)
-
-	// if we clone too quickly next calls may fail
-	time.Sleep(4000 * time.Millisecond)
+	gitHubRepository, err := gitHubRepositoryPool.Acquire(0)
+	require.NoError(t, err) // stop here if the pooled repository is not available, i.e. due to rate limits
 
 	replicaScript := gittools.FROM_SCRATCH().Realize()
 	defer os.RemoveAll(replicaScript.GetWorkingDirectory())
@@ -1559,9 +1556,6 @@ func TestMarkRunOnGitHubClonedWorkspaceWithAdditionalRemoteWithNewVersionOrNewRe
 	assert.Equal(t, len(script.GetTags()), len(replicaScript.GetTags()))
 	assert.Equal(t, len(script.GetTags()), len(remoteScript.GetTags()))
 
-	// now delete it
-	gitHub.DeleteGitRepository(randomID)
-
 	log.SetLevel(logLevel) // restore the original logging level
 }
 
@@ -1569,16 +1563,13 @@ func TestMarkRunOnGitHubClonedWorkspaceWithWithMultipleTagNamesAndNewVersionOrNe
 	logLevel := log.GetLevel()   // save the previous logging level
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 
-	randomID := gitutil.RandomAlphabeticString(5, 101)
 	// the 'gitHubTestUserToken' environment variable is set by the build script
 	assert.NotEmpty(t, os.Getenv("gitHubTestUserToken"), "A GitHub authentication token must be passed to this test as an environment variable but it was not set")
-	gitHub, err := github.Instance(map[string]string{github.AUTHENTICATION_TOKEN_OPTION_NAME: os.Getenv("gitHubTestUserToken")})
+	// use a pooled repository instead of creating a new one to avoid the hosting service rate limits on content creation
+	gitHubRepositoryPool, err := gittools.GitHubRepositoryPoolInstance(os.Getenv("gitHubTestUserToken"))
 	assert.NoError(t, err)
-	gitHubRepository, err := gitHub.CreateGitRepository(randomID, utl.PointerToString("Test repository "+randomID), false, true)
-	assert.NoError(t, err)
-
-	// if we clone too quickly next calls may fail
-	time.Sleep(4000 * time.Millisecond)
+	gitHubRepository, err := gitHubRepositoryPool.Acquire(0)
+	require.NoError(t, err) // stop here if the pooled repository is not available, i.e. due to rate limits
 
 	script := gittools.ONE_BRANCH_SHORT().ApplyOnCloneFromWithUserNameAndPassword((*gitHubRepository).GetHTTPURL(), utl.PointerToString(os.Getenv("gitHubTestUserToken")), utl.PointerToString(""))
 	defer os.RemoveAll(script.GetWorkingDirectory())
@@ -1694,9 +1685,6 @@ func TestMarkRunOnGitHubClonedWorkspaceWithWithMultipleTagNamesAndNewVersionOrNe
 	assert.Equal(t, len(script.GetTags()), len(remoteScript.GetTags()))
 	assert.False(t, firstTaggedCommit == secondTaggedCommit)
 
-	// now delete it
-	gitHub.DeleteGitRepository(randomID)
-
 	log.SetLevel(logLevel) // restore the original logging level
 }
 
@@ -1704,16 +1692,13 @@ func TestMarkRunOnGitHubClonedWorkspaceWithAdditionalRemoteWithNewVersionOrNewRe
 	logLevel := log.GetLevel()   // save the previous logging level
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 
-	randomID := gitutil.RandomAlphabeticString(5, 103)
 	// the 'gitHubTestUserToken' environment variable is set by the build script
 	assert.NotEmpty(t, os.Getenv("gitHubTestUserToken"), "A GitHub authentication token must be passed to this test as an environment variable but it was not set")
-	gitHub, err := github.Instance(map[string]string{github.AUTHENTICATION_TOKEN_OPTION_NAME: os.Getenv("gitHubTestUserToken")})
+	// use a pooled repository instead of creating a new one to avoid the hosting service rate limits on content creation
+	gitHubRepositoryPool, err := gittools.GitHubRepositoryPoolInstance(os.Getenv("gitHubTestUserToken"))
 	assert.NoError(t, err)
-	gitHubRepository, err := gitHub.CreateGitRepository(randomID, utl.PointerToString("Test repository "+randomID), false, true)
-	assert.NoError(t, err)
-
-	// if we clone too quickly next calls may fail
-	time.Sleep(4000 * time.Millisecond)
+	gitHubRepository, err := gitHubRepositoryPool.Acquire(0)
+	require.NoError(t, err) // stop here if the pooled repository is not available, i.e. due to rate limits
 
 	replicaScript := gittools.FROM_SCRATCH().Realize()
 	defer os.RemoveAll(replicaScript.GetWorkingDirectory())
@@ -1777,9 +1762,6 @@ func TestMarkRunOnGitHubClonedWorkspaceWithAdditionalRemoteWithNewVersionOrNewRe
 	assert.Equal(t, len(script.GetTags()), len(replicaScript.GetTags()))
 	assert.Equal(t, len(script.GetTags()), len(remoteScript.GetTags()))
 
-	// now delete it
-	gitHub.DeleteGitRepository((*gitHubRepository).GetID())
-
 	log.SetLevel(logLevel) // restore the original logging level
 }
 
@@ -1787,16 +1769,13 @@ func TestMarkRunOnGitHubClonedWorkspaceWithAdditionalRemoteWithNewVersionOrNewRe
 	logLevel := log.GetLevel()   // save the previous logging level
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 
-	randomID := gitutil.RandomAlphabeticString(5, 103)
 	// the 'gitHubTestUserToken' environment variable is set by the build script
 	assert.NotEmpty(t, os.Getenv("gitHubTestUserToken"), "A GitHub authentication token must be passed to this test as an environment variable but it was not set")
-	gitHub, err := github.Instance(map[string]string{github.AUTHENTICATION_TOKEN_OPTION_NAME: os.Getenv("gitHubTestUserToken")})
+	// use a pooled repository instead of creating a new one to avoid the hosting service rate limits on content creation
+	gitHubRepositoryPool, err := gittools.GitHubRepositoryPoolInstance(os.Getenv("gitHubTestUserToken"))
 	assert.NoError(t, err)
-	gitHubRepository, err := gitHub.CreateGitRepository(randomID, utl.PointerToString("Test repository "+randomID), false, true)
-	assert.NoError(t, err)
-
-	// if we clone too quickly next calls may fail
-	time.Sleep(4000 * time.Millisecond)
+	gitHubRepository, err := gitHubRepositoryPool.Acquire(0)
+	require.NoError(t, err) // stop here if the pooled repository is not available, i.e. due to rate limits
 
 	replicaScript := gittools.FROM_SCRATCH().Realize()
 	defer os.RemoveAll(replicaScript.GetWorkingDirectory())
@@ -1860,9 +1839,6 @@ func TestMarkRunOnGitHubClonedWorkspaceWithAdditionalRemoteWithNewVersionOrNewRe
 	assert.Equal(t, len(script.GetTags()), len(replicaScript.GetTags()))
 	assert.Equal(t, len(script.GetTags()), len(remoteScript.GetTags()))
 
-	// now delete it
-	gitHub.DeleteGitRepository((*gitHubRepository).GetID())
-
 	log.SetLevel(logLevel) // restore the original logging level
 }
 
@@ -1870,16 +1846,13 @@ func TestMarkRunOnGitLabClonedWorkspaceWithAdditionalRemoteWithNewVersionOrNewRe
 	logLevel := log.GetLevel()   // save the previous logging level
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 
-	randomID := gitutil.RandomAlphabeticString(5, 103)
 	// the 'gitLabTestUserToken' environment variable is set by the build script
 	assert.NotEmpty(t, os.Getenv("gitLabTestUserToken"), "A GitLab authentication token must be passed to this test as an environment variable but it was not set")
-	gitLab, err := gitlab.Instance(map[string]string{gitlab.AUTHENTICATION_TOKEN_OPTION_NAME: os.Getenv("gitLabTestUserToken")})
+	// use a pooled repository instead of creating a new one to avoid the hosting service rate limits on content creation
+	gitLabRepositoryPool, err := gittools.GitLabRepositoryPoolInstance(os.Getenv("gitLabTestUserToken"))
 	assert.NoError(t, err)
-	gitLabRepository, err := gitLab.CreateGitRepository(randomID, utl.PointerToString("Test repository "+randomID), false, true)
-	assert.NoError(t, err)
-
-	// if we clone too quickly next calls may fail
-	time.Sleep(4000 * time.Millisecond)
+	gitLabRepository, err := gitLabRepositoryPool.Acquire(0)
+	require.NoError(t, err) // stop here if the pooled repository is not available, i.e. due to rate limits
 
 	replicaScript := gittools.FROM_SCRATCH().Realize()
 	defer os.RemoveAll(replicaScript.GetWorkingDirectory())
@@ -1943,9 +1916,6 @@ func TestMarkRunOnGitLabClonedWorkspaceWithAdditionalRemoteWithNewVersionOrNewRe
 	assert.Equal(t, len(script.GetTags()), len(replicaScript.GetTags()))
 	assert.Equal(t, len(script.GetTags()), len(remoteScript.GetTags()))
 
-	// now delete it
-	gitLab.DeleteGitRepository((*gitLabRepository).GetID())
-
 	log.SetLevel(logLevel) // restore the original logging level
 }
 
@@ -1953,16 +1923,13 @@ func TestMarkRunOnGitLabClonedWorkspaceWithWithMultipleTagNamesAndNewVersionOrNe
 	logLevel := log.GetLevel()   // save the previous logging level
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 
-	randomID := gitutil.RandomAlphabeticString(5, 103)
 	// the 'gitLabTestUserToken' environment variable is set by the build script
 	assert.NotEmpty(t, os.Getenv("gitLabTestUserToken"), "A GitLab authentication token must be passed to this test as an environment variable but it was not set")
-	gitLab, err := gitlab.Instance(map[string]string{gitlab.AUTHENTICATION_TOKEN_OPTION_NAME: os.Getenv("gitLabTestUserToken")})
+	// use a pooled repository instead of creating a new one to avoid the hosting service rate limits on content creation
+	gitLabRepositoryPool, err := gittools.GitLabRepositoryPoolInstance(os.Getenv("gitLabTestUserToken"))
 	assert.NoError(t, err)
-	gitLabRepository, err := gitLab.CreateGitRepository(randomID, utl.PointerToString("Test repository "+randomID), false, true)
-	assert.NoError(t, err)
-
-	// if we clone too quickly next calls may fail
-	time.Sleep(4000 * time.Millisecond)
+	gitLabRepository, err := gitLabRepositoryPool.Acquire(0)
+	require.NoError(t, err) // stop here if the pooled repository is not available, i.e. due to rate limits
 
 	script := gittools.ONE_BRANCH_SHORT().ApplyOnCloneFromWithUserNameAndPassword((*gitLabRepository).GetHTTPURL(), utl.PointerToString("PRIVATE-TOKEN"), utl.PointerToString(os.Getenv("gitLabTestUserToken")))
 	defer os.RemoveAll(script.GetWorkingDirectory())
@@ -2078,9 +2045,6 @@ func TestMarkRunOnGitLabClonedWorkspaceWithWithMultipleTagNamesAndNewVersionOrNe
 	assert.Equal(t, len(script.GetTags()), len(remoteScript.GetTags()))
 	assert.False(t, firstTaggedCommit == secondTaggedCommit)
 
-	// now delete it
-	gitLab.DeleteGitRepository((*gitLabRepository).GetID())
-
 	log.SetLevel(logLevel) // restore the original logging level
 }
 
@@ -2088,16 +2052,13 @@ func TestMarkRunOnGitLabClonedWorkspaceWithAdditionalRemoteWithNewVersionOrNewRe
 	logLevel := log.GetLevel()   // save the previous logging level
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 
-	randomID := gitutil.RandomAlphabeticString(5, 103)
 	// the 'gitLabTestUserToken' environment variable is set by the build script
 	assert.NotEmpty(t, os.Getenv("gitLabTestUserToken"), "A GitLab authentication token must be passed to this test as an environment variable but it was not set")
-	gitLab, err := gitlab.Instance(map[string]string{gitlab.AUTHENTICATION_TOKEN_OPTION_NAME: os.Getenv("gitLabTestUserToken")})
+	// use a pooled repository instead of creating a new one to avoid the hosting service rate limits on content creation
+	gitLabRepositoryPool, err := gittools.GitLabRepositoryPoolInstance(os.Getenv("gitLabTestUserToken"))
 	assert.NoError(t, err)
-	gitLabRepository, err := gitLab.CreateGitRepository(randomID, utl.PointerToString("Test repository "+randomID), false, true)
-	assert.NoError(t, err)
-
-	// if we clone too quickly next calls may fail
-	time.Sleep(4000 * time.Millisecond)
+	gitLabRepository, err := gitLabRepositoryPool.Acquire(0)
+	require.NoError(t, err) // stop here if the pooled repository is not available, i.e. due to rate limits
 
 	replicaScript := gittools.FROM_SCRATCH().Realize()
 	defer os.RemoveAll(replicaScript.GetWorkingDirectory())
@@ -2161,9 +2122,6 @@ func TestMarkRunOnGitLabClonedWorkspaceWithAdditionalRemoteWithNewVersionOrNewRe
 	assert.Equal(t, len(script.GetTags()), len(replicaScript.GetTags()))
 	assert.Equal(t, len(script.GetTags()), len(remoteScript.GetTags()))
 
-	// now delete it
-	gitLab.DeleteGitRepository((*gitLabRepository).GetID())
-
 	log.SetLevel(logLevel) // restore the original logging level
 }
 
@@ -2171,16 +2129,13 @@ func TestMarkRunOnGitLabClonedWorkspaceWithAdditionalRemoteWithNewVersionOrNewRe
 	logLevel := log.GetLevel()   // save the previous logging level
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 
-	randomID := gitutil.RandomAlphabeticString(5, 103)
 	// the 'gitLabTestUserToken' environment variable is set by the build script
 	assert.NotEmpty(t, os.Getenv("gitLabTestUserToken"), "A GitLab authentication token must be passed to this test as an environment variable but it was not set")
-	gitLab, err := gitlab.Instance(map[string]string{gitlab.AUTHENTICATION_TOKEN_OPTION_NAME: os.Getenv("gitLabTestUserToken")})
+	// use a pooled repository instead of creating a new one to avoid the hosting service rate limits on content creation
+	gitLabRepositoryPool, err := gittools.GitLabRepositoryPoolInstance(os.Getenv("gitLabTestUserToken"))
 	assert.NoError(t, err)
-	gitLabRepository, err := gitLab.CreateGitRepository(randomID, utl.PointerToString("Test repository "+randomID), false, true)
-	assert.NoError(t, err)
-
-	// if we clone too quickly next calls may fail
-	time.Sleep(4000 * time.Millisecond)
+	gitLabRepository, err := gitLabRepositoryPool.Acquire(0)
+	require.NoError(t, err) // stop here if the pooled repository is not available, i.e. due to rate limits
 
 	replicaScript := gittools.FROM_SCRATCH().Realize()
 	defer os.RemoveAll(replicaScript.GetWorkingDirectory())
@@ -2243,9 +2198,6 @@ func TestMarkRunOnGitLabClonedWorkspaceWithAdditionalRemoteWithNewVersionOrNewRe
 	assert.Equal(t, "0.0.5", *version)
 	assert.Equal(t, len(script.GetTags()), len(replicaScript.GetTags()))
 	assert.Equal(t, len(script.GetTags()), len(remoteScript.GetTags()))
-
-	// now delete it
-	gitLab.DeleteGitRepository((*gitLabRepository).GetID())
 
 	log.SetLevel(logLevel) // restore the original logging level
 }

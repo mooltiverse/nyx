@@ -43,9 +43,10 @@ import com.mooltiverse.oss.nyx.services.User;
 import com.mooltiverse.oss.nyx.services.UserService;
 import com.mooltiverse.oss.nyx.git.tools.Scenario;
 import com.mooltiverse.oss.nyx.git.tools.Script;
-import com.mooltiverse.oss.nyx.git.util.RandomUtil;
 import com.mooltiverse.oss.nyx.services.github.GitHub;
+import com.mooltiverse.oss.nyx.services.github.GitHubRepositoryPool;
 import com.mooltiverse.oss.nyx.services.gitlab.GitLab;
+import com.mooltiverse.oss.nyx.services.gitlab.GitLabRepositoryPool;
 
 /**
  * The test suite:<br>
@@ -172,7 +173,6 @@ public class TestSuite {
 		GitHostedRepository gitHostedRepository = null;
 		Provider provider = null;
 		if (!Objects.isNull(hostingRepoService)) {
-			String randomID = RandomUtil.randomAlphabeticString(5);
 			provider = Provider.valueOf(hostingRepoService.toUpperCase());
 			Map<String,String> hostingServiceOptions = new HashMap<String,String>();
 			switch (provider)
@@ -195,10 +195,14 @@ public class TestSuite {
 			gitHostingService = ServiceFactory.gitHostingServiceInstance(provider, hostingServiceOptions);
 			gitHostingUserService = ServiceFactory.userServiceInstance(provider, hostingServiceOptions);
 			gitHostingReleaseService = ServiceFactory.releaseServiceInstance(provider, hostingServiceOptions);
-			gitHostedRepository = gitHostingService.createGitRepository(randomID, "Test repository "+randomID, false, true);
-
-			// if we clone too quickly next calls may fail
-			Thread.sleep(4000);
+			// use a pooled repository instead of creating a new one to avoid the hosting service rate limits on content creation.
+			// Functional tests have their own scope so they never share repositories with integration tests.
+			switch (provider)
+			{
+				case GITHUB: gitHostedRepository = GitHubRepositoryPool.instance(System.getProperty("gitHubTestUserToken"), "functional").acquire(0); break;
+				case GITLAB: gitHostedRepository = GitLabRepositoryPool.instance(System.getProperty("gitLabTestUserToken"), "functional").acquire(0); break;
+				default: throw new RuntimeException("unknown provider");
+			}
 		}
 	
 		// set up the Git repository
@@ -362,22 +366,6 @@ public class TestSuite {
 		}
 
 		logger.debug("test complete");
-
-		// clean up
-		if (!Objects.isNull(gitHostedRepository)) {
-			switch (provider)
-			{
-				case GITHUB: {
-					gitHostingService.deleteGitRepository(gitHostedRepository.getName());
-					break;
-				}
-				case GITLAB: {
-					gitHostingService.deleteGitRepository(gitHostedRepository.getID());
-					break;
-				}
-				default: throw new RuntimeException("unknown provider");
-			}
-		}
 
 		logger.debug("Running the clean-up commands");
 		for (GradleCommand cleanCmd: context.getCleanUpCommands(script.getWorkingDirectory(), env, null)) {

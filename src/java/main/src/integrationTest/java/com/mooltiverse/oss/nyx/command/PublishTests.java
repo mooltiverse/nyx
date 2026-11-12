@@ -39,12 +39,13 @@ import com.mooltiverse.oss.nyx.entities.ReleaseTypes;
 import com.mooltiverse.oss.nyx.entities.ServiceConfiguration;
 import com.mooltiverse.oss.nyx.git.tools.Scenario;
 import com.mooltiverse.oss.nyx.git.tools.Script;
-import com.mooltiverse.oss.nyx.git.util.RandomUtil;
 import com.mooltiverse.oss.nyx.services.github.GitHub;
 import com.mooltiverse.oss.nyx.services.github.GitHubRepository;
+import com.mooltiverse.oss.nyx.services.github.GitHubRepositoryPool;
 import com.mooltiverse.oss.nyx.services.github.GitHubRelease;
 import com.mooltiverse.oss.nyx.services.github.GitHubUser;
 import com.mooltiverse.oss.nyx.services.gitlab.GitLab;
+import com.mooltiverse.oss.nyx.services.gitlab.GitLabRepositoryPool;
 import com.mooltiverse.oss.nyx.services.gitlab.GitLabRepository;
 import com.mooltiverse.oss.nyx.services.gitlab.GitLabRelease;
 import com.mooltiverse.oss.nyx.services.gitlab.GitLabUser;
@@ -58,11 +59,11 @@ public class PublishTests {
         @DisplayName("Publish.run() after a new release has been created on a GitHub hosted repository using only global assets > publishes a new version with local files published as release assets")
         void runWithNewReleaseAndGlobalAssetsOnGitHubRepositoryTest()
             throws Exception {
-            String randomID = RandomUtil.randomAlphabeticString(5);
             // the 'gitHubTestUserToken' system property is set by the build script, which in turn reads it from an environment variable
             GitHub gitHub = GitHub.instance(Map.<String,String>of(GitHub.AUTHENTICATION_TOKEN_OPTION_NAME, System.getProperty("gitHubTestUserToken")));
             GitHubUser user = gitHub.getAuthenticatedUser();
-            GitHubRepository gitHubRepository = gitHub.createGitRepository(randomID, "Test repository "+randomID, false, true);
+            // use a pooled repository instead of creating a new one to avoid GitHub's secondary rate limit on content creation
+            GitHubRepository gitHubRepository = GitHubRepositoryPool.instance(System.getProperty("gitHubTestUserToken")).acquire(0);
 
             Path assetPath1 = Files.createTempFile("nyx-test-github-release-test-", ".txt");
             assetPath1.toFile().deleteOnExit();
@@ -71,8 +72,6 @@ public class PublishTests {
             assetPath2.toFile().deleteOnExit();
             Files.write(assetPath2, "content2".getBytes());
 
-            // if we clone too quickly next calls may fail
-            Thread.sleep(4000);
 
             Script script = Scenario.ONE_BRANCH_SHORT.applyOnClone(gitHubRepository.getHTTPURL(), System.getProperty("gitHubTestUserToken"), "");
             script.getWorkingDirectory().deleteOnExit();
@@ -172,21 +171,18 @@ public class PublishTests {
             }
 
             // now delete it
-            gitHub.deleteGitRepository(randomID);
         }
 
         @Test
         @DisplayName("Publish.run() after a new release has been created on a GitHub hosted repository using a custom release name > publishes a new version with a custom release name")
         void runWithNewReleaseWithCustomNameOnGitHubRepositoryTest()
             throws Exception {
-            String randomID = RandomUtil.randomAlphabeticString(5);
             // the 'gitHubTestUserToken' system property is set by the build script, which in turn reads it from an environment variable
             GitHub gitHub = GitHub.instance(Map.<String,String>of(GitHub.AUTHENTICATION_TOKEN_OPTION_NAME, System.getProperty("gitHubTestUserToken")));
             GitHubUser user = gitHub.getAuthenticatedUser();
-            GitHubRepository gitHubRepository = gitHub.createGitRepository(randomID, "Test repository "+randomID, false, true);
+            // use a pooled repository instead of creating a new one to avoid GitHub's secondary rate limit on content creation
+            GitHubRepository gitHubRepository = GitHubRepositoryPool.instance(System.getProperty("gitHubTestUserToken")).acquire(0);
 
-            // if we clone too quickly next calls may fail
-            Thread.sleep(4000);
 
             Script script = Scenario.ONE_BRANCH_SHORT.applyOnClone(gitHubRepository.getHTTPURL(), System.getProperty("gitHubTestUserToken"), "");
             script.getWorkingDirectory().deleteOnExit();
@@ -253,18 +249,17 @@ public class PublishTests {
             Thread.sleep(2000);
 
             // now delete it
-            gitHub.deleteGitRepository(randomID);
         }
 
         @Test
         @DisplayName("Publish.run() after a new release has been created on a GitHub hosted repository using filtered assets > publishes a new version with filtered assets published as release assets")
         void runWithNewReleaseAndFilteredAssetsOnGitHubRepositoryTest()
             throws Exception {
-            String randomID = RandomUtil.randomAlphabeticString(5);
             // the 'gitHubTestUserToken' system property is set by the build script, which in turn reads it from an environment variable
             GitHub gitHub = GitHub.instance(Map.<String,String>of(GitHub.AUTHENTICATION_TOKEN_OPTION_NAME, System.getProperty("gitHubTestUserToken")));
             GitHubUser user = gitHub.getAuthenticatedUser();
-            GitHubRepository gitHubRepository = gitHub.createGitRepository(randomID, "Test repository "+randomID, false, true);
+            // use a pooled repository instead of creating a new one to avoid GitHub's secondary rate limit on content creation
+            GitHubRepository gitHubRepository = GitHubRepositoryPool.instance(System.getProperty("gitHubTestUserToken")).acquire(0);
 
             Path assetPath1 = Files.createTempFile("nyx-test-github-release-test-", ".txt");
             assetPath1.toFile().deleteOnExit();
@@ -273,8 +268,6 @@ public class PublishTests {
             assetPath2.toFile().deleteOnExit();
             Files.write(assetPath2, "content2".getBytes());
 
-            // if we clone too quickly next calls may fail
-            Thread.sleep(4000);
 
             Script script = Scenario.ONE_BRANCH_SHORT.applyOnClone(gitHubRepository.getHTTPURL(), System.getProperty("gitHubTestUserToken"), "");
             script.getWorkingDirectory().deleteOnExit();
@@ -375,21 +368,18 @@ public class PublishTests {
             }
 
             // now delete it
-            gitHub.deleteGitRepository(randomID);
         }
 
         @Test
         @DisplayName("Publish.run() after a new release has been created on a GitHub hosted repository using the draft release flag > publishes a new version flagged as draft")
         void runWithNewReleaseWithDraftFlagOnGitHubRepositoryTest()
             throws Exception {
-            String randomID = RandomUtil.randomAlphabeticString(5);
             // the 'gitHubTestUserToken' system property is set by the build script, which in turn reads it from an environment variable
             GitHub gitHub = GitHub.instance(Map.<String,String>of(GitHub.AUTHENTICATION_TOKEN_OPTION_NAME, System.getProperty("gitHubTestUserToken")));
             GitHubUser user = gitHub.getAuthenticatedUser();
-            GitHubRepository gitHubRepository = gitHub.createGitRepository(randomID, "Test repository "+randomID, false, true);
+            // use a pooled repository instead of creating a new one to avoid GitHub's secondary rate limit on content creation
+            GitHubRepository gitHubRepository = GitHubRepositoryPool.instance(System.getProperty("gitHubTestUserToken")).acquire(0);
 
-            // if we clone too quickly next calls may fail
-            Thread.sleep(4000);
 
             Script script = Scenario.ONE_BRANCH_SHORT.applyOnClone(gitHubRepository.getHTTPURL(), System.getProperty("gitHubTestUserToken"), "");
             script.getWorkingDirectory().deleteOnExit();
@@ -451,21 +441,18 @@ public class PublishTests {
             // with the flag (and yes, it is).
 
             // now delete it
-            gitHub.deleteGitRepository(randomID);
         }
 
         @Test
         @DisplayName("Publish.run() after a new release has been created on a GitHub hosted repository using the pre-release release flag > publishes a new version flagged as pre-release")
         void runWithNewReleaseWithPreReleaseFlagOnGitHubRepositoryTest()
             throws Exception {
-            String randomID = RandomUtil.randomAlphabeticString(5);
             // the 'gitHubTestUserToken' system property is set by the build script, which in turn reads it from an environment variable
             GitHub gitHub = GitHub.instance(Map.<String,String>of(GitHub.AUTHENTICATION_TOKEN_OPTION_NAME, System.getProperty("gitHubTestUserToken")));
             GitHubUser user = gitHub.getAuthenticatedUser();
-            GitHubRepository gitHubRepository = gitHub.createGitRepository(randomID, "Test repository "+randomID, false, true);
+            // use a pooled repository instead of creating a new one to avoid GitHub's secondary rate limit on content creation
+            GitHubRepository gitHubRepository = GitHubRepositoryPool.instance(System.getProperty("gitHubTestUserToken")).acquire(0);
 
-            // if we clone too quickly next calls may fail
-            Thread.sleep(4000);
 
             Script script = Scenario.ONE_BRANCH_SHORT.applyOnClone(gitHubRepository.getHTTPURL(), System.getProperty("gitHubTestUserToken"), "");
             script.getWorkingDirectory().deleteOnExit();
@@ -527,18 +514,17 @@ public class PublishTests {
             // with the flag (and yes, it is).
 
             // now delete it
-            gitHub.deleteGitRepository(randomID);
         }
 
         @Test
         @DisplayName("Publish.run() after a new release has been created on a GitLab hosted repository using only global assets > publishes a new version with local files and URLs published as release assets")
         void runWithNewReleaseAndGlobalAssetsOnGitLabRepositoryTest()
             throws Exception {
-            String randomID = RandomUtil.randomAlphabeticString(5);
             // the 'gitLabTestUserToken' system property is set by the build script, which in turn reads it from an environment variable
             GitLab gitLab = GitLab.instance(Map.<String,String>of(GitLab.AUTHENTICATION_TOKEN_OPTION_NAME, System.getProperty("gitLabTestUserToken")));
             GitLabUser user = gitLab.getAuthenticatedUser();
-            GitLabRepository gitLabRepository = gitLab.createGitRepository(randomID, "Test repository "+randomID, false, true);
+            // use a pooled repository instead of creating a new one to avoid the hosting service rate limits on content creation
+            GitLabRepository gitLabRepository = GitLabRepositoryPool.instance(System.getProperty("gitLabTestUserToken")).acquire(0);
 
             Path assetPath1 = Files.createTempFile("nyx-test-gitlab-release-test-", ".txt");
             assetPath1.toFile().deleteOnExit();
@@ -546,9 +532,6 @@ public class PublishTests {
             Path assetPath2 = Files.createTempFile("nyx-test-gitlab-release-test-", ".bin");
             assetPath2.toFile().deleteOnExit();
             Files.write(assetPath2, "content2".getBytes());
-
-            // if we clone too quickly next calls may fail
-            Thread.sleep(4000);
 
             // when a token for user and password authentication for plain Git operations against a GitLab repository,
             // the user is the "PRIVATE-TOKEN" string and the password is the token
@@ -648,23 +631,17 @@ public class PublishTests {
                 //assertTrue(asset.getType().equals("text/plain") || asset.getType().equals("application/octet-stream")); // the content type is not available via this API
                 //assertTrue(asset.getPath().startsWith("https://api.github.com/repos/")); // as of now these URLS are like https://storage.googleapis.com...
             }
-
-            // now delete it
-            gitLab.deleteGitRepository(gitLabRepository.getID());
         }
 
         @Test
         @DisplayName("Publish.run() after a new release has been created on a GitLab hosted repository using a custom release name > publishes a new version with a custom release name")
         void runWithNewReleaseWithCustomNameOnGitLabRepositoryTest()
             throws Exception {
-            String randomID = RandomUtil.randomAlphabeticString(5);
             // the 'gitLabTestUserToken' system property is set by the build script, which in turn reads it from an environment variable
             GitLab gitLab = GitLab.instance(Map.<String,String>of(GitLab.AUTHENTICATION_TOKEN_OPTION_NAME, System.getProperty("gitLabTestUserToken")));
             GitLabUser user = gitLab.getAuthenticatedUser();
-            GitLabRepository gitLabRepository = gitLab.createGitRepository(randomID, "Test repository "+randomID, false, true);
-
-            // if we clone too quickly next calls may fail
-            Thread.sleep(4000);
+            // use a pooled repository instead of creating a new one to avoid the hosting service rate limits on content creation
+            GitLabRepository gitLabRepository = GitLabRepositoryPool.instance(System.getProperty("gitLabTestUserToken")).acquire(0);
 
             // when a token for user and password authentication for plain Git operations against a GitLab repository,
             // the user is the "PRIVATE-TOKEN" string and the password is the token
@@ -731,20 +708,17 @@ public class PublishTests {
         
             // if we delete too quickly we often get a 404 from the server so let's wait a short while
             Thread.sleep(2000);
-
-            // now delete it
-            gitLab.deleteGitRepository(gitLabRepository.getID());
         }
 
         @Test
         @DisplayName("Publish.run() after a new release has been created on a GitLab hosted repository using filtered assets > publishes a new version with filtered assets published as release assets")
         void runWithNewReleaseAndFilteredAssetsOnGitLabRepositoryTest()
             throws Exception {
-            String randomID = RandomUtil.randomAlphabeticString(5);
             // the 'gitLabTestUserToken' system property is set by the build script, which in turn reads it from an environment variable
             GitLab gitLab = GitLab.instance(Map.<String,String>of(GitLab.AUTHENTICATION_TOKEN_OPTION_NAME, System.getProperty("gitLabTestUserToken")));
             GitLabUser user = gitLab.getAuthenticatedUser();
-            GitLabRepository gitLabRepository = gitLab.createGitRepository(randomID, "Test repository "+randomID, false, true);
+            // use a pooled repository instead of creating a new one to avoid the hosting service rate limits on content creation
+            GitLabRepository gitLabRepository = GitLabRepositoryPool.instance(System.getProperty("gitLabTestUserToken")).acquire(0);
 
             Path assetPath1 = Files.createTempFile("nyx-test-gitlab-release-test-", ".txt");
             assetPath1.toFile().deleteOnExit();
@@ -752,9 +726,6 @@ public class PublishTests {
             Path assetPath2 = Files.createTempFile("nyx-test-gitlab-release-test-", ".bin");
             assetPath2.toFile().deleteOnExit();
             Files.write(assetPath2, "content2".getBytes());
-
-            // if we clone too quickly next calls may fail
-            Thread.sleep(4000);
 
             // when a token for user and password authentication for plain Git operations against a GitLab repository,
             // the user is the "PRIVATE-TOKEN" string and the password is the token
@@ -855,9 +826,6 @@ public class PublishTests {
                 //assertEquals("text/plain", asset.getType()); // the content type is not available via this API
                 //assertTrue(asset.getPath().startsWith("https://api.github.com/repos/")); // as of now these URLS are like https://storage.googleapis.com...
             }
-
-            // now delete it
-            gitLab.deleteGitRepository(gitLabRepository.getID());
         }
 
         @Test
@@ -865,14 +833,11 @@ public class PublishTests {
         void runWithNewReleaseWithDraftFlagOnGitLabRepositoryTest()
             throws Exception {
             // ATTENTION: the "draft" flag is not supported on GitLab so here we just test that setting the flag has no effect
-            String randomID = RandomUtil.randomAlphabeticString(5);
             // the 'gitLabTestUserToken' system property is set by the build script, which in turn reads it from an environment variable
             GitLab gitLab = GitLab.instance(Map.<String,String>of(GitLab.AUTHENTICATION_TOKEN_OPTION_NAME, System.getProperty("gitLabTestUserToken")));
             GitLabUser user = gitLab.getAuthenticatedUser();
-            GitLabRepository gitLabRepository = gitLab.createGitRepository(randomID, "Test repository "+randomID, false, true);
-
-            // if we clone too quickly next calls may fail
-            Thread.sleep(4000);
+            // use a pooled repository instead of creating a new one to avoid the hosting service rate limits on content creation
+            GitLabRepository gitLabRepository = GitLabRepositoryPool.instance(System.getProperty("gitLabTestUserToken")).acquire(0);
 
             // when a token for user and password authentication for plain Git operations against a GitLab repository,
             // the user is the "PRIVATE-TOKEN" string and the password is the token
@@ -932,9 +897,6 @@ public class PublishTests {
             Thread.sleep(2000);
 
             // ATTENTION: the "draft" flag is not supported on GitLab so here we just test that setting the flag has no effect
-
-            // now delete it
-            gitLab.deleteGitRepository(gitLabRepository.getID());
         }
 
         @Test
@@ -942,14 +904,11 @@ public class PublishTests {
         void runWithNewReleaseWithPreReleaseFlagOnGitLabRepositoryTest()
             throws Exception {
             // ATTENTION: the "pre-release" flag is not supported on GitLab so here we just test that setting the flag has no effect
-            String randomID = RandomUtil.randomAlphabeticString(5);
             // the 'gitLabTestUserToken' system property is set by the build script, which in turn reads it from an environment variable
             GitLab gitLab = GitLab.instance(Map.<String,String>of(GitLab.AUTHENTICATION_TOKEN_OPTION_NAME, System.getProperty("gitLabTestUserToken")));
             GitLabUser user = gitLab.getAuthenticatedUser();
-            GitLabRepository gitLabRepository = gitLab.createGitRepository(randomID, "Test repository "+randomID, false, true);
-
-            // if we clone too quickly next calls may fail
-            Thread.sleep(4000);
+            // use a pooled repository instead of creating a new one to avoid the hosting service rate limits on content creation
+            GitLabRepository gitLabRepository = GitLabRepositoryPool.instance(System.getProperty("gitLabTestUserToken")).acquire(0);
 
             // when a token for user and password authentication for plain Git operations against a GitLab repository,
             // the user is the "PRIVATE-TOKEN" string and the password is the token
@@ -1009,9 +968,6 @@ public class PublishTests {
             Thread.sleep(2000);
 
             // ATTENTION: the "pre-release" flag is not supported on GitLab so here we just test that setting the flag has no effect
-
-            // now delete it
-            //gitLab.deleteGitRepository(gitLabRepository.getID());
         }
     }
 }
