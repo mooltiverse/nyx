@@ -1,0 +1,30 @@
+---
+sidebar_position: 5
+tags:
+  - ai
+  - agent
+  - skill
+  - user
+  - guide
+  - quick start
+---
+
+# AI Agent Skill
+
+:::tip
+Check out [this section](../introduction/usage.mdx#using-the-ai-agent-skill) for a full reference on the AI Agent Skill.
+:::
+
+Due to the conversational nature of AI agents, the skill is best used in a chat interface. The following examples show how to use the skill with any agent supporting the [Agent Skills specification](https://agentskills.io/), assuming the skill is installed and the agent is configured to use it.
+
+> Our project releases with Nyx using the `simple` preset. I just removed the deprecated `/v1/orders` REST endpoint from the `api` module; clients still calling it will break. Write the commit message for this change and tell me which version number Nyx will produce if the latest release is `3.7.2` and this is the only commit since.
+
+> We use Nyx with the `simple` preset. A colleague developed a feature on branch `topic` with the commit `feat: add export to CSV`, then merged it into `main` with `git merge --no-ff topic` (default message). `git log --first-parent --oneline` on `main` shows:
+> 
+> ```
+> 3c9ed55 Merge branch 'topic'
+> 22395ad chore: update dependencies
+> a12c172 chore: release housekeeping   (tagged 1.0.0)
+> ```
+> 
+> Nyx says the version is still `1.0.0` and there is no new release. Isn't the `feat` commit supposed to bump the minor version? Explain what happens and what we should change in our workflow.

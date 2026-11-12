@@ -26,13 +26,12 @@ import (
 	"path/filepath" // https://pkg.go.dev/path/filepath
 	"strings"       // https://pkg.go.dev/strings
 	"testing"       // https://pkg.go.dev/testing
-	"time"          // https://pkg.go.dev/time
 
-	log "github.com/sirupsen/logrus"            // https://pkg.go.dev/github.com/sirupsen/logrus
-	assert "github.com/stretchr/testify/assert" // https://pkg.go.dev/github.com/stretchr/testify/assert
+	log "github.com/sirupsen/logrus"              // https://pkg.go.dev/github.com/sirupsen/logrus
+	assert "github.com/stretchr/testify/assert"   // https://pkg.go.dev/github.com/stretchr/testify/assert
+	require "github.com/stretchr/testify/require" // https://pkg.go.dev/github.com/stretchr/testify/require
 
 	. "github.com/mooltiverse/nyx/src/go/nyx/git"
-	github "github.com/mooltiverse/nyx/src/go/nyx/services/github"
 	gittools "github.com/mooltiverse/nyx/src/go/nyx/test/integration/git/tools"
 	gitutil "github.com/mooltiverse/nyx/src/go/nyx/test/integration/git/util"
 	utl "github.com/mooltiverse/nyx/src/go/utils"
@@ -162,26 +161,18 @@ func TestGitCloneWithoutRequiredUserAndPasswordCredentials(t *testing.T) {
 	logLevel := log.GetLevel()   // save the previous logging level
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 
-	randomID := gitutil.RandomAlphabeticString(5, 91)
-
 	// the 'gitHubTestUserToken' environment variable is set by the build script
 	assert.NotEmpty(t, os.Getenv("gitHubTestUserToken"), "A GitHub authentication token must be passed to this test as an environment variable but it was not set")
-	gitHub, err := github.Instance(map[string]string{github.AUTHENTICATION_TOKEN_OPTION_NAME: os.Getenv("gitHubTestUserToken")})
+	// use a pooled repository instead of creating a new one to avoid the hosting service rate limits on content creation
+	gitHubRepositoryPool, err := gittools.GitHubRepositoryPoolInstance(os.Getenv("gitHubTestUserToken"))
 	assert.NoError(t, err)
-	// create a brand new test repository for this purpose
-	gitHubRepository, err := gitHub.CreateGitRepository(randomID, utl.PointerToString("Test repository "+randomID), true, true)
-
-	// if we read too quickly we often get a 404 from the server so let's wait a short while
-	time.Sleep(4000 * time.Millisecond)
+	gitHubRepository, err := gitHubRepositoryPool.AcquirePrivate(0)
+	require.NoError(t, err) // stop here if the pooled repository is not available, i.e. due to rate limits
 
 	directory, err := os.MkdirTemp("", "nyx-test-git-clone-test-")
 	defer os.RemoveAll(directory)
 	_, err = GitInstance().CloneWithUserNameAndPassword(&directory, utl.PointerToString((*gitHubRepository).GetHTTPURL()), nil, nil)
 	assert.Error(t, err)
-
-	// now delete it
-	err = gitHub.DeleteGitRepository(randomID)
-	assert.NoError(t, err)
 
 	log.SetLevel(logLevel) // restore the original logging level
 }
@@ -190,26 +181,18 @@ func TestGitCloneWithoutRequiredSSHCredentials(t *testing.T) {
 	logLevel := log.GetLevel()   // save the previous logging level
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 
-	randomID := gitutil.RandomAlphabeticString(5, 91)
-
 	// the 'gitHubTestUserToken' environment variable is set by the build script
 	assert.NotEmpty(t, os.Getenv("gitHubTestUserToken"), "A GitHub authentication token must be passed to this test as an environment variable but it was not set")
-	gitHub, err := github.Instance(map[string]string{github.AUTHENTICATION_TOKEN_OPTION_NAME: os.Getenv("gitHubTestUserToken")})
+	// use a pooled repository instead of creating a new one to avoid the hosting service rate limits on content creation
+	gitHubRepositoryPool, err := gittools.GitHubRepositoryPoolInstance(os.Getenv("gitHubTestUserToken"))
 	assert.NoError(t, err)
-	// create a brand new test repository for this purpose
-	gitHubRepository, err := gitHub.CreateGitRepository(randomID, utl.PointerToString("Test repository "+randomID), true, true)
-
-	// if we read too quickly we often get a 404 from the server so let's wait a short while
-	time.Sleep(4000 * time.Millisecond)
+	gitHubRepository, err := gitHubRepositoryPool.AcquirePrivate(0)
+	require.NoError(t, err) // stop here if the pooled repository is not available, i.e. due to rate limits
 
 	directory, err := os.MkdirTemp("", "nyx-test-git-clone-test-")
 	defer os.RemoveAll(directory)
 	_, err = GitInstance().CloneWithPublicKey(&directory, utl.PointerToString((*gitHubRepository).GetSSHURL()), nil, nil)
 	assert.Error(t, err)
-
-	// now delete it
-	err = gitHub.DeleteGitRepository(randomID)
-	assert.NoError(t, err)
 
 	log.SetLevel(logLevel) // restore the original logging level
 }
@@ -218,25 +201,17 @@ func TestGitCloneWithRequiredUserAndPasswordCredentials(t *testing.T) {
 	logLevel := log.GetLevel()   // save the previous logging level
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 
-	randomID := gitutil.RandomAlphabeticString(5, 93)
-
 	// the 'gitHubTestUserToken' environment variable is set by the build script
 	assert.NotEmpty(t, os.Getenv("gitHubTestUserToken"), "A GitHub authentication token must be passed to this test as an environment variable but it was not set")
-	gitHub, err := github.Instance(map[string]string{github.AUTHENTICATION_TOKEN_OPTION_NAME: os.Getenv("gitHubTestUserToken")})
+	// use a pooled repository instead of creating a new one to avoid the hosting service rate limits on content creation
+	gitHubRepositoryPool, err := gittools.GitHubRepositoryPoolInstance(os.Getenv("gitHubTestUserToken"))
 	assert.NoError(t, err)
-	// create a brand new test repository for this purpose
-	gitHubRepository, err := gitHub.CreateGitRepository(randomID, utl.PointerToString("Test repository "+randomID), true, true)
-
-	// if we read too quickly we often get a 404 from the server so let's wait a short while
-	time.Sleep(4000 * time.Millisecond)
+	gitHubRepository, err := gitHubRepositoryPool.AcquirePrivate(0)
+	require.NoError(t, err) // stop here if the pooled repository is not available, i.e. due to rate limits
 
 	directory, err := os.MkdirTemp("", "nyx-test-git-clone-test-")
 	defer os.RemoveAll(directory)
 	_, err = GitInstance().CloneWithUserNameAndPassword(&directory, utl.PointerToString((*gitHubRepository).GetHTTPURL()), utl.PointerToString(os.Getenv("gitHubTestUserToken")), utl.PointerToString(os.Getenv("gitHubTestUserToken")))
-	assert.NoError(t, err)
-
-	// now delete it
-	err = gitHub.DeleteGitRepository(randomID)
 	assert.NoError(t, err)
 
 	log.SetLevel(logLevel) // restore the original logging level
@@ -246,27 +221,19 @@ func TestGitCloneWithRequiredSSHUnprotectedCredentials(t *testing.T) {
 	logLevel := log.GetLevel()   // save the previous logging level
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 
-	randomID := gitutil.RandomAlphabeticString(5, 93)
-
 	// the 'gitHubTestUserToken' environment variable is set by the build script
 	assert.NotEmpty(t, os.Getenv("gitHubTestUserToken"), "A GitHub authentication token must be passed to this test as an environment variable but it was not set")
-	gitHub, err := github.Instance(map[string]string{github.AUTHENTICATION_TOKEN_OPTION_NAME: os.Getenv("gitHubTestUserToken")})
+	// use a pooled repository instead of creating a new one to avoid the hosting service rate limits on content creation
+	gitHubRepositoryPool, err := gittools.GitHubRepositoryPoolInstance(os.Getenv("gitHubTestUserToken"))
 	assert.NoError(t, err)
-	// create a brand new test repository for this purpose
-	gitHubRepository, err := gitHub.CreateGitRepository(randomID, utl.PointerToString("Test repository "+randomID), true, true)
-
-	// if we read too quickly we often get a 404 from the server so let's wait a short while
-	time.Sleep(4000 * time.Millisecond)
+	gitHubRepository, err := gitHubRepositoryPool.AcquirePrivate(0)
+	require.NoError(t, err) // stop here if the pooled repository is not available, i.e. due to rate limits
 
 	directory, err := os.MkdirTemp("", "nyx-test-git-clone-test-")
 	defer os.RemoveAll(directory)
 	// the 'gitHubTestUserPrivateKeyWithoutPassphrase' environment variable is set by the build script
 	assert.NotEmpty(t, os.Getenv("gitHubTestUserPrivateKeyWithoutPassphrase"), "A GitHub private key must be passed to this test as an environment variable but it was not set")
 	_, err = GitInstance().CloneWithPublicKey(&directory, utl.PointerToString((*gitHubRepository).GetSSHURL()), utl.PointerToString(os.Getenv("gitHubTestUserPrivateKeyWithoutPassphrase")), nil)
-	assert.NoError(t, err)
-
-	// now delete it
-	err = gitHub.DeleteGitRepository(randomID)
 	assert.NoError(t, err)
 
 	log.SetLevel(logLevel) // restore the original logging level
@@ -276,27 +243,19 @@ func TestGitCloneWithRequiredSSHProtectedCredentials(t *testing.T) {
 	logLevel := log.GetLevel()   // save the previous logging level
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 
-	randomID := gitutil.RandomAlphabeticString(5, 93)
-
 	// the 'gitHubTestUserToken' environment variable is set by the build script
 	assert.NotEmpty(t, os.Getenv("gitHubTestUserToken"), "A GitHub authentication token must be passed to this test as an environment variable but it was not set")
-	gitHub, err := github.Instance(map[string]string{github.AUTHENTICATION_TOKEN_OPTION_NAME: os.Getenv("gitHubTestUserToken")})
+	// use a pooled repository instead of creating a new one to avoid the hosting service rate limits on content creation
+	gitHubRepositoryPool, err := gittools.GitHubRepositoryPoolInstance(os.Getenv("gitHubTestUserToken"))
 	assert.NoError(t, err)
-	// create a brand new test repository for this purpose
-	gitHubRepository, err := gitHub.CreateGitRepository(randomID, utl.PointerToString("Test repository "+randomID), true, true)
-
-	// if we read too quickly we often get a 404 from the server so let's wait a short while
-	time.Sleep(4000 * time.Millisecond)
+	gitHubRepository, err := gitHubRepositoryPool.AcquirePrivate(0)
+	require.NoError(t, err) // stop here if the pooled repository is not available, i.e. due to rate limits
 
 	directory, err := os.MkdirTemp("", "nyx-test-git-clone-test-")
 	defer os.RemoveAll(directory)
 	// the 'gitHubTestUserPrivateKeyWithPassphrase' environment variable is set by the build script
 	assert.NotEmpty(t, os.Getenv("gitHubTestUserPrivateKeyWithPassphrase"), "A GitHub private key must be passed to this test as an environment variable but it was not set")
 	_, err = GitInstance().CloneWithPublicKey(&directory, utl.PointerToString((*gitHubRepository).GetSSHURL()), utl.PointerToString(os.Getenv("gitHubTestUserPrivateKeyWithPassphrase")), utl.PointerToString(os.Getenv("gitHubTestUserPrivateKeyPassphrase")))
-	assert.NoError(t, err)
-
-	// now delete it
-	err = gitHub.DeleteGitRepository(randomID)
 	assert.NoError(t, err)
 
 	log.SetLevel(logLevel) // restore the original logging level

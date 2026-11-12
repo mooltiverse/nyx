@@ -110,10 +110,10 @@ on:
         description: |-
           The JDK version to setup if 'install-jdk' is 'true'.
           For available versions see: https://github.com/actions/setup-java.
-          Default: 21
+          Default: 25
         type: string
         required: false
-        default: '21'
+        default: '25'
       install-gradle:
         description: |-
           Whether to install Gradle or not.

@@ -304,28 +304,40 @@ export default {
           title: 'Resources',
           items: [
             {
-              label: 'Releases',
-              to: 'https://github.com/mooltiverse/nyx/releases/latest',
+              label: 'Documentation',
+              href: 'https://mooltiverse.github.io/nyx/',
+            },
+            {
+              label: 'GitHub Repository',
+              href: 'https://github.com/mooltiverse/nyx',
+            },
+            {
+              label: 'GitHub Releases',
+              href: 'https://github.com/mooltiverse/nyx/releases',
             },
             {
               label: 'Docker Images (Docker Hub)',
-              to: 'https://hub.docker.com/repository/docker/mooltiverse/nyx',
+              href: 'https://hub.docker.com/r/mooltiverse/nyx',
             },
             {
               label: 'Docker Images (GitHub)',
-              to: 'https://github.com/mooltiverse/nyx/pkgs/container/nyx',
+              href: 'https://github.com/mooltiverse/nyx/pkgs/container/nyx',
             },
             {
-              label: 'Gradle Plug-In',
-              to: 'https://plugins.gradle.org/plugin/com.mooltiverse.oss.nyx',
+              label: 'Maven Repository (GitHub)',
+              href: 'https://github.com/orgs/mooltiverse/packages?repo_name=nyx',
             },
             {
-              label: 'Go Docs',
-              to: 'https://godocs.io/github.com/mooltiverse/nyx/src/go/nyx',
+              label: 'Gradle Plugin Repository',
+              href: 'https://plugins.gradle.org/plugin/com.mooltiverse.oss.nyx',
             },
             {
-              label: 'Javadocs',
-              to: 'https://javadoc.io/doc/com.mooltiverse.oss.nyx/java',
+              label: 'GoDoc Documentation',
+              href: 'https://godocs.io/github.com/mooltiverse/nyx/src/go/nyx',
+            },
+            {
+              label: 'Javadoc Documentation',
+              href: 'https://javadoc.io/doc/com.mooltiverse.oss.nyx/java',
             },
             /*{ // The site map is built by the '@docusaurus/plugin-sitemap' plugin
               // and is only available on the live site
@@ -335,23 +347,41 @@ export default {
           ],
         },
         {
+          title: 'Project',
+          items: [
+            {
+              label: 'GitHub Issues',
+              href: 'https://github.com/mooltiverse/nyx/issues',
+            },
+          ],
+        },
+        {
+          title: 'Insights',
+          items: [
+            {
+              label: 'GitHub Code Insights',
+              href: 'https://github.com/mooltiverse/nyx/pulse',
+            },
+            {
+              label: 'GitHub Actions',
+              href: 'https://github.com/mooltiverse/nyx/actions',
+            },
+          ],
+        },
+        {
           title: 'Support',
           items: [
             {
               label: 'Examples',
-              to: 'docs/resources/examples/',
+              href: '/docs/resources/examples/',
             },
             {
               label: 'FAQ',
-              to: 'docs/resources/faq/',
+              href: '/docs/resources/faq/',
             },
             {
               label: 'Troubleshooting',
-              to: 'docs/resources/troubleshooting/',
-            },
-            {
-              label: 'Issues',
-              href: 'https://github.com/mooltiverse/nyx/issues',
+              href: '/docs/resources/troubleshooting/',
             },
             {
               label: 'Discussions',

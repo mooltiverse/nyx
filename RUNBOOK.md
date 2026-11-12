@@ -25,7 +25,7 @@ This is the general purpose runbook for the project. Here you can find the scrip
 
 ```bash
 # Run all tests
-./gradlew tests
+./gradlew test
 
 # Run all unit tests
 ./gradlew unitTest

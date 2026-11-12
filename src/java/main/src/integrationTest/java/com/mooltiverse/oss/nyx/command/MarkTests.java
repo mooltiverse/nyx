@@ -36,10 +36,11 @@ import com.mooltiverse.oss.nyx.entities.ReleaseTypes;
 import com.mooltiverse.oss.nyx.entities.ServiceConfiguration;
 import com.mooltiverse.oss.nyx.git.tools.Scenario;
 import com.mooltiverse.oss.nyx.git.tools.Script;
-import com.mooltiverse.oss.nyx.git.util.RandomUtil;
 import com.mooltiverse.oss.nyx.services.github.GitHub;
+import com.mooltiverse.oss.nyx.services.github.GitHubRepositoryPool;
 import com.mooltiverse.oss.nyx.services.github.GitHubRepository;
 import com.mooltiverse.oss.nyx.services.gitlab.GitLab;
+import com.mooltiverse.oss.nyx.services.gitlab.GitLabRepositoryPool;
 import com.mooltiverse.oss.nyx.services.gitlab.GitLabRepository;
 
 @DisplayName("Mark")
@@ -51,15 +52,12 @@ public class MarkTests {
         @DisplayName("Mark.run() on a cloned workspace from GitHub with an additional remote using a release type with Commit, Tag and Push enabled after Infer has generated a new Version, using user name and password credentials > yield to a new commit and a new tag, with changes pushed to all remotes")
         void runOnGitHubClonedWorkspaceWithAdditionalRemoteWithNewVersionOrNewReleaseWithCommitAndTagAndPushEnabledUsingUsernameAndPasswordCredentialsTest()
             throws Exception {
-            String randomID = RandomUtil.randomAlphabeticString(5);
             // the 'gitHubTestUserToken' system property is set by the build script, which in turn reads it from an environment variable
             // when a token for user and password authentication for plain Git operations against a GitHub repository,
             // the user is the token and the password is the empty string
             GitHub gitHub = GitHub.instance(Map.<String,String>of(GitHub.AUTHENTICATION_TOKEN_OPTION_NAME, System.getProperty("gitHubTestUserToken")));
-            GitHubRepository gitHubRepository = gitHub.createGitRepository(randomID, "Test repository "+randomID, false, true);
-
-            // if we clone too quickly next calls may fail
-            Thread.sleep(4000);
+            // use a pooled repository instead of creating a new one to avoid the hosting service rate limits on content creation
+            GitHubRepository gitHubRepository = GitHubRepositoryPool.instance(System.getProperty("gitHubTestUserToken")).acquire(0);
 
             Script replicaScript = Scenario.FROM_SCRATCH.realize();
             replicaScript.getWorkingDirectory().deleteOnExit();
@@ -124,24 +122,18 @@ public class MarkTests {
             assertEquals("0.0.5", nyx.state().getVersion());
             assertEquals(script.getTags().size(), replicaScript.getTags().size());
             assertEquals(script.getTags().size(), remoteScript.getTags().size());
-
-            // now delete it
-            gitHub.deleteGitRepository(randomID);
         }
 
         @Test
         @DisplayName("Mark.run() on a cloned workspace from GitHub with an additional remote using a release type with Commit, Tag and Push enabled after Infer has generated a new Version, using unprotected private key credentials > yield to a new commit and a new tag, with changes pushed to all remotes")
         void runOnGitHubClonedWorkspaceWithAdditionalRemoteWithNewVersionOrNewReleaseWithCommitAndTagAndPushEnabledUsingUnprotectedPrivateKeyCredentialsTest()
             throws Exception {
-            String randomID = RandomUtil.randomAlphabeticString(5);
             // the 'gitHubTestUserToken' system property is set by the build script, which in turn reads it from an environment variable
             // when a token for user and password authentication for plain Git operations against a GitHub repository,
             // the user is the token and the password is the empty string
             GitHub gitHub = GitHub.instance(Map.<String,String>of(GitHub.AUTHENTICATION_TOKEN_OPTION_NAME, System.getProperty("gitHubTestUserToken")));
-            GitHubRepository gitHubRepository = gitHub.createGitRepository(randomID, "Test repository "+randomID, false, true);
-
-            // if we clone too quickly next calls may fail
-            Thread.sleep(4000);
+            // use a pooled repository instead of creating a new one to avoid the hosting service rate limits on content creation
+            GitHubRepository gitHubRepository = GitHubRepositoryPool.instance(System.getProperty("gitHubTestUserToken")).acquire(0);
 
             Script replicaScript = Scenario.FROM_SCRATCH.realize();
             replicaScript.getWorkingDirectory().deleteOnExit();
@@ -206,24 +198,18 @@ public class MarkTests {
             assertEquals("0.0.5", nyx.state().getVersion());
             assertEquals(script.getTags().size(), replicaScript.getTags().size());
             assertEquals(script.getTags().size(), remoteScript.getTags().size());
-
-            // now delete it
-            gitHub.deleteGitRepository(randomID);
         }
 
         @Test
         @DisplayName("Mark.run() on a cloned workspace from GitHub with an additional remote using a release type with Commit, Tag and Push enabled after Infer has generated a new Version, using protected private key credentials > yield to a new commit and a new tag, with changes pushed to all remotes")
         void runOnGitHubClonedWorkspaceWithAdditionalRemoteWithNewVersionOrNewReleaseWithCommitAndTagAndPushEnabledUsingProtectedPrivateKeyCredentialsTest()
             throws Exception {
-            String randomID = RandomUtil.randomAlphabeticString(5);
             // the 'gitHubTestUserToken' system property is set by the build script, which in turn reads it from an environment variable
             // when a token for user and password authentication for plain Git operations against a GitHub repository,
             // the user is the token and the password is the empty string
             GitHub gitHub = GitHub.instance(Map.<String,String>of(GitHub.AUTHENTICATION_TOKEN_OPTION_NAME, System.getProperty("gitHubTestUserToken")));
-            GitHubRepository gitHubRepository = gitHub.createGitRepository(randomID, "Test repository "+randomID, false, true);
-
-            // if we clone too quickly next calls may fail
-            Thread.sleep(4000);
+            // use a pooled repository instead of creating a new one to avoid the hosting service rate limits on content creation
+            GitHubRepository gitHubRepository = GitHubRepositoryPool.instance(System.getProperty("gitHubTestUserToken")).acquire(0);
 
             Script replicaScript = Scenario.FROM_SCRATCH.realize();
             replicaScript.getWorkingDirectory().deleteOnExit();
@@ -288,24 +274,18 @@ public class MarkTests {
             assertEquals("0.0.5", nyx.state().getVersion());
             assertEquals(script.getTags().size(), replicaScript.getTags().size());
             assertEquals(script.getTags().size(), remoteScript.getTags().size());
-
-            // now delete it
-            gitHub.deleteGitRepository(randomID);
         }
 
         @Test
         @DisplayName("Mark.run() on a cloned workspace from GitHub using multiple tag names, a release type with Commit, Tag and Push enabled after Infer has generated a new Version, using user name and password credentials > yield to a new commit and multiple new tags, with changes pushed to all remotes")
         void runOnGitHubClonedWorkspaceWithWithMultipleTagNamesAndNewVersionOrNewReleaseWithCommitAndTagAndPushEnabledUsingUsernameAndPasswordCredentialsTest()
             throws Exception {
-            String randomID = RandomUtil.randomAlphabeticString(5);
             // the 'gitHubTestUserToken' system property is set by the build script, which in turn reads it from an environment variable
             // when a token for user and password authentication for plain Git operations against a GitHub repository,
             // the user is the token and the password is the empty string
             GitHub gitHub = GitHub.instance(Map.<String,String>of(GitHub.AUTHENTICATION_TOKEN_OPTION_NAME, System.getProperty("gitHubTestUserToken")));
-            GitHubRepository gitHubRepository = gitHub.createGitRepository(randomID, "Test repository "+randomID, false, true);
-
-            // if we clone too quickly next calls may fail
-            Thread.sleep(4000);
+            // use a pooled repository instead of creating a new one to avoid the hosting service rate limits on content creation
+            GitHubRepository gitHubRepository = GitHubRepositoryPool.instance(System.getProperty("gitHubTestUserToken")).acquire(0);
 
             Script script = Scenario.ONE_BRANCH_SHORT.applyOnClone(gitHubRepository.getHTTPURL(), System.getProperty("gitHubTestUserToken"), "");
             script.getWorkingDirectory().deleteOnExit();
@@ -400,24 +380,18 @@ public class MarkTests {
             nyx.mark();
             assertEquals("0.0.6", nyx.state().getVersion());
             assertEquals(script.getTags().size(), remoteScript.getTags().size());
-
-            // now delete it
-            gitHub.deleteGitRepository(randomID);
         }
 
         @Test
         @DisplayName("Mark.run() on a cloned workspace from GitLab with an additional remote using a release type with Commit, Tag and Push enabled after Infer has generated a new Version, using user name and password credentials > yield to a new commit and a new tag, with changes pushed to all remotes")
         void runOnGitLabClonedWorkspaceWithAdditionalRemoteWithNewVersionOrNewReleaseWithCommitAndTagAndPushEnabledUsingUsernameAndPasswordCredentialsTest()
             throws Exception {
-            String randomID = RandomUtil.randomAlphabeticString(5);
             // the 'gitLabTestUserToken' system property is set by the build script, which in turn reads it from an environment variable
             // when a token for user and password authentication for plain Git operations against a GitLab repository,
             // the user is the "PRIVATE-TOKEN" string and the password is the token
             GitLab gitLab = GitLab.instance(Map.<String,String>of(GitLab.AUTHENTICATION_TOKEN_OPTION_NAME, System.getProperty("gitLabTestUserToken")));
-            GitLabRepository gitLabRepository = gitLab.createGitRepository(randomID, "Test repository "+randomID, false, true);
-
-            // if we clone too quickly next calls may fail
-            Thread.sleep(4000);
+            // use a pooled repository instead of creating a new one to avoid the hosting service rate limits on content creation
+            GitLabRepository gitLabRepository = GitLabRepositoryPool.instance(System.getProperty("gitLabTestUserToken")).acquire(0);
 
             Script replicaScript = Scenario.FROM_SCRATCH.realize();
             replicaScript.getWorkingDirectory().deleteOnExit();
@@ -482,24 +456,18 @@ public class MarkTests {
             assertEquals("0.0.5", nyx.state().getVersion());
             assertEquals(script.getTags().size(), replicaScript.getTags().size());
             assertEquals(script.getTags().size(), remoteScript.getTags().size());
-
-            // now delete it
-            gitLab.deleteGitRepository(gitLabRepository.getID());
         }
 
         @Test
         @DisplayName("Mark.run() on a cloned workspace from GitLab using multiple tag names, a release type with Commit, Tag and Push enabled after Infer has generated a new Version, using user name and password credentials > yield to a new commit and multiple new tags, with changes pushed to all remotes")
         void runOnGitLabClonedWorkspaceWithWithMultipleTagNamesAndNewVersionOrNewReleaseWithCommitAndTagAndPushEnabledUsingUsernameAndPasswordCredentialsTest()
             throws Exception {
-            String randomID = RandomUtil.randomAlphabeticString(5);
             // the 'gitLabTestUserToken' system property is set by the build script, which in turn reads it from an environment variable
             // when a token for user and password authentication for plain Git operations against a GitLab repository,
             // the user is the "PRIVATE-TOKEN" string and the password is the token
             GitLab gitLab = GitLab.instance(Map.<String,String>of(GitLab.AUTHENTICATION_TOKEN_OPTION_NAME, System.getProperty("gitLabTestUserToken")));
-            GitLabRepository gitLabRepository = gitLab.createGitRepository(randomID, "Test repository "+randomID, false, true);
-
-            // if we clone too quickly next calls may fail
-            Thread.sleep(4000);
+            // use a pooled repository instead of creating a new one to avoid the hosting service rate limits on content creation
+            GitLabRepository gitLabRepository = GitLabRepositoryPool.instance(System.getProperty("gitLabTestUserToken")).acquire(0);
 
             Script script = Scenario.ONE_BRANCH_SHORT.applyOnClone(gitLabRepository.getHTTPURL(), "PRIVATE-TOKEN", System.getProperty("gitLabTestUserToken"));
             script.getWorkingDirectory().deleteOnExit();
@@ -594,24 +562,18 @@ public class MarkTests {
             nyx.mark();
             assertEquals("0.0.6", nyx.state().getVersion());
             assertEquals(script.getTags().size(), remoteScript.getTags().size());
-
-            // now delete it
-            gitLab.deleteGitRepository(gitLabRepository.getID());
         }
 
         @Test
         @DisplayName("Mark.run() on a cloned workspace from GitLab with an additional remote using a release type with Commit, Tag and Push enabled after Infer has generated a new Version, using unprotected private key credentials > yield to a new commit and a new tag, with changes pushed to all remotes")
         void runOnGitLabClonedWorkspaceWithAdditionalRemoteWithNewVersionOrNewReleaseWithCommitAndTagAndPushEnabledUsingUnprotectedPrivateKeyCredentialsTest()
             throws Exception {
-            String randomID = RandomUtil.randomAlphabeticString(5);
             // the 'gitLabTestUserToken' system property is set by the build script, which in turn reads it from an environment variable
             // when a token for user and password authentication for plain Git operations against a GitLab repository,
             // the user is the "PRIVATE-TOKEN" string and the password is the token
             GitLab gitLab = GitLab.instance(Map.<String,String>of(GitLab.AUTHENTICATION_TOKEN_OPTION_NAME, System.getProperty("gitLabTestUserToken")));
-            GitLabRepository gitLabRepository = gitLab.createGitRepository(randomID, "Test repository "+randomID, false, true);
-
-            // if we clone too quickly next calls may fail
-            Thread.sleep(4000);
+            // use a pooled repository instead of creating a new one to avoid the hosting service rate limits on content creation
+            GitLabRepository gitLabRepository = GitLabRepositoryPool.instance(System.getProperty("gitLabTestUserToken")).acquire(0);
 
             Script replicaScript = Scenario.FROM_SCRATCH.realize();
             replicaScript.getWorkingDirectory().deleteOnExit();
@@ -676,24 +638,18 @@ public class MarkTests {
             assertEquals("0.0.5", nyx.state().getVersion());
             assertEquals(script.getTags().size(), replicaScript.getTags().size());
             assertEquals(script.getTags().size(), remoteScript.getTags().size());
-
-            // now delete it
-            gitLab.deleteGitRepository(gitLabRepository.getID());
         }
 
         @Test
         @DisplayName("Mark.run() on a cloned workspace from GitLab with an additional remote using a release type with Commit, Tag and Push enabled after Infer has generated a new Version, using protected private key credentials > yield to a new commit and a new tag, with changes pushed to all remotes")
         void runOnGitLabClonedWorkspaceWithAdditionalRemoteWithNewVersionOrNewReleaseWithCommitAndTagAndPushEnabledUsingProtectedPrivateKeyCredentialsTest()
             throws Exception {
-            String randomID = RandomUtil.randomAlphabeticString(5);
             // the 'gitLabTestUserToken' system property is set by the build script, which in turn reads it from an environment variable
             // when a token for user and password authentication for plain Git operations against a GitLab repository,
             // the user is the "PRIVATE-TOKEN" string and the password is the token
             GitLab gitLab = GitLab.instance(Map.<String,String>of(GitLab.AUTHENTICATION_TOKEN_OPTION_NAME, System.getProperty("gitLabTestUserToken")));
-            GitLabRepository gitLabRepository = gitLab.createGitRepository(randomID, "Test repository "+randomID, false, true);
-
-            // if we clone too quickly next calls may fail
-            Thread.sleep(4000);
+            // use a pooled repository instead of creating a new one to avoid the hosting service rate limits on content creation
+            GitLabRepository gitLabRepository = GitLabRepositoryPool.instance(System.getProperty("gitLabTestUserToken")).acquire(0);
 
             Script replicaScript = Scenario.FROM_SCRATCH.realize();
             replicaScript.getWorkingDirectory().deleteOnExit();
@@ -758,9 +714,6 @@ public class MarkTests {
             assertEquals("0.0.5", nyx.state().getVersion());
             assertEquals(script.getTags().size(), replicaScript.getTags().size());
             assertEquals(script.getTags().size(), remoteScript.getTags().size());
-
-            // now delete it
-            gitLab.deleteGitRepository(gitLabRepository.getID());
         }
     }
 }

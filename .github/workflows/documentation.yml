@@ -60,7 +60,7 @@ jobs:
     with:
       verbosity: info
       install-jdk: true
-      install-jdk-version: 20
+      install-jdk-version: 25
       # Restore the cache from the previous job to 'chain' caches
       nyx-cache-from: ${{ needs.initialize.outputs.nyx-cache-name }}
   
@@ -73,7 +73,7 @@ jobs:
     with:
       verbosity: info
       install-jdk: true
-      install-jdk-version: 20
+      install-jdk-version: 25
       # Restore the cache from the previous job to 'chain' caches
       nyx-cache-from: ${{ needs.initialize.outputs.nyx-cache-name }}
       gradle-cache-from: ${{ needs.docusaurus-build.outputs.gradle-cache-name }}

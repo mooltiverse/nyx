@@ -84,12 +84,11 @@ subprojects {
 
     doLast {
       logger.quiet("Importing the documentation")
-      configurations.documentation.getIncoming().getFiles().each { f -> 
-      logger.debug("Extracting the documentation from ${f.name} to ${outputDir.absolutePath}")
-        copy {
-          from tarTree(f)
-          into(outputDir)
-        }
+      // Mirror the documentation shared by other projects, so that files they
+      // no longer share are removed
+      sync {
+        from(configurations.documentation.getIncoming().getFiles())
+        into(outputDir)
       }
 
       // Now use a copySpec to distribute the imported documentation to the microsite
@@ -150,8 +149,9 @@ subprojects {
 
   task docusaurusInstall(group: 'build setup', description: 'Installs Docusaurus') {
     // Declare inputs and outputs of this task
-    // Run this task if there's any change in Docusaurus' configuration
-    inputs.files('docusaurus.config.ts')
+    // Run this task if there's any change in Docusaurus' configuration or in
+    // the dependencies, i.e. after pulling an updated 'package-lock.json'
+    inputs.files('docusaurus.config.ts', 'package.json', 'package-lock.json')
     // Output of this task is the '.docusaurus' and 'node_modules' subdirectory
     outputs.dir('.docusaurus')
     outputs.dir('node_modules')
@@ -245,6 +245,15 @@ subprojects {
   }
 
   task docusaurusClean(group: 'build', description: 'Deletes the local documentation site') {
+    // Delete what 'docusaurusBuild' renders
+    def siteDir = buildDir
+    doLast {
+      delete siteDir
+    }
+  }
+
+  // This is just a lifecycle task. It runs the tests of the documentation microsite, if any.
+  task test(group: 'verification', description: 'Runs the tests for the documentation microsite') {
   }
 
   task deepClean(group: 'build', description: 'Clean the reproducible and reusable artifacts including caches, dependencies etc') {
@@ -261,6 +270,7 @@ subprojects {
     Additional task dependencies
     ----------------------------------------------------------------------------*/
   tasks.assemble.dependsOn docusaurusBuild
+  tasks.check.dependsOn test
   tasks.clean.dependsOn docusaurusClean
 
   /*----------------------------------------------------------------------------
@@ -283,8 +293,14 @@ task publish(group: 'publishing', description: 'Publishes artifacts produced by 
   dependsOn subprojects*.publish
 }
 
+// This is just a lifecycle task
+task test(group: 'verification', description: 'Runs the tests for the documentation microsites') {
+  dependsOn subprojects*.test
+}
+
 task deepClean(group: 'build', description: 'Clean the reproducible and reusable artifacts including caches, dependencies etc') {
-  dependsOn subprojects*.clean
+  dependsOn clean
+  dependsOn subprojects*.deepClean
 }
 
 /*------------------------------------------------------------------------------
@@ -292,4 +308,5 @@ task deepClean(group: 'build', description: 'Clean the reproducible and reusable
   ------------------------------------------------------------------------------*/
 tasks.assemble.dependsOn subprojects*.assemble
 tasks.build.dependsOn subprojects*.build
+tasks.check.dependsOn subprojects*.check
 tasks.clean.dependsOn subprojects*.clean

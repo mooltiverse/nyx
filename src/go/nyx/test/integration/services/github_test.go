@@ -28,8 +28,9 @@ import (
 	"testing"       // https://pkg.go.dev/testing
 	"time"          // https://pkg.go.dev/time
 
-	log "github.com/sirupsen/logrus"            // https://pkg.go.dev/github.com/sirupsen/logrus
-	assert "github.com/stretchr/testify/assert" // https://pkg.go.dev/github.com/stretchr/testify/assert
+	log "github.com/sirupsen/logrus"              // https://pkg.go.dev/github.com/sirupsen/logrus
+	assert "github.com/stretchr/testify/assert"   // https://pkg.go.dev/github.com/stretchr/testify/assert
+	require "github.com/stretchr/testify/require" // https://pkg.go.dev/github.com/stretchr/testify/require
 
 	ent "github.com/mooltiverse/nyx/src/go/nyx/entities"
 	svcapi "github.com/mooltiverse/nyx/src/go/nyx/services/api"
@@ -142,24 +143,23 @@ func TestGitHubReleaseServiceCreateRelease(t *testing.T) {
 	logLevel := log.GetLevel()   // save the previous logging level
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 
-	randomID := gitutil.RandomAlphabeticString(5, 77)
-
 	// the 'gitHubTestUserToken' environment variable is set by the build script
 	assert.NotEmpty(t, os.Getenv("gitHubTestUserToken"), "A GitHub authentication token must be passed to this test as an environment variable but it was not set")
 	gitHub, err := github.Instance(map[string]string{github.AUTHENTICATION_TOKEN_OPTION_NAME: os.Getenv("gitHubTestUserToken")})
 	assert.NoError(t, err)
 	user, err := gitHub.GetAuthenticatedUser()
 	assert.NoError(t, err)
-	gitHubRepository, err := gitHub.CreateGitRepository(randomID, utl.PointerToString("Test repository "+randomID), false, true)
+	// use a pooled repository instead of creating a new one to avoid the hosting service rate limits on content creation
+	gitHubRepositoryPool, err := gittools.GitHubRepositoryPoolInstance(os.Getenv("gitHubTestUserToken"))
+	assert.NoError(t, err)
+	gitHubRepository, err := gitHubRepositoryPool.Acquire(0)
+	require.NoError(t, err) // stop here if the pooled repository is not available, i.e. due to rate limits
 
 	ownerName := (*user).GetUserName()
 	repositoryName := (*gitHubRepository).GetName()
 	release, err := gitHub.GetReleaseByTag(&ownerName, &repositoryName, "1.0.0-alpha.1")
 	assert.NoError(t, err)
 	assert.Nil(t, release)
-
-	// if we clone too quickly next calls may fail
-	time.Sleep(4000 * time.Millisecond)
 
 	// when a token for user and password authentication for plain Git operations against a GitHub repository,
 	// the user is the token and the password is the empty string
@@ -217,10 +217,6 @@ func TestGitHubReleaseServiceCreateRelease(t *testing.T) {
 		//assert.True(t, *asset.GetType() == "text/plain" || *asset.GetType() == "application/octet-stream")
 		assert.True(t, strings.HasPrefix(*asset.GetPath(), "https://api.github.com/repos/"))
 	}
-
-	// now delete it
-	err = gitHub.DeleteGitRepository(randomID)
-	assert.NoError(t, err)
 
 	log.SetLevel(logLevel) // restore the original logging level
 }

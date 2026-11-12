@@ -75,17 +75,41 @@ public class Suites {
 
         // Java versions >= 15 are recommended
         // Gradle versions from 7.0 on are recommended
-        if (javaVersion <= 20) {
+        if (javaVersion <= 27) {
             // the latest version is always among the 'quick' tests
-            quickTestVersions.add("9.2.1");
+            quickTestVersions.add("9.9.0");
+            extensiveTestVersions.add("9.8.2");
+            extensiveTestVersions.add("9.8.1");
+            extensiveTestVersions.add("9.8.0");
+            extensiveTestVersions.add("9.7.1");
+            extensiveTestVersions.add("9.7.0");
+            extensiveTestVersions.add("9.6.1");
+            extensiveTestVersions.add("9.6.0");
+            extensiveTestVersions.add("9.5.1");
+            extensiveTestVersions.add("9.5.0");
+            extensiveTestVersions.add("9.4.1");
+            extensiveTestVersions.add("9.4.0");
+        }
+        if (javaVersion <= 25) {
+            extensiveTestVersions.add("9.3.1");
+            extensiveTestVersions.add("9.3.0");
+            extensiveTestVersions.add("9.2.1");
             extensiveTestVersions.add("9.2.0");
+
             extensiveTestVersions.add("9.1.0");
+        }
+        if (javaVersion <= 24) {
             extensiveTestVersions.add("9.0.0");
 
+            extensiveTestVersions.add("8.14.6");
+            extensiveTestVersions.add("8.14.5");
+            extensiveTestVersions.add("8.14.4");
             extensiveTestVersions.add("8.14.3");
             extensiveTestVersions.add("8.14.2");
             extensiveTestVersions.add("8.14.1");
             extensiveTestVersions.add("8.14");
+        }
+        if (javaVersion <= 23) {
             extensiveTestVersions.add("8.13");
             extensiveTestVersions.add("8.12.1");
             extensiveTestVersions.add("8.12");
@@ -94,12 +118,19 @@ public class Suites {
             extensiveTestVersions.add("8.10.2");
             extensiveTestVersions.add("8.10.1");
             extensiveTestVersions.add("8.10");
+        }
+        if (javaVersion <= 22) {
             extensiveTestVersions.add("8.9");
             extensiveTestVersions.add("8.8");
+        }
+        if (javaVersion <= 21) {
             extensiveTestVersions.add("8.7");
             extensiveTestVersions.add("8.6");
             extensiveTestVersions.add("8.5");
+        }
+        if (javaVersion <= 20) {
             extensiveTestVersions.add("8.4");
+
             // These tests are suspended due to the 'GRADLE MULTI-RELEASE JARS ERROR'
             // commented below.
             //extensiveTestVersions.add("8.3");

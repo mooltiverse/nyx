@@ -113,9 +113,9 @@ inputs:
     description: |-
       The JDK version to setup if 'install-jdk' is 'true'.
       For available versions see: https://github.com/actions/setup-java.
-      Default: 21
+      Default: 25
     required: false
-    default: '21'
+    default: '25'
 outputs:
   probed:
     description: "Returns 'true' if this action has probed the files for this feature."

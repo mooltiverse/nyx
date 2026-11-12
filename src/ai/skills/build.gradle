@@ -1,0 +1,231 @@
+/* Add support to inject the ExecOperations object in order to run exec commands.
+ * See: https://docs.gradle.org/current/userguide/service_injection.html#execoperations
+ */
+import org.gradle.process.ExecOperations
+import javax.inject.Inject
+interface InjectedExec {
+  @Inject ExecOperations getExecOps()
+}
+
+/*------------------------------------------------------------------------------
+  Plugins DSL block
+  https://docs.gradle.org/current/userguide/plugins.html#sec:plugins_block
+------------------------------------------------------------------------------*/
+plugins {
+}
+
+/*------------------------------------------------------------------------------
+  Local sub-project properties
+------------------------------------------------------------------------------*/
+description = 'Agent Skills'
+
+/*------------------------------------------------------------------------------
+  Additional properties
+------------------------------------------------------------------------------*/
+// The directory with the skills' test data. 'test' is a reserved name, so it's
+// never a skill.
+ext.testDir = file('test')
+
+// Validates the skills found in the given directory against the Agent Skills
+// specification with 'gh skill publish --dry-run', which publishes nothing and
+// needs no authentication. Errors fail validation, while warnings (i.e. a
+// missing 'license' or a 'description' longer than 1024 characters) are only
+// printed. When 'quiet' is true the output is discarded instead of printed.
+// Returns the exit value: anything other than 0 means that validation failed
+// or that no skill was found.
+ext.validateSkillsIn = { ExecOperations execOps, File dir, boolean quiet = false ->
+  def discarded = new ByteArrayOutputStream()
+  execOps.exec {
+    commandLine 'gh', 'skill', 'publish', dir.absolutePath, '--dry-run'
+    ignoreExitValue = true
+    if (quiet) {
+      standardOutput = discarded
+      errorOutput = discarded
+    }
+  }.exitValue
+}
+
+// Returns the SKILL.md files under the given directory that 'gh skill' would
+// discover and publish: those directly inside a child of the directory (i.e.
+// 'test/<name>/SKILL.md') and those directly inside a child of any directory
+// named 'skills' (i.e. '.../skills/<name>/SKILL.md'). 'gh skill' ignores hidden
+// directories, so files below one (i.e. '.agents/skills/' in a sample project)
+// are skipped.
+ext.discoverableSkillFiles = { File dir ->
+  def found = []
+  if (dir.isDirectory()) {
+    dir.eachFileRecurse(groovy.io.FileType.FILES) { f ->
+      def segments = dir.toPath().relativize(f.toPath()).collect { it.toString() }
+      if (f.name == 'SKILL.md' && !segments.any { it.startsWith('.') }) {
+        def grandParent = f.parentFile.parentFile
+        if (grandParent == dir || grandParent.name == 'skills') {
+          found << f
+        }
+      }
+    }
+  }
+  found.sort()
+}
+
+/*------------------------------------------------------------------------------
+  Additional tasks
+  ------------------------------------------------------------------------------*/
+task checkTestData(group: 'verification', description: "Fails if the skills' test data contains files that 'gh skill' would publish as skills") {
+  doLast {
+    def found = discoverableSkillFiles(testDir)
+    if (found) {
+      throw new GradleException("'gh skill' would publish these test files as skills: ${found.collect { projectDir.toPath().relativize(it.toPath()) }.join(', ')}. Move each one at least one directory deeper, outside any directory named 'skills'")
+    }
+  }
+}
+
+task validateSkills(group: 'verification', description: 'Validates the skills against the Agent Skills specification') {
+  // 'gh skill publish' fails when it finds no skill, so there must be one.
+  onlyIf {
+    projectDir.listFiles().any { d ->
+      d.isDirectory() && !d.name.startsWith('.') && d.name != 'test' && new File(d, 'SKILL.md').isFile()
+    }
+  }
+
+  def injectedExecOps = project.objects.newInstance(InjectedExec)
+  doLast {
+    // 'gh skill publish' can't validate a single skill directory, so all the
+    // skills are validated at once from here.
+    if (validateSkillsIn(injectedExecOps.execOps, projectDir) != 0) {
+      throw new GradleException("Skill validation failed: see the errors reported above")
+    }
+  }
+}
+
+/*------------------------------------------------------------------------------
+  This is the configuration for all sub-projects, but not this project
+------------------------------------------------------------------------------*/
+subprojects {
+  /*----------------------------------------------------------------------------
+    Configurations and Dependencies
+  ----------------------------------------------------------------------------*/
+  // For more on Configurations, Dependencies and Artifacts see:
+  // - https://docs.gradle.org/current/userguide/declaring_dependencies_adv.html
+  // - https://docs.gradle.org/current/userguide/cross_project_publications.html
+  configurations {
+    // Here we define the configurations to:
+    // - define dependencies to other projects so this project can use their
+    //   artifacts
+    // - expose artifacts produced by this project that can be used by others as
+    //  dependencies
+    // Configurations can extend other configurations from within the same
+    // project by means of 'extendsFrom'.
+    // To add artifacts to configurations use the 'artifacts' section.
+  }
+
+  dependencies {
+    // Here we define the static dependencies on other projects' configurations.
+  }
+
+  /*----------------------------------------------------------------------------
+    Additional properties
+  ----------------------------------------------------------------------------*/
+
+  /*----------------------------------------------------------------------------
+    Additional tasks
+  ----------------------------------------------------------------------------*/
+  // This is a lifecycle task that will depend on concrete test tasks defined
+  // by each sub-project. These tests must not require AI agent tokens.
+  task unitTest(group: 'verification', description: 'Runs the unit tests for the AI agent extensions') {
+  }
+
+  // This is a lifecycle task that will depend on concrete test tasks defined
+  // by each sub-project. These tests must not require AI agent tokens.
+  task integrationTest(group: 'verification', description: 'Runs the integration tests for the AI agent extensions') {
+    // When they are all in the execution plan, run faster tests first.
+    mustRunAfter unitTest
+  }
+
+  // This is a lifecycle task that will depend on concrete test tasks defined
+  // by each sub-project. These tests must not require AI agent tokens.
+  task functionalTest(group: 'verification', description: 'Runs the functional tests for the AI agent extensions') {
+    // When they are all in the execution plan, run faster tests first.
+    mustRunAfter unitTest
+    mustRunAfter integrationTest
+  }
+
+  // This is a lifecycle task that will depend on other specific test tasks.
+  task test(group: 'verification', description: 'Runs all the tests for the AI agent extensions') {
+    dependsOn unitTest
+    dependsOn integrationTest
+    dependsOn functionalTest
+    dependsOn subprojects*.test
+  }
+
+  task deepClean(group: 'build', description: 'Clean the reproducible and reusable artifacts including caches, dependencies etc') {
+    dependsOn clean
+    dependsOn subprojects*.deepClean
+  }
+
+  /*----------------------------------------------------------------------------
+    Additional task dependencies
+    ----------------------------------------------------------------------------*/
+  //tasks.assemble.dependsOn package
+  //tasks.build.dependsOn documentation
+  tasks.check.dependsOn test
+  
+  /*----------------------------------------------------------------------------
+    Artifacts published by this project
+  ----------------------------------------------------------------------------*/
+  // For more on Configurations, Dependencies and Artifacts see:
+  // - https://docs.gradle.org/current/userguide/declaring_dependencies_adv.html
+  // - https://docs.gradle.org/current/userguide/cross_project_publications.html
+  artifacts {
+  }
+}
+
+/*------------------------------------------------------------------------------
+  Additional tasks
+------------------------------------------------------------------------------*/
+// This is just a lifecycle task.
+// TODO: these tests are missing for now, and should be run with external tools
+// rather than implemented in this script:
+// - unit: tests of the validation itself (that validateSkills and checkTestData
+//   fail on invalid skills and test data)
+// - unit: skill names must be unique across the skills here and those bundled
+//   in plugins (src/ai/plugins/*/skills/)
+// - unit: checks that need to parse the SKILL.md YAML frontmatter beyond what
+//   'gh skill publish --dry-run' checks (i.e. the Toolbox metadata)
+// - integration and functional: installing and updating the skills with the
+//   supported agents (Claude Code, Codex CLI, GitHub Copilot, Gemini CLI)
+task unitTest(group: 'verification', description: 'Runs the unit tests for the AI agent extensions') {
+  dependsOn checkTestData, validateSkills
+  dependsOn subprojects*.unitTest
+}
+
+// This is just a lifecycle task
+task integrationTest(group: 'verification', description: 'Runs the integration tests for the AI agent extensions') {
+  dependsOn subprojects*.integrationTest
+}
+
+// This is just a lifecycle task
+task functionalTest(group: 'verification', description: 'Runs the functional tests for the AI agent extensions') {
+  dependsOn subprojects*.functionalTest
+}
+
+// This is just a lifecycle task
+task test(group: 'verification', description: 'Runs all the tests for the AI agent extensions') {
+  dependsOn unitTest
+  dependsOn integrationTest
+  dependsOn functionalTest
+  dependsOn subprojects*.test
+}
+
+task deepClean(group: 'build', description: 'Clean the reproducible and reusable artifacts including caches, dependencies etc') {
+  dependsOn clean
+  dependsOn subprojects*.deepClean
+}
+
+/*------------------------------------------------------------------------------
+  Additional task dependencies
+------------------------------------------------------------------------------*/
+tasks.assemble.dependsOn subprojects*.assemble
+tasks.build.dependsOn subprojects*.build
+tasks.check.dependsOn test
+tasks.check.dependsOn subprojects*.check
+tasks.clean.dependsOn subprojects*.clean

@@ -1,5 +1,26 @@
 # Nyx Release Notes
 
+## 3.2.0
+
+This release is available at [this link](https://github.com/mooltiverse/nyx/releases/tag/3.2.0).
+
+### Upgrade instructions
+
+There are no actions to take for backward compatibility.
+
+### New features and improvements
+
+This release:
+
+* releases the AI skill ([444](https://github.com/mooltiverse/nyx/issues/444))
+* fixes the bug that caused preset release types to never create Git tags in the Go implementation (CLI, Docker, GitHub Action) since 2.5.0 ([443](https://github.com/mooltiverse/nyx/issues/443))
+* upgrades Go to version 1.27.3
+* updates all Go dependencies to the latest versions
+* upgrades Java to version 25 (LTS)
+* updates all Java dependencies and gradle plugins to the latest versions
+* adds support for Gradle up to `9.9.0`
+* removes the publication of Go artifacts for 32 bit `windows/arm` as [support was removed from Go](https://github.com/golang/go/issues/71671)
+
 ## 3.1.7
 
 This release is available at [this link](https://github.com/mooltiverse/nyx/releases/tag/3.1.5).

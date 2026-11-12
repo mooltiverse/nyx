@@ -94,6 +94,7 @@ You can work on the project on any platform (Linux, Windows, Mac). You need to h
 * [Gradle](https://gradle.org/install/) 7.x or above
 * [Docker CE](https://docs.docker.com/install/)
 * [Node](https://nodejs.org/) 18.0 or above
+* [Python](https://www.python.org/) 3 (to validate the AI agent skills) and, to run the skills integration and functional tests, AI agent CLIs (Claude Code, ChatGPT Codex etc)
 
 You also need a local copy of the repository that you can get by running:
 
@@ -119,6 +120,8 @@ nyx
 |   \--- main                       # The documentation site
 +-- gradle                          # Gradle wrapper files
 +-- src                             # Project sources
+|   +--- ai                         # AI agent extensions
+|        \--- skills                # Agent Skills sub module (one directory per skill)
 |   +--- docker                     # Docker image sub module
 |   \--- go                         # Go sources
 |        +--- errors                # Go errors sub module
@@ -159,7 +162,7 @@ where the main tasks are:
 
 The `publish` and `release` tasks can only be executed on the CI/CD platform.
 
-The recommended JDK version is `20` or newer. JDK version older than `17` is not supported.
+The recommended JDK version is `25` or newer. JDK version older than `17` is not supported.
 
 The JDK version affects the number of functional tests excuted for the Gradle plugin, according to the [Gradle compatibility matrix](https://docs.gradle.org/current/userguide/compatibility.html). This means that newer JDKs will run functional tests against a reduced set of Gradle versions because [TestKit](https://docs.gradle.org/current/userguide/test_kit.html) uses the original Java binaries for each tested Gradle release and Java classes compiled for JVM versions published after the Gradle release would raise an exception like `unsupported class file major version XY`. You don't need to worry about this (as it's already taken care of in the functional test suites) unless you need to run functional tests against a specific gradle version that is not covered by the tests due to the JDK version you're using.
 
@@ -228,7 +231,7 @@ Since Nyx supports remote repositories with different authentication options and
 * [GitHub Nyx Test User](https://github.com/nyxtest20200701) for [GitHub](https://github.com/)
 * [GitLab Nyx Test User](https://gitlab.com/nyxtest20200701) for [GitLab](https://gitlab.com/)
 
-These accounts are used to to test multiple authentication options, dynamically create repositories, fiddle with them and clean up at the end of a test run. Complete cleanup is performed at the end of tests so when tests complete successfully there should be no contents left on the above accounts. In case some tests fail some stale repository might remain and can be deleted manually from the UI once logged in as the test user or just run `./gradlew testClean`.
+These accounts are used to to test multiple authentication options, dynamically create repositories, fiddle with them and clean up at the end of a test run. Complete cleanup is performed at the end of tests so when tests complete successfully there should be no contents left on the above accounts, except for the [pooled test repositories](#pooled-test-repositories). In case some tests fail some stale repository might remain and can be deleted manually from the UI once logged in as the test user or just run `./gradlew testClean`.
 
 These users are not connected to any team or organization so they do not expose any sensitive information. In case they get compromised we can replace them with some new accounts at any time.
 
@@ -311,6 +314,26 @@ Examples on how to use credentials passed as [secrets on GitHub Actions](https:/
 
 For more on the above options see the [Gradle Build Environment](https://docs.gradle.org/current/userguide/build_environment.html). In any case, **never store your credentials along with the project files**.
 
+##### Pooled test repositories
+
+Hosting services apply rate limits on content creation, and repository creation in particular (i.e. GitHub's [secondary rate limit](https://docs.github.com/en/rest/using-the-rest-api/rate-limits-for-the-rest-api#about-secondary-rate-limits)), that test suites creating a new repository for every test exceed. To avoid this, tests acquire a repository from a pool of long-lived repositories instead of creating a new one:
+
+* Java integration tests use `GitHubRepositoryPool` and `GitLabRepositoryPool`, extending `git.tools.HostedRepositoryPool`; Go integration tests use `tools.GitHubRepositoryPool` and `tools.GitLabRepositoryPool`, built on `tools.hostedRepositoryPool`
+* `acquire(slot)` (`Acquire(slot)` in Go) returns a public repository while `acquire(slot, true)` (`AcquirePrivate(slot)` in Go) returns a private one, for tests that need credentials to be required
+* pooled repositories are created the first time they are used and then reused across test runs, so they are never deleted at the end of tests
+* a pooled repository is reset when it's acquired (not when it's released, so a test that crashed can't affect the next one):
+  * all releases are deleted and, on GitLab, all packages (where release assets are uploaded) and branch and tag protections (GitLab protects the default branch on the first push, preventing force pushes)
+  * the `main` branch is force pushed to a constant reference commit and set as the default branch, the repository visibility is set as requested
+  * all other branches and tags are deleted
+  * the result is then verified and, if the repository is still not clean, it's deleted and created again
+* repository names are in the form `nyx-test-pool-<language>-<environment>-[private-]<slot>`, where the language is `java` or `go` and the environment is `ci-<runner OS>-<Java version>` (Java) or `ci-<runner OS>-<test package>` (Go) on GitHub Actions and `local-<user name>` (Java) or `local-<user name>-<test package>` (Go) elsewhere, so that CI jobs and local runs never share a repository. Go repositories are also scoped by test package because `go test` runs the tests of different packages in parallel. Tests needing more than one repository with the same visibility at the same time use different slots
+* do not run more than one integration test session at the same time with the same user on the same machine (i.e. from the command line and the IDE), as they would share the same pooled repositories
+* tests using pooled repositories must not change the repository settings, only their contents and releases
+* functional tests (Java Gradle plugin and Go) use the same pools: in Java they use `instance(token, "functional")`, which appends the `functional` scope to the environment so they never share repositories with integration tests, while in Go they are scoped by their own test package (`functional`)
+* tests for the repository creation and deletion themselves still create and delete their own repositories
+
+The `deleteGitHubTestProjects` and `deleteGitLabTestProjects` tasks skip the pooled repositories (those whose name starts with `nyx-test-pool-`). To delete them, do it manually from the hosting service UI; they are created again on their next use.
+
 ##### More on SSH keypairs
 
 Tests are executed also using SSH keypairs to authenticate to Git services. Private keys are tested in two ways:
@@ -342,6 +365,12 @@ to:
 ###### Troubleshooting SSH authentication
 
 You can get the list of algorithms supported by the remote server running `nmap --script ssh2-enum-algos -sV -p <REMOTE_SERVER_PORT> <REMOTE_SERVER_ADDRESS>`.
+
+### Contributing AI agent skills
+
+[Agent Skills](https://agentskills.io/) for AI coding agents live in the `src/ai/skills` directory, one sub directory per skill, each with its own `SKILL.md`.
+
+All skills are built and tested by the same script, `src/ai/skills/build.gradle`, so new skills are picked up automatically with no change to the build scripts. Each skill can configure how it's built and tested with an optional `gradle.properties` file in its own directory (i.e. `src/ai/skills/nyx/gradle.properties`). The available properties and their defaults are listed in the build script.
 
 ### Build statistics
 

@@ -127,16 +127,13 @@ public class GitHubTest {
         @DisplayName("GitHub.instance().createRelease() and GitHub.instance().getRelease()")
         public void createRelease()
             throws Exception {
-            String randomID = RandomUtil.randomAlphabeticString(5);
             // the 'gitHubTestUserToken' system property is set by the build script, which in turn reads it from an environment variable
             GitHub gitHub = GitHub.instance(Map.<String,String>of(GitHub.AUTHENTICATION_TOKEN_OPTION_NAME, System.getProperty("gitHubTestUserToken")));
             GitHubUser user = gitHub.getAuthenticatedUser();
-            GitHubRepository gitHubRepository = gitHub.createGitRepository(randomID, "Test repository "+randomID, false, true);
+            // use a pooled repository instead of creating a new one to avoid the hosting service rate limits on content creation
+            GitHubRepository gitHubRepository = GitHubRepositoryPool.instance(System.getProperty("gitHubTestUserToken")).acquire(0);
 
             assertNull(gitHub.getReleaseByTag(user.getUserName(), gitHubRepository.getName(), "1.0.0-alpha.1"));
-
-            // if we clone too quickly next calls may fail
-            Thread.sleep(4000);
 
             // when a token for user and password authentication for plain Git operations against a GitHub repository,
             // the user is the token and the password is the empty string
@@ -187,9 +184,6 @@ public class GitHubTest {
                 assertTrue(asset.getType().equals("text/plain") || asset.getType().equals("application/octet-stream"));
                 //assertTrue(asset.getPath().startsWith("https://api.github.com/repos/")); // The path may start with https://api.github.com/repos/ or https://github.com/
             }
-
-            // now delete it
-            gitHub.deleteGitRepository(randomID);
         }
     }
 }

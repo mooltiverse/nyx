@@ -127,16 +127,13 @@ public class GitLabTest {
         @DisplayName("GitLab.instance().createRelease() and GitLab.instance().getRelease()")
         public void createRelease()
             throws Exception {
-            String randomID = RandomUtil.randomAlphabeticString(5);
             // the 'gitLabTestUserToken' system property is set by the build script, which in turn reads it from an environment variable
             GitLab gitLab = GitLab.instance(Map.<String,String>of(GitLab.AUTHENTICATION_TOKEN_OPTION_NAME, System.getProperty("gitLabTestUserToken")));
             GitLabUser user = gitLab.getAuthenticatedUser();
-            GitLabRepository gitLabRepository = gitLab.createGitRepository(randomID, "Test repository "+randomID, false, true);
+            // use a pooled repository instead of creating a new one to avoid the hosting service rate limits on content creation
+            GitLabRepository gitLabRepository = GitLabRepositoryPool.instance(System.getProperty("gitLabTestUserToken")).acquire(0);
 
             assertNull(gitLab.getReleaseByTag(user.getUserName(), gitLabRepository.getName(), "1.0.0-alpha.1"));
-
-            // if we clone too quickly next calls may fail
-            Thread.sleep(4000);
 
             // when a token for user and password authentication for plain Git operations against a GitLab repository,
             // the user is the "PRIVATE-TOKEN" string and the password is the token
@@ -187,9 +184,6 @@ public class GitLabTest {
                 //assertTrue(asset.getType().equals("text/plain") || asset.getType().equals("application/octet-stream")); // the content type is not available via this API
                 //assertTrue(asset.getPath().startsWith("https://api.github.com/repos/")); // as of now these URLS are like https://storage.googleapis.com...
             }
-
-            // now delete it
-            gitLab.deleteGitRepository(gitLabRepository.getID());
         }
     }
 }
