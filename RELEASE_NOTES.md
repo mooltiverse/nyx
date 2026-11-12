@@ -13,6 +13,7 @@ There are no actions to take for backward compatibility.
 This release:
 
 * releases the AI skill ([444](https://github.com/mooltiverse/nyx/issues/444))
+* fixes the bug that caused preset release types to never create Git tags in the Go implementation (CLI, Docker, GitHub Action) since 2.5.0 ([443](https://github.com/mooltiverse/nyx/issues/443))
 * upgrades Go to version 1.27.3
 * updates all Go dependencies to the latest versions
 * upgrades Java to version 25 (LTS)

@@ -107,12 +107,11 @@ These names are derived from the configuration path:
 
 | Preset | Conventions | Release types (in order) | Other |
 | ------ | ----------- | ------------------------ | ----- |
-| `simple` | `conventionalCommits` | `mainline` (`main`/`master`, clean workspace, `gitTag`, `gitPush` and `publish` enabled, but see the tagging note below) and `internal` (any branch, collapsed `internal` pre-release with a timestamp build identifier, no tag, no push) | Nothing else |
+| `simple` | `conventionalCommits` | `mainline` (`main`/`master`, clean workspace, `gitTag`, `gitPush` and `publish` enabled) and `internal` (any branch, collapsed `internal` pre-release with a timestamp build identifier, no tag, no push) | Nothing else |
 | `extended` | `conventionalCommits` and `gitmoji` enabled; `conventionalCommitsForMerge` defined but disabled | `mainline`, `integration` (`develop`, `development`, `integration`, `latest`), `maturity` (`alpha`, `beta`, ... `omega`), `feature` (`feat[-/]x`, `feature[-/]x`), `fix` (`fix[-/]x`), `hotfix` (`hotfix[-/]x`), `release` (`rel[-/]1.2`, `release[-/]1.x`), `maintenance` (`1.x`, `v2.3.x`), `internal` | Changelog at `CHANGELOG.md`, `github` and `gitlab` services reading `GITHUB_TOKEN` and `GITLAB_TOKEN`, version substitutions for common manifests (all disabled) |
 
 Neither preset lists any `publicationServices`, so nothing is published until you set that list.
 
-From Nyx 2.5.0 to 3.1.x, the preset release types used by the command line tool, the Docker image and the GitHub Action have an empty `gitTagNames` list, so `mark` creates **no tag** for them. The Gradle plugin is not affected. Redefine every release type that must tag in your configuration file. A user-defined item gets the default `gitTagNames: [ "{{version}}" ]`, as in the [verified example](#verified-example).
 
 ## Release types
 
@@ -149,7 +148,7 @@ Boolean-like attributes that accept templates (`gitTag`, `gitPush`, `gitCommit`,
 
 Pick only the release types the user's branches need. Each type must have a `filterTags` regex that accepts the tags it creates. Shapes that work:
 
-- **Mainline only** (trunk based): the `simple` preset with the `mainline` item redefined in full (needed for tagging up to 3.1.x, see above). Add `matchEnvironmentVariables: { CI: "^true$" }` to it if only CI may release.
+- **Mainline only** (trunk based): the `simple` preset. Add `matchEnvironmentVariables: { CI: "^true$" }` to it if only CI may release.
 - **Mainline plus pre-release branches**: add types with `collapseVersions: true` and a branch-derived `collapsedVersionQualifier`. Tag and push them when users consume the pre-releases, and set `publishPreRelease: "true"` if they are published.
 - **Release and maintenance branches**: use `versionRangeFromBranchName: true` so a `release-1.2` or `1.x` branch can never issue versions outside its line.
 - **Feature branches**: usually no tag or push, just a collapsed version for build artifacts.
