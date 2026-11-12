@@ -28,7 +28,7 @@ Commands chain: running `publish` runs everything before it. Gradle tasks are `n
 
 ## Safety rules
 
-- **Never run `mark` or `publish` (or `nyxMark`, `nyxPublish`, `release`) without the user's explicit confirmation.** They create tags, push to remotes and publish releases, which are hard to undo.
+- **Never run `mark` or `publish` (or `nyxMark`, `nyxPublish`, `release`) without the user's explicit confirmation.** They create tags, push to remotes and publish releases.
 - Before any of them, run the same command with `--dry-run` and show the user what would happen.
 - Prefer `infer` with a state file for everything else: it never changes the repository.
 - **Never put tokens or passwords on the command line or in committed configuration files.** Command lines leak through process lists, shell history, CI logs and agent transcripts. Read secrets from environment variables with a template, i.e. `AUTHENTICATION_TOKEN: "{{#environmentVariable}}GH_TOKEN{{/environmentVariable}}"`.
