@@ -82,7 +82,7 @@ gradlePlugin {
       displayName = 'Nyx Gradle plugin'
       description = project.description
       implementationClass = 'com.mooltiverse.oss.nyx.gradle.NyxPlugin'
-      tags.set([ 'auto-versioning', 'changelog', 'continuous delivery', 'git', 'github', 'gitlab', 'release', 'semantic', 'semantic-release', 'semantic-version', 'semver', 'version', 'versioning' ])
+      tags.set([ 'auto-versioning', 'changelog', 'continuous-delivery', 'git', 'github', 'gitlab', 'release', 'semantic', 'semantic-release', 'semantic-version', 'semver', 'version', 'versioning' ])
     }
   }
 }
