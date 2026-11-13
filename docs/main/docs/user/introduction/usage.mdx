@@ -723,6 +723,15 @@ The folders where agents look for skills are:
 
 Use the project folder to share the skill with everyone working on a repository (commit it along with the code), or the user folder to have it available in all your projects. Check your agent's documentation for other options, as folders may change over time.
 
+You can install the skill by different means and tools, depending on your agent and its configuration. If using `gh skill install` from the [GitHub CLI](https://cli.github.com/) examples are:
+
+```bash
+# Install for Codex, project scoped
+gh skill install mooltiverse/nyx src/ai/skills/nyx --agent codex --scope project
+# Install for Claude, project scoped
+gh skill install mooltiverse/nyx src/ai/skills/nyx --agent claude-code --scope project
+```
+
 ### Use the skill
 
 Agents load the skill automatically when the task relates to Nyx, for example when the repository contains a `.nyx.yaml` file or you mention semantic releases. Some agents also let you invoke the skill explicitly, i.e. `/nyx` in Claude Code.

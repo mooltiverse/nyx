@@ -119,9 +119,16 @@ Available for all platforms in the [latest release](https://github.com/mooltiver
 
 ### Agent skill
 
-* the [`src/ai/skills/nyx/`](src/ai/skills/nyx/) skill directory, including
-  * [`SKILL.md`](src/ai/skills/nyx/SKILL.md) (the actual skill file)
-  * the [`src/ai/skills/nyx/references`](src/ai/skills/nyx/references/) directory, containing additional references
+* The Nyx skill is available in the [`src/ai/skills/nyx/`](src/ai/skills/nyx/) skill directory
+
+Examples installing the skill using `gh skill install`:
+
+```bash
+# Install for Codex, project scoped
+gh skill install mooltiverse/nyx src/ai/skills/nyx --agent codex --scope project
+# Install for Claude, project scoped
+gh skill install mooltiverse/nyx src/ai/skills/nyx --agent claude-code --scope project
+```
 
 ## Documentation
 

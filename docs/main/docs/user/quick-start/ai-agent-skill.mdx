@@ -28,3 +28,14 @@ Due to the conversational nature of AI agents, the skill is best used in a chat 
 > ```
 > 
 > Nyx says the version is still `1.0.0` and there is no new release. Isn't the `feat` commit supposed to bump the minor version? Explain what happens and what we should change in our workflow.
+
+## Installation
+
+You can install the skill by different means and tools, depending on your agent and its configuration. If using `gh skill install` from the [GitHub CLI](https://cli.github.com/) examples are:
+
+```bash
+# Install for Codex, project scoped
+gh skill install mooltiverse/nyx src/ai/skills/nyx --agent codex --scope project
+# Install for Claude, project scoped
+gh skill install mooltiverse/nyx src/ai/skills/nyx --agent claude-code --scope project
+```
