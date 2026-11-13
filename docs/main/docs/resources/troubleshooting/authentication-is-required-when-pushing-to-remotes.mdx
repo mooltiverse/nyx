@@ -1,0 +1,69 @@
+---
+sidebar_position: 3
+tags:
+  - troubleshooting
+  - user
+  - support
+  - configuration
+  - git
+  - credentials
+  - ci-cd
+  - github actions
+---
+
+# Authentication is required when pushing to remotes
+
+When Nyx pushes changes to a remote repository (i.e. when running the [mark](../../user/introduction/how-nyx-works.mdx#mark) command with [`gitPush`](../../user/configuration-reference/release-types.mdx#git-push) enabled) it may fail with errors like these:
+
+```text
+An error occurred when trying to push
+...
+https://github.com/<owner>/<repository>: Authentication is required but no CredentialsProvider has been registered
+```
+
+or, when using the command line version:
+
+```text
+authentication required
+```
+
+## Cause
+
+Nyx only uses the credentials configured for the [Git remotes](../../user/configuration-reference/git.mdx#remotes) when pushing. When no credentials are configured for the remote it attempts an anonymous push and relies on whatever the local Git configuration provides.
+
+There are two common reasons why that isn't enough:
+
+* **the token configured for a [service](../../user/configuration-reference/services.mdx) is not used to push**: the `AUTHENTICATION_TOKEN` option of the [GitHub](../../user/configuration-reference/services.mdx#github) or [GitLab](../../user/configuration-reference/services.mdx#gitlab) services is only used to call the service APIs (i.e. to publish releases), never for Git operations like pushing
+* **the credentials left by the CI/CD platform are not visible to Nyx**: GitHub's [`actions/checkout`](https://github.com/actions/checkout) persists the token used to check out the repository so that later Git commands can reuse it. Up to version 4 the token was stored as an `http.<url>.extraheader` entry in the repository's `.git/config` file, where Nyx could find it. Starting from version 6 it is stored in a separate file that's included in the Git configuration with conditional `includeIf.gitdir:` entries. The Git libraries used by Nyx ([JGit](https://www.eclipse.org/jgit/) and [go-git](https://github.com/go-git/go-git)) don't evaluate those conditional includes, so they don't see the token and the push runs without credentials. Workflows that used to work may start failing just by upgrading `actions/checkout`, even if nothing changed in Nyx
+
+## Solution
+
+Configure the credentials for the remote explicitly in the [Git remotes](../../user/configuration-reference/git.mdx#remotes) configuration, reading them from environment variables by means of [templates](../../user/configuration-reference/templates.mdx#environmentvariable). On GitHub the token is passed as both the [`user`](../../user/configuration-reference/git.mdx#user) and the [`password`](../../user/configuration-reference/git.mdx#password) (see [using tokens](../../user/configuration-reference/git.mdx#using-tokens) for other services).
+
+For example, with a YAML configuration file:
+
+```yaml
+git:
+  remotes:
+    origin:
+      authenticationMethod: "USER_PASSWORD"
+      user: "{{#environmentVariable}}GH_TOKEN{{/environmentVariable}}"
+      password: "{{#environmentVariable}}GH_TOKEN{{/environmentVariable}}"
+```
+
+and make sure the variable is available to the step running Nyx:
+
+```yaml
+    - name: Release
+      run: ./gradlew nyxRelease
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+```
+
+You can reuse the same environment variable you already pass to the GitHub service, but it has to be configured in both places.
+
+:::info
+Pinning `actions/checkout` to version 4 also brings back the previous behavior, but configuring the credentials explicitly is more robust as it doesn't depend on how the CI/CD platform stores them.
+:::
+
+The token needs permission to write to the repository contents, i.e. on GitHub Actions the job needs the `contents: write` [permission](https://docs.github.com/en/actions/security-guides/automatic-token-authentication#permissions-for-the-github_token).

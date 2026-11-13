@@ -153,8 +153,14 @@ changelog:
   substitutions:
     "(?m)#([0-9]+)(?s)": "[#%s](https://github.com/mooltiverse/nyx/issues/%s)"
     "(?m)\\[([a-z0-9]+)\\](?s)": "[[%s](https://github.com/mooltiverse/nyx/commit/%s)]"
-releaseTypes: 
-  enabled: 
+git:
+  remotes:
+    origin:
+      authenticationMethod: "USER_PASSWORD"
+      user: "{{#environmentVariable}}GH_TOKEN{{/environmentVariable}}"
+      password: "{{#environmentVariable}}GH_TOKEN{{/environmentVariable}}"
+releaseTypes:
+  enabled:
     - mainline
     - maturity
     - integration

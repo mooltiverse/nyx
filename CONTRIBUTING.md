@@ -175,17 +175,15 @@ CI/CD is configured using [GitHub Actions](https://github.com/mooltiverse/nyx/ac
 Sometimes the build brakes for reasons that are not related to code. Most frequent reasons for failure are:
 
 * tests hit [GitHub rate limits](https://github.com/mooltiverse/nyx/issues/206) because they are very request intensive and when this happens all requests performed during tests fail until the rate limit is reset by GitHub
-* the [Nexus Server](https://oss.sonatype.org/) used to publish Java artifacts sometimes breaks connections
 
 When tests fail because of the above reasons they can be easily relaunched. To do so, just click on the failed job in the [GitHub Actions](https://github.com/mooltiverse/nyx/actions) page and re-run.
 
 When the *Publish* job fails there are a few cleaning steps to take before relaunching because the tasks performed in that job are not repeatable. Before re-running the job, using administrative credentials, you need to:
 
-1. connect to the [Nexus repository](https://oss.sonatype.org/) and delete all stale Staging Repositories, if any
-2. delete the [GitHub Release](https://github.com/mooltiverse/nyx/releases) that was already published by the job, if any
-3. delete the [GitHub tag](https://github.com/mooltiverse/nyx/tags) that was already published by the job, if any
-4. delete the [GitHub packages](https://github.com/orgs/mooltiverse/packages?repo_name=nyx) that were already published by the job, if any; for each package click on *Package Settings*, in the bottom right, then *Manage Versions*, and delete the specific version
-5. delete the [Gradle plugin](https://plugins.gradle.org/plugin/com.mooltiverse.oss.nyx) that was already published by the job, if any
+1. delete the [GitHub Release](https://github.com/mooltiverse/nyx/releases) that was already published by the job, if any
+2. delete the [GitHub tag](https://github.com/mooltiverse/nyx/tags) that was already published by the job, if any
+3. delete the [GitHub packages](https://github.com/orgs/mooltiverse/packages?repo_name=nyx) that were already published by the job, if any; for each package click on *Package Settings*, in the bottom right, then *Manage Versions*, and delete the specific version
+4. delete the [Gradle plugin](https://plugins.gradle.org/plugin/com.mooltiverse.oss.nyx) that was already published by the job, if any
 
 After the above cleaning has been done the *Release* job can be re-launched from the [GitHub Actions](https://github.com/mooltiverse/nyx/actions) page.
 

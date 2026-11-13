@@ -42,6 +42,7 @@ jobs:
           stateFile: build/.nyx-state.json
 ```
 
+- Pushing tags and commits needs credentials under `git.remotes` in the configuration file (i.e. `origin` with `authenticationMethod: "USER_PASSWORD"` and `GH_TOKEN` as both `user` and `password`). The `services.github` token is only used for the GitHub API, and the token persisted by `actions/checkout` v6 is not visible to Nyx. See the push authentication row in [troubleshooting.md](troubleshooting.md).
 - Inputs: `command`, `bump`, `changelogPath`, `changelogTemplate`, `commitMessageConventionsEnabled`, `configurationFile`, `directory`, `dryRun`, `initialVersion`, `preset`, `releaseLenient`, `releasePrefix`, `releaseTypesEnabled`, `releaseTypesPublicationServices`, `releaseTypesRemoteRepositories`, `resume`, `scheme`, `sharedConfigurationFile`, `stateFile`, `summaryFile`, `verbosity`, `version`. Options with dynamic names (services, release type items) are only available through configuration files or `NYX_*` environment variables.
 - Outputs: `branch`, `bump`, `coreVersion`, `latestVersion`, `newRelease`, `newVersion`, `scheme`, `timestamp`, `previousVersion`, `primeVersion`, `version`.
 - Across jobs, carry the state file with `actions/cache` or artifacts, keyed by `${{ github.run_id }}`.

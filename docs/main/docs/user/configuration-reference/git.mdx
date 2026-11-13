@@ -37,6 +37,10 @@ In case you notice some errors or unexpected behavior please make sure it's not 
 
 ### Credentials
 
+:::info
+Nyx pushes to a remote using only the credentials configured here. Tokens configured for [services](services.mdx) are never used for Git operations, and credentials persisted by CI/CD platforms (i.e. by `actions/checkout` version 6 on GitHub Actions) may not be visible to Nyx. If pushing fails with authentication errors see [Authentication is required when pushing to remotes](../../resources/troubleshooting/authentication-is-required-when-pushing-to-remotes.mdx).
+:::
+
 #### Using tokens
 
 Many Git hosting services encourage to use tokens (Personal Access Tokens, OAuth Tokens etc) to log in as they are more secure and they allow tokens to be issued and revoked independently from the user accounts. However Git does not support (so far) authentication using a single token and it still needs credentials to be passed as a user name and password pair. In order to cope with this you can map the token to user names and passwords by following known rules for remote services. Here is the list of known services and the mapping:
