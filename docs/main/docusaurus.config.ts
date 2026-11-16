@@ -12,6 +12,26 @@ export default {
   organizationName: 'mooltiverse',
   projectName: 'nyx',
 
+  // The directories whose contents are copied as they are to the root of the
+  // site. These assets can be imported by the build scripts and published
+  // under their own names, without the content hash Docusaurus adds to the
+  // files linked from Markdown, so that others can reference them by name.
+  // See:
+  // - https://docusaurus.io/docs/static-assets
+  //
+  // Please note that these paths require to start with `pathname:/` in order to
+  // be recognized as static resource paths by Docusaurus.
+  // This is done by the 'staticAssets' remark plugin, which must be registered
+  // among the 'beforeDefaultRemarkPlugins' to run before Docusaurus processes
+  // images and links.
+  // Thanks to the plugin, we can author the contents of local Markdown files
+  // regardless of how they will be published (so we can us local relative paths)
+  // and let the plugin take care of translating the paths.
+  //
+  // See:
+  // - src/remark/staticAssets.ts
+  staticDirectories: ['static'],
+
   // These attributes define the behavior when encountering broken links.
   // Allowed values are: 'ignore' | 'log' | 'warn' | 'throw'.
   // 'throw' means 'raise an error', which is the safest to avoid publishing
